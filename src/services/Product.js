@@ -25,7 +25,22 @@ const ListProducts = async () => {
   }
 };
 
+// oneupdate
+const ListOneProducts = async (id) => {
+  try {
+    const data = await Products.findOne({ _id: id }).populate(
+      "category",
+      "name"
+    );
+    return data;
+  } catch (error) {
+    console.log("list products error:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   AddProducts,
   ListProducts,
+  ListOneProducts,
 };

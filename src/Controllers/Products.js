@@ -1,5 +1,9 @@
 const { uploadFileToCloudinary } = require("./../services/Cloudinary");
-const { AddProducts, ListProducts } = require("./../services/Product");
+const {
+  AddProducts,
+  ListProducts,
+  ListOneProducts,
+} = require("./../services/Product");
 
 const AddProductsAPI = async (req, res) => {
   const {
@@ -81,7 +85,30 @@ const ListProductsAPI = async (req, res) => {
       .json({ success: false, message: "Error adding product" });
   }
 };
+
+const ListOneProductAPI = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    console.log(id);
+
+    const data = await ListOneProducts(id);
+
+    console.log(data);
+
+    return res.status(201).json({
+      EC: 0,
+      data: data,
+    });
+  } catch (error) {
+    console.error("Error list product:", error.message);
+    return res
+      .status(500)
+      .json({ success: false, message: "Error adding product" });
+  }
+};
 module.exports = {
   AddProductsAPI,
   ListProductsAPI,
+  ListOneProductAPI,
 };

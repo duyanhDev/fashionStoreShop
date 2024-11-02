@@ -1,4 +1,9 @@
-const { AddCategory } = require("./../services/Category");
+const {
+  AddCategory,
+  ListCategory,
+  ListOneCategory,
+  UpdateOneCatogry,
+} = require("./../services/Category");
 
 const CreateCategoryAPI = async (req, res) => {
   try {
@@ -20,4 +25,56 @@ const CreateCategoryAPI = async (req, res) => {
   }
 };
 
-module.exports = { CreateCategoryAPI };
+const ListCategoryAPI = async (req, res) => {
+  try {
+    const data = await ListCategory();
+
+    return res.status(201).json({
+      EC: 0,
+      data: data,
+    });
+  } catch (error) {
+    console.error("Đã xảy ra lỗi khi tạo danh mục:", error);
+    res.status(500).json({ message: "Đã xảy ra lỗi", error });
+  }
+};
+
+const ListCategoryOneAPI = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const data = await ListOneCategory(id);
+
+    return res.status(200).json({
+      EC: 0,
+      data: data,
+    });
+  } catch (error) {
+    console.error("Đã xảy ra lỗi khi tạo danh mục:", error);
+    res.status(500).json({ message: "Đã xảy ra lỗi", error });
+  }
+};
+
+const UpdateOneCatogryAPI = async (req, res) => {
+  try {
+    const { name, description } = req.body;
+    const { id } = req.params;
+
+    const data = await UpdateOneCatogry(id, name, description);
+
+    return res.status(201).json({
+      EC: 0,
+      data: data,
+    });
+  } catch (error) {
+    console.error("Đã xảy ra lỗi khi tạo danh mục:", error);
+    res.status(500).json({ message: "Đã xảy ra lỗi", error });
+  }
+};
+
+module.exports = {
+  CreateCategoryAPI,
+  ListCategoryAPI,
+  ListCategoryOneAPI,
+  UpdateOneCatogryAPI,
+};
