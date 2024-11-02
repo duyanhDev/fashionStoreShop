@@ -10,12 +10,10 @@ const {
   ListCategoryAPI,
   ListCategoryOneAPI,
   UpdateOneCatogryAPI,
+  DeleteOneCategoryAPI,
 } = require("../Controllers/Category");
 
-RouterAPI.get("/users", (req, res) => {
-  return res.send("Create users successfully");
-}),
-  RouterAPI.get("/products", ListProductsAPI);
+RouterAPI.get("/products", ListProductsAPI);
 
 RouterAPI.post("/products", AddProductsAPI);
 
@@ -30,5 +28,7 @@ RouterAPI.get("/category", ListCategoryAPI);
 RouterAPI.get("/category/:id", ListCategoryOneAPI);
 
 RouterAPI.put("/category/:id", UpdateOneCatogryAPI);
+
+RouterAPI.delete("/category/:id", DeleteOneCategoryAPI);
 
 module.exports = RouterAPI;

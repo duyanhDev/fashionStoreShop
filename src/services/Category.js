@@ -44,9 +44,19 @@ const UpdateOneCatogry = async (id, name, description) => {
     console.log(`Đã xảy ra lỗi:`, error);
   }
 };
+
+const DeleteOneCategory = async (id) => {
+  try {
+    const data = await Category.deleteOne({ _id: id });
+    return data;
+  } catch (error) {
+    console.log(`Đã xảy ra lỗi:`, error);
+  }
+};
 module.exports = {
   AddCategory,
   ListCategory,
   ListOneCategory,
   UpdateOneCatogry,
+  DeleteOneCategory,
 };

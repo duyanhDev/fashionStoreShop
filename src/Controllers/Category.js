@@ -3,6 +3,7 @@ const {
   ListCategory,
   ListOneCategory,
   UpdateOneCatogry,
+  DeleteOneCategory,
 } = require("./../services/Category");
 
 const CreateCategoryAPI = async (req, res) => {
@@ -72,9 +73,25 @@ const UpdateOneCatogryAPI = async (req, res) => {
   }
 };
 
+const DeleteOneCategoryAPI = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const data = await DeleteOneCategory(id);
+
+    return res.status(200).json({
+      EC: 0,
+      data: data,
+    });
+  } catch (error) {
+    console.error("Đã xảy ra lỗi khi tạo danh mục:", error);
+    res.status(500).json({ message: "Đã xảy ra lỗi", error });
+  }
+};
+
 module.exports = {
   CreateCategoryAPI,
   ListCategoryAPI,
   ListCategoryOneAPI,
   UpdateOneCatogryAPI,
+  DeleteOneCategoryAPI,
 };
