@@ -32,4 +32,8 @@ const creatProductAPI = async (
   return axios.post("api/v1/products", productData);
 };
 
-export { creatProductAPI, getListProductsAPI };
+const ListOneProductAPI = async (id) => {
+  return await axios.get(`http://localhost:9000/api/v1/products/${id}`);
+};
+
+export { creatProductAPI, getListProductsAPI, ListOneProductAPI };

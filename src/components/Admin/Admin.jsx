@@ -34,15 +34,15 @@ const Admin = () => {
         <div className="nav_left w-1/6 text-center ">
           <ul className="nav_content_ul text-center m-auto ">
             <li>
-              <Link to="products" className="nav-link">
+              <Link to="" className="nav-link">
                 <FiHome />
                 Dashobar
               </Link>
             </li>
             <li>
-              <Link to="/inventory" className="nav-link">
+              <Link to="category" className="nav-link">
                 <FaOpencart />
-                Inventory
+                Category
               </Link>
             </li>
             <li>

@@ -1,7 +1,9 @@
 // routes.js
 import Admin from "../components/Admin/Admin";
+import Category from "../components/Category/Category";
 import Home from "../components/Home/Home";
 import Products from "../components/Products/Product";
+import UpLoad from "../components/UpLoadProducts/UpLoad";
 
 export const RouterLayout = [
   {
@@ -17,7 +19,8 @@ export const RouterAdmin = [
     element: <Admin />,
     children: [
       { index: true, element: <Products /> },
-      { path: "products", element: <Products /> },
+      { path: "category", element: <Category /> },
+      { path: "uploadproducts/:id", element: <UpLoad /> },
     ],
   },
 ];

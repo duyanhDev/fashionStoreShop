@@ -2,7 +2,7 @@ import { Table, Button, Tag, Image } from "antd";
 import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { getListProductsAPI } from "../../service/ApiProduct";
 import { useEffect, useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 const Products = () => {
   const [dataProducts, setDataProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -29,6 +29,11 @@ const Products = () => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
   };
 
+  const navigate = useNavigate();
+  const handleNavigate = (id) => {
+    navigate(`uploadproducts/${id}`);
+  };
+
   useEffect(() => {
     // Fetch product data from the API
     const fetchData = async () => {
@@ -53,12 +58,56 @@ const Products = () => {
               ))}
             </div>
           ),
-          color: product.color,
-          image: <Image src={product.images} alt={product.name} width={50} />,
+          color: (
+            <div className="flex gap-3 items-center">
+              {product.color.map((color) => {
+                if (color === "đen") {
+                  return (
+                    <div
+                      key={color}
+                      className="w-5 h-5 bg-black rounded-full"
+                    ></div>
+                  );
+                } else if (color === "vàng") {
+                  return (
+                    <div
+                      key={color}
+                      className="w-5 h-5 bg-yellow-500 rounded-full "
+                    ></div>
+                  );
+                } else if (color === "trắng") {
+                  return (
+                    <div
+                      key={color}
+                      className="w-5 h-5 bg-white border border-black-300 rounded-full "
+                    ></div>
+                  );
+                }
+
+                return null;
+              })}
+            </div>
+          ),
+          image: product.images.map((image) => (
+            <Image
+              src={image}
+              alt={product.name}
+              width={50}
+              height={50}
+              style={{
+                objectFit: "cover",
+                borderRadius: "5px",
+              }}
+            />
+          )),
+
           Features: (
             <div className="flex items-center gap-5">
               <Button icon={<EyeOutlined />} />
-              <Button icon={<EditOutlined />} />
+              <Button
+                icon={<EditOutlined />}
+                onClick={() => handleNavigate(product._id)}
+              />
               <Button icon={<DeleteOutlined />} />
             </div>
           ),
