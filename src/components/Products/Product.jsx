@@ -1,4 +1,4 @@
-import { Table, Button, Tag, Image } from "antd";
+import { Table, Button, Tag, Image, Flex } from "antd";
 import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { getListProductsAPI } from "../../service/ApiProduct";
 import { useEffect, useState } from "react";
@@ -25,7 +25,6 @@ const Products = () => {
     return colors[Math.floor(Math.random() * colors.length)];
   };
   const formatPrice = (price) => {
-    // Chuyển giá trị thành chuỗi và thêm dấu phân cách cho hàng ngàn
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
   };
 
@@ -35,7 +34,6 @@ const Products = () => {
   };
 
   useEffect(() => {
-    // Fetch product data from the API
     const fetchData = async () => {
       try {
         const response = await getListProductsAPI();
@@ -88,18 +86,29 @@ const Products = () => {
               })}
             </div>
           ),
-          image: product.images.map((image) => (
-            <Image
-              src={image}
-              alt={product.name}
-              width={50}
-              height={50}
-              style={{
-                objectFit: "cover",
-                borderRadius: "5px",
-              }}
-            />
-          )),
+          image: (
+            <div className="flex">
+              {product.images
+                .filter((image) => image !== null) // Filter out null values
+                .map((image, index) => (
+                  <Image
+                    key={index} // Use index as key (consider using a unique ID if available)
+                    src={image}
+                    alt={`${product.name} image ${index + 1}`} // More descriptive alt text
+                    width={50}
+                    height={50}
+                    style={{
+                      objectFit: "cover",
+                      borderRadius: "5px",
+                    }}
+                    onError={(e) => {
+                      e.target.onerror = null; // Prevent infinite loop
+                      e.target.src = "path/to/placeholder/image.jpg"; // Use a placeholder image on error
+                    }}
+                  />
+                ))}
+            </div>
+          ),
 
           Features: (
             <div className="flex items-center gap-5">
@@ -140,18 +149,31 @@ const Products = () => {
   );
 
   return (
-    <div className="w-full">
-      <Table
-        dataSource={paginatedData}
-        columns={columns}
-        pagination={{
-          current: currentPage,
-          pageSize: pageSize,
-          total: dataProducts.length,
-          onChange: (page) => setCurrentPage(page), // Cập nhật trang hiện tại
-        }}
-      />
-    </div>
+    <>
+      <div className="w-full">
+        <Flex
+          vertical
+          gap="small"
+          style={{
+            width: "100%",
+          }}
+        >
+          <Button type="primary" block onClick={() => navigate("addproduct")}>
+            Add Product
+          </Button>
+        </Flex>
+        <Table
+          dataSource={paginatedData}
+          columns={columns}
+          pagination={{
+            current: currentPage,
+            pageSize: pageSize,
+            total: dataProducts.length,
+            onChange: (page) => setCurrentPage(page), // Cập nhật trang hiện tại
+          }}
+        />
+      </div>
+    </>
   );
 };
 

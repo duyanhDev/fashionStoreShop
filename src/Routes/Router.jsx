@@ -1,4 +1,5 @@
 // routes.js
+import Create from "../components/AddProducts/Create";
 import Admin from "../components/Admin/Admin";
 import Category from "../components/Category/Category";
 import Home from "../components/Home/Home";
@@ -19,6 +20,7 @@ export const RouterAdmin = [
     element: <Admin />,
     children: [
       { index: true, element: <Products /> },
+      { path: "addproduct", element: <Create /> },
       { path: "category", element: <Category /> },
       { path: "uploadproducts/:id", element: <UpLoad /> },
     ],

@@ -12,11 +12,10 @@ import ImgCrop from "antd-img-crop";
 import { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css"; // Import styles for Quill
-import { useParams } from "react-router-dom";
-import { ListOneProductAPI } from "../../service/ApiProduct";
-import { ListCategoryAPI } from "../../service/ApiCategory";
 
-const UpLoad = () => {
+import { ListCategoryAPI } from "../../service/ApiCategory";
+import { createProductAPI } from "../../service/ApiProduct";
+const Create = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState([]);
@@ -25,29 +24,38 @@ const UpLoad = () => {
   const [stock, setStock] = useState("");
   const [size, setSize] = useState([]);
   const [color, setColor] = useState([]);
-  const param = useParams();
+  const [image, setImageFiles] = useState([]);
+  const [brand, setBrand] = useState("");
+  const [categoryId, setCategoryId] = useState();
 
   // xử lí ảnh
-  const [fileList, setFileList] = useState([{}]);
+  const [fileList, setFileList] = useState([]);
 
   const onChangeImg = ({ fileList: newFileList }) => {
     setFileList(newFileList);
-  };
-  const onPreview = async (file) => {
-    let src = file.url;
-    if (!src) {
-      src = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file.originFileObj);
-        reader.onload = () => resolve(reader.result);
-      });
-    }
-    const image = new Image();
-    image.src = src;
-    const imgWindow = window.open(src);
-    imgWindow?.document.write(image.outerHTML);
+
+    // Lưu trữ các file ảnh thực tế, không phải chỉ tên
+    const files = newFileList.map((file) => file.originFileObj);
+    setImageFiles(files);
   };
 
+  const onPreview = async (file) => {
+    // You can handle image preview here if needed
+    // Example: display modal with the selected image
+    const src = file.url || (await getBase64(file.originFileObj));
+    const imgWindow = window.open(src);
+    imgWindow.document.write(`<img src="${src}" />`);
+  };
+
+  // Function to convert file to base64 for preview
+  const getBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
   const handleNameChange = (e) => {
     setName(e.target.value);
   };
@@ -56,53 +64,28 @@ const UpLoad = () => {
     setDescription(e.target.value);
   };
 
-  // const categories = ["Áo", "Quần"];
-
   const handleChange = (value) => {
-    setCategory(value);
-  };
-  const handleChange1 = (value) => {
-    console.log(`selected ${value}`);
+    setCategoryId(value);
   };
 
-  useEffect(() => {
-    const CallApiListProduct = async () => {
-      try {
-        const res = await ListOneProductAPI(param.id);
+  const handleChangeSize = (value) => {
+    setSize(value);
+  };
 
-        if (res && res.data.EC === 0) {
-          setName(res.data.data.name || "");
-          setDescription(res.data.data.description || "");
-          setCategory([res.data.data.category.name] || []);
-          setPrice(res.data.data.price || "");
-          setStock(res.data.data.stock || "");
-          setSize(res.data.data.size || []);
-          setColor(res.data.data.color || []);
-          setFileList(
-            res.data.data.images.map((image) => ({
-              url: image,
-              name: image || "Image",
-            })) || []
-          );
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    CallApiListProduct();
-  }, [param.id]);
+  const handleChangeClor = (value) => {
+    setColor(value);
+  };
 
   useEffect(() => {
     const FetchCategory = async () => {
       try {
         const res = await ListCategoryAPI();
-        console.log(res);
-
         if (res && res.data && res.data.EC === 0) {
-          const dataCategory = res.data.data.map((category) => {
-            return category.name;
-          });
-          setOptionCategory(dataCategory);
+          const dataCategory = res.data.data.map((category) => ({
+            label: category.name,
+            value: category._id,
+          }));
+          setOptionCategory(dataCategory); // Set the options with IDs and names
         }
       } catch (error) {
         console.log(error);
@@ -116,19 +99,60 @@ const UpLoad = () => {
     label: category,
     value: category,
   }));
-  const options1 = size.map((size) => ({
-    label: size,
-    value: size,
+
+  const optionsSize = [
+    { label: "S", value: "S" },
+    { label: "M", value: "M" },
+    { label: "L", value: "L" },
+    { label: "XL", value: "XL" },
+    { label: "XXL", value: "XXL" },
+  ];
+
+  const colorArr = ["đen", "trắng", "vàng", "đỏ", "be"];
+  const optionsColor = colorArr.map((color) => ({
+    label: color,
+    value: color,
   }));
+
   const onChange = (value) => {
-    console.log("changed", value);
+    setPrice(value);
   };
+
+  const onChangeStock = (value) => {
+    setStock(value);
+  };
+
+  const handleCreate = async () => {
+    try {
+      const res = await createProductAPI(
+        name,
+        description,
+        categoryId,
+        brand,
+        price,
+        stock,
+        size,
+        color,
+        image
+      );
+      console.log(image);
+      console.log(res);
+    } catch (error) {}
+  };
+  console.log(size, color);
 
   return (
     <div className="w-full ml-6 flex ">
       <div className="w-3/5">
         <Typography.Title level={5}>Name</Typography.Title>
         <Input maxLength={200} value={name} onChange={handleNameChange} />
+
+        <Typography.Title level={5}>Brand</Typography.Title>
+        <Input
+          maxLength={200}
+          value={brand}
+          onChange={(e) => setBrand(e.target.value)}
+        />
         <Typography.Title level={5} className="mt-4">
           Description
         </Typography.Title>
@@ -149,7 +173,9 @@ const UpLoad = () => {
       <div className="w-2/5 ">
         <Flex gap="small" wrap className="mt-8 ml-5 ">
           <Button>Cancel</Button>
-          <Button type="primary">Update</Button>
+          <Button type="primary" onClick={handleCreate}>
+            Create
+          </Button>
         </Flex>
 
         <div className="ml-5 mt-2">
@@ -167,9 +193,9 @@ const UpLoad = () => {
                 width: "100%",
               }}
               placeholder="Please select"
-              value={category}
+              value={categoryId} // This should hold the category ID(s)
               onChange={handleChange}
-              options={options}
+              options={opitonCategory} // Use options with IDs and names
             />
           </Space>
         </div>
@@ -195,7 +221,7 @@ const UpLoad = () => {
             min={0}
             max={10000}
             value={stock}
-            onChange={onChange}
+            onChange={onChangeStock}
           />
         </div>
         <div className="ml-5 mt-2">
@@ -214,8 +240,8 @@ const UpLoad = () => {
               }}
               placeholder="Please select"
               value={size}
-              onChange={handleChange1}
-              options={options1}
+              onChange={handleChangeSize}
+              options={optionsSize}
             />
           </Space>
         </div>
@@ -236,8 +262,8 @@ const UpLoad = () => {
               }}
               placeholder="Please select"
               value={color}
-              onChange={handleChange1}
-              options={options1}
+              onChange={handleChangeClor}
+              options={optionsColor}
             />
           </Space>
         </div>
@@ -245,11 +271,12 @@ const UpLoad = () => {
         <div className="ml-5 mt-2">
           <ImgCrop rotationSlider>
             <Upload
-              action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
               listType="picture-card"
               fileList={fileList}
               onChange={onChangeImg}
               onPreview={onPreview}
+              multiple
+              beforeUpload={() => false} // Prevent automatic upload
             >
               {fileList.length < 5 && "+ Upload"}
             </Upload>
@@ -260,4 +287,4 @@ const UpLoad = () => {
   );
 };
 
-export default UpLoad;
+export default Create;

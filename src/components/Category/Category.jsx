@@ -5,6 +5,7 @@ import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import AddCategory from "./AddCategory/AddCategory";
 import View from "./ViewCategory/View";
 import Update from "./UpdateCategory/Update";
+import Delete from "./DeleteCategory/Delete";
 
 const Category = () => {
   const [dataCategory, setDataCategory] = useState([]);
@@ -12,6 +13,7 @@ const Category = () => {
   const [open, setOpen] = useState(false);
   const [isModel, setIsModel] = useState(false);
   const [hidden, setHidden] = useState(false);
+  const [isModelDel, setIsModelDel] = useState(false);
   const [isCategory, setIdCategory] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -58,7 +60,10 @@ const Category = () => {
               icon={<EditOutlined />}
               onClick={() => handleShowUpdate(record._id)}
             />
-            <Button icon={<DeleteOutlined />} />
+            <Button
+              icon={<DeleteOutlined />}
+              onClick={() => handleDelete(record._id, record.name)}
+            />
           </div>
         </Space>
       ),
@@ -85,6 +90,12 @@ const Category = () => {
     setOpen(false);
     setName("");
     setDescription("");
+  };
+
+  const handleDelete = (id, name) => {
+    setIdCategory(id);
+    setName(name);
+    setIsModelDel(true);
   };
   return (
     <div className="w-full">
@@ -129,6 +140,14 @@ const Category = () => {
         isCategory={isCategory}
         setIsModel={setHidden}
         isModalOpen={hidden}
+        FetchApiCategory={FetchApiCategory}
+      />
+
+      <Delete
+        isCategory={isCategory}
+        name={name}
+        setIsModel={setIsModelDel}
+        isModalOpen={isModelDel}
         FetchApiCategory={FetchApiCategory}
       />
     </div>

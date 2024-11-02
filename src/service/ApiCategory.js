@@ -21,9 +21,14 @@ const UpdateOneCatogryAPI = async (id, name, description) => {
     description,
   });
 };
+
+const DeleteOneCategoryAPI = async (id) => {
+  return await axios.delete(`http://localhost:9000/api/v1/category/${id}`);
+};
 export {
   ListCategoryAPI,
   AddCategoryAPI,
   ListOneCategoryAPI,
   UpdateOneCatogryAPI,
+  DeleteOneCategoryAPI,
 };
