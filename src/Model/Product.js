@@ -8,7 +8,6 @@ const productSchema = new mongoose.Schema({
   description: {
     type: String,
   },
-  // Thay đổi category từ String sang reference tới model Category
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
@@ -21,6 +20,13 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  discount: {
+    type: Number,
+    default: 0,
+  },
+  discountedPrice: {
+    type: Number,
+  },
   stock: {
     type: Number,
     default: 0,
@@ -29,17 +35,17 @@ const productSchema = new mongoose.Schema({
     {
       type: String,
     },
-  ], // Các kích cỡ sản phẩm (S, M, L, XL, ...)
+  ],
   color: [
     {
       type: String,
     },
-  ], // Các màu sắc
+  ],
   images: [
     {
       type: String,
     },
-  ], // URLs của ảnh sản phẩm
+  ],
   ratings: [
     {
       userId: {
@@ -70,9 +76,10 @@ const productSchema = new mongoose.Schema({
   },
 });
 
-// Middleware để tự động cập nhật updatedAt
+// Middleware để tự động cập nhật `updatedAt` và tính `discountedPrice`
 productSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
+  this.discountedPrice = this.price * (1 - this.discount / 100);
   next();
 });
 

@@ -39,8 +39,38 @@ const ListOneProducts = async (id) => {
   }
 };
 
+const UpdateProducts = async (productData) => {
+  try {
+    const updateData = await Products.findByIdAndUpdate(
+      productData.id,
+      {
+        name: productData.name,
+        description: productData.description,
+        category: productData.category,
+        brand: productData.brand,
+        price: productData.price,
+        discount: productData.discount,
+        stock: productData.stock,
+        size: productData.size,
+        color: productData.color,
+        images: productData.images,
+      },
+      { new: true } // Trả về document sau khi update
+    );
+
+    if (!updateData) {
+      throw new Error("Product not found");
+    }
+
+    return updateData;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   AddProducts,
   ListProducts,
   ListOneProducts,
+  UpdateProducts,
 };
