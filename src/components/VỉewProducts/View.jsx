@@ -12,11 +12,11 @@ import ImgCrop from "antd-img-crop";
 import { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css"; // Import styles for Quill
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ListOneProductAPI, UpdateProductAPI } from "../../service/ApiProduct";
 import { ListCategoryAPI } from "../../service/ApiCategory";
 
-const UpLoad = () => {
+const View = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState([]);
@@ -30,6 +30,9 @@ const UpLoad = () => {
   const [categoryId, setCategoryId] = useState();
   const [brand, setBrand] = useState("");
   // xử lí ảnh
+
+  const navigate = useNavigate();
+
   const [fileList, setFileList] = useState([{}]);
 
   const onChangeImg = ({ fileList: newFileList }) => {
@@ -79,8 +82,6 @@ const UpLoad = () => {
   };
 
   const handleChangeColor = (value) => {
-    console.log(value);
-
     setColor(value);
   };
   const handleChangeSize = (value) => {
@@ -157,35 +158,25 @@ const UpLoad = () => {
   }));
 
   const hanldeUpdateProducts = async () => {
-    try {
-      const res = await UpdateProductAPI(
-        param.id,
-        name,
-        description,
-        categoryId,
-        brand,
-        price,
-        stock,
-        size,
-        color,
-        image
-      );
-      if (res) {
-        console.log(res);
-      }
-    } catch (error) {}
+    navigate("/admin");
   };
 
   return (
     <div className="w-full ml-6 flex ">
       <div className="w-3/5">
         <Typography.Title level={5}>Name</Typography.Title>
-        <Input maxLength={200} value={name} onChange={handleNameChange} />
+        <Input
+          maxLength={200}
+          value={name}
+          onChange={handleNameChange}
+          disabled
+        />
         <Typography.Title level={5}>Brand</Typography.Title>
         <Input
           maxLength={200}
           value={brand}
           onChange={(e) => setBrand(e.target.value)}
+          disabled
         />
         <Typography.Title level={5} className="mt-4">
           Description
@@ -195,6 +186,7 @@ const UpLoad = () => {
           maxLength={100}
           value={description}
           onChange={handleDescriptionChange}
+          disabled
           placeholder="disable resize"
           style={{
             height: 120,
@@ -202,13 +194,12 @@ const UpLoad = () => {
           }}
         />
         <Typography.Title level={5}>Content</Typography.Title>
-        <ReactQuill value={"1"} style={{ height: "300px" }} />
+        <ReactQuill value={"1"} style={{ height: "300px" }} disabled />
       </div>
       <div className="w-2/5 ">
         <Flex gap="small" wrap className="mt-8 ml-5 ">
-          <Button>Cancel</Button>
           <Button type="primary" onClick={hanldeUpdateProducts}>
-            Update
+            Cancel
           </Button>
         </Flex>
 
@@ -227,9 +218,10 @@ const UpLoad = () => {
                 width: "100%",
               }}
               placeholder="Please select"
-              value={categoryId}
+              value={category}
               onChange={handleChangeCatogry}
               options={opitonCategory}
+              disabled
             />
           </Space>
         </div>
@@ -243,6 +235,7 @@ const UpLoad = () => {
             max={90000000}
             value={price}
             onChange={onChangePrice}
+            disabled
           />
         </div>
 
@@ -256,6 +249,7 @@ const UpLoad = () => {
             max={10000}
             value={stock}
             onChange={onChangeStock}
+            disabled
           />
         </div>
         <div className="ml-5 mt-2">
@@ -276,6 +270,7 @@ const UpLoad = () => {
               value={size}
               onChange={handleChangeSize}
               options={optionsSize}
+              disabled
             />
           </Space>
         </div>
@@ -298,6 +293,7 @@ const UpLoad = () => {
               value={color}
               onChange={handleChangeColor}
               options={optionsColor}
+              disabled
             />
           </Space>
         </div>
@@ -310,7 +306,8 @@ const UpLoad = () => {
               onChange={onChangeImg}
               onPreview={onPreview}
               multiple
-              beforeUpload={() => false} // Prevent automatic upload
+              beforeUpload={() => false}
+              disabled // Prevent automatic upload
             >
               {fileList.length < 5 && "+ Upload"}
             </Upload>
@@ -321,4 +318,4 @@ const UpLoad = () => {
   );
 };
 
-export default UpLoad;
+export default View;

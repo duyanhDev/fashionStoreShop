@@ -1,0 +1,155 @@
+.Details {
+    position: relative;
+}
+
+.Details_main {
+    height       : 650px;
+    width        : 1300px;
+    margin       : auto;
+    background   : #fff;
+    border       : 1px solid rgba(16, 16, 16, .1);
+    box-shadow   : 0 0 4px rgba(16, 16, 16, .1);
+    border-radius: 8px;
+    margin-top   : 30px;
+}
+
+.Details .Details_main .swiper-slide img {
+    width        : 100%;
+    height       : 100%;
+    -o-object-fit: cover;
+    object-fit   : cover;
+    width        : 450px;
+    height       : 450px;
+    border-radius: 5px;
+}
+
+.Details .Details_main .swiper.swiper-initialized.swiper-horizontal.swiper-free-mode.swiper-watch-progress.swiper-backface-hidden.mySwiper {
+    width       : 300px;
+    display     : flex;
+    margin      : auto;
+    display     : flex;
+    justify-self: center;
+}
+
+.Details .Details_main .swiper.swiper-initialized.swiper-horizontal.swiper-free-mode.swiper-watch-progress.swiper-backface-hidden.mySwiper.swiper-thumbs {
+
+    display : block;
+    height  : 50px;
+    position: relative;
+    top     : -90px;
+    left    : 10px;
+    margin  : auto;
+    border  : 1px solid #fff;
+
+}
+
+.Details .Details_main .swiper.swiper-initialized.swiper-horizontal.swiper-free-mode.swiper-watch-progress.swiper-backface-hidden.mySwiper img {
+    width : 50px;
+    height: 250px !important;
+}
+
+.Details .Details_main .swiper-button-prev {
+    left : 175px !important;
+    /* Corrected from invalid '175x' */
+    right: auto;
+    width: 30px;
+}
+
+/* Adjust positioning of the next button */
+.Details .Details_main .swiper-button-next {
+    right: 175px !important;
+    left : auto;
+}
+
+.Details .doisi_detail__main {
+    border-left: 1px solid #ccc;
+}
+
+/* Styling for the thumbnails swiper */
+
+/* Media query for smaller screens (max-width: 768px) */
+@media screen and (max-width: 768px) {
+    .Details_main {
+        width : 100%;
+        height: auto;
+    }
+
+    .swiper-button-prev,
+    .swiper-button-next {
+        left : 50px;
+        /* Adjust button position for smaller screens */
+        right: auto;
+    }
+}
+
+.text-pink-gradient {
+    background             : linear-gradient(135deg, #ed55c7, #6756ca);
+    -webkit-background-clip: text;
+    background-clip        : text;
+    -webkit-text-fill-color: transparent;
+    font-size              : 14px;
+    line-height            : 150%;
+}
+
+.Details .color_black {
+    width           : 30px;
+    height          : 30px;
+    border-radius   : 100%;
+    background-color: black;
+}
+
+.Details .color_white {
+    width           : 30px;
+    height          : 30px;
+    border-radius   : 50%;
+    background-color: #e6e6e6;
+}
+
+.Details .color_red {
+    width           : 30px;
+    height          : 30px;
+    border-radius   : 50%;
+    background-color: rgb(255, 0, 0)
+}
+
+.color_yellor {
+    width           : 30px;
+    height          : 30px;
+    border-radius   : 50%;
+    background-color: yellow
+}
+
+.number-input-group {
+    width        : 100px;
+    height       : 34px;
+    border       : 1px solid #333;
+    border-radius: 10px;
+}
+
+/* Media query for very small screens (max-width: 480px) */
+@media screen and (max-width: 480px) {
+    .Details_main {
+        width : 90%;
+        height: auto;
+    }
+
+    .swiper-button-prev,
+    .swiper-button-next {
+        left : 20px;
+        right: auto;
+    }
+}
+
+/* Media query for medium-sized screens (769px to 1200px) */
+@media screen and (min-width: 769px) and (max-width: 1200px) {
+    .Details_main {
+        width : 100%;
+        height: auto;
+    }
+
+    .swiper-button-prev,
+    .swiper-button-next {
+        left : 100px;
+        right: auto;
+    }
+}

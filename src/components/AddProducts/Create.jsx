@@ -7,7 +7,9 @@ import {
   Space,
   InputNumber,
   Upload,
+  message,
 } from "antd";
+
 import ImgCrop from "antd-img-crop";
 import { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
@@ -15,19 +17,23 @@ import "react-quill/dist/quill.snow.css"; // Import styles for Quill
 
 import { ListCategoryAPI } from "../../service/ApiCategory";
 import { createProductAPI } from "../../service/ApiProduct";
+import { useNavigate } from "react-router-dom";
 const Create = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState([]);
   const [opitonCategory, setOptionCategory] = useState([]);
   const [price, setPrice] = useState("");
+  const [discount, setDisscount] = useState(0);
   const [stock, setStock] = useState("");
   const [size, setSize] = useState([]);
   const [color, setColor] = useState([]);
   const [image, setImageFiles] = useState([]);
   const [brand, setBrand] = useState("");
   const [categoryId, setCategoryId] = useState();
+  const [messageApi, contextHolder] = message.useMessage();
 
+  const navigate = useNavigate();
   // xử lí ảnh
   const [fileList, setFileList] = useState([]);
 
@@ -76,6 +82,10 @@ const Create = () => {
     setColor(value);
   };
 
+  const onChangeDiscount = (value) => {
+    setDisscount(value);
+  };
+
   useEffect(() => {
     const FetchCategory = async () => {
       try {
@@ -94,11 +104,6 @@ const Create = () => {
 
     FetchCategory();
   }, []);
-
-  const options = opitonCategory.map((category) => ({
-    label: category,
-    value: category,
-  }));
 
   const optionsSize = [
     { label: "S", value: "S" },
@@ -130,19 +135,50 @@ const Create = () => {
         categoryId,
         brand,
         price,
+        discount,
         stock,
         size,
         color,
         image
       );
-      console.log(image);
       console.log(res);
+
+      if (res) {
+        const key = "updatable";
+
+        // Display loading message and success notification
+        messageApi.open({
+          key,
+          type: "loading",
+          content: "Loading...",
+        });
+        setTimeout(() => {
+          messageApi.open({
+            key,
+            type: "success",
+            content: "Products added successfully!",
+            duration: 2,
+          });
+        }, 1000);
+        setName("");
+        setBrand("");
+        setDescription("");
+        setCategory("");
+        setStock("");
+        setColor([]);
+        setSize([]);
+        setDisscount("");
+        setPrice("");
+        setImageFiles("");
+      }
     } catch (error) {}
   };
-  console.log(size, color);
+
+  console.log(discount);
 
   return (
     <div className="w-full ml-6 flex ">
+      {contextHolder}
       <div className="w-3/5">
         <Typography.Title level={5}>Name</Typography.Title>
         <Input maxLength={200} value={name} onChange={handleNameChange} />
@@ -172,7 +208,7 @@ const Create = () => {
       </div>
       <div className="w-2/5 ">
         <Flex gap="small" wrap className="mt-8 ml-5 ">
-          <Button>Cancel</Button>
+          <Button onClick={() => navigate("/admin")}>Cancel</Button>
           <Button type="primary" onClick={handleCreate}>
             Create
           </Button>
@@ -206,12 +242,22 @@ const Create = () => {
               width: "50%",
             }}
             min={1}
-            max={90000000}
             value={price}
             onChange={onChange}
           />
         </div>
-
+        <div className="ml-5 mt-2">
+          <Typography.Title level={5}>discount</Typography.Title>
+          <InputNumber
+            style={{
+              width: "50%",
+            }}
+            min={0}
+            max={90000000}
+            value={discount}
+            onChange={onChangeDiscount}
+          />
+        </div>
         <div className="ml-5 mt-2">
           <Typography.Title level={5}>Stock</Typography.Title>
           <InputNumber

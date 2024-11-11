@@ -1,0 +1,37 @@
+.text_shop {
+    color                  : linear-gradient(135deg, #ed55c7, #6756ca);
+    background             : linear-gradient(135deg, #ed55c7, #6756ca);
+    -webkit-background-clip: text;
+    background-clip        : text;
+    -webkit-text-fill-color: transparent;
+}
+
+.input {
+    width        : 540px;
+    height       : 40px;
+    border-radius: 999px;
+    align-items  : center;
+    padding      : 0 12px;
+    background   : rgba(16, 16, 16, .05);
+    border       : 1px solid rgba(16, 16, 16, .05);
+    box-sizing   : border-box;
+
+
+}
+
+.input input {
+    text-align      : center;
+    padding         : 8px 0;
+    border          : none;
+    background-color: hsla(0, 0%, 81.2%, .05);
+    width           : 100%;
+    height          : 100%;
+    font-size       : 16px;
+    font-weight     : 400;
+    font-style      : normal;
+}
+
+.doin_image,
+.doin_right {
+    width: 23.7%;
+}

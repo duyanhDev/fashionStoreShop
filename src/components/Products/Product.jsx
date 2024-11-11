@@ -3,10 +3,21 @@ import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { getListProductsAPI } from "../../service/ApiProduct";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 const Products = () => {
   const [dataProducts, setDataProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 4;
+
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const hasSelected = selectedRowKeys.length > 0;
+  const onSelectChange = (newSelectedRowKeys) => {
+    console.log("selectedRowKeys changed: ", newSelectedRowKeys);
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  // const arr1 = selectedRowKeys.join(",");
+  // console.log(arr1);
 
   const getRandomColor = () => {
     const colors = [
@@ -32,14 +43,17 @@ const Products = () => {
   const handleNavigate = (id) => {
     navigate(`uploadproducts/${id}`);
   };
+  const handleViewNavigate = (id) => {
+    navigate(`viewproduct/${id}`);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await getListProductsAPI();
-        console.log(response);
+
         const products = response.data.data.map((product, index) => ({
-          key: index + 1,
+          key: product._id,
           Index: index + 1,
           name: product.name,
           description: product.description,
@@ -48,8 +62,8 @@ const Products = () => {
           price: formatPrice(product.price),
           stock: product.stock,
           size: (
-            <div className="flex items-center gap-2">
-              {product.size.slice(0, 3).map((item, index) => (
+            <div className="flex flex-wrap items-center gap-1 w-52">
+              {product.size.slice(0, 10).map((item, index) => (
                 <Tag key={index} color={getRandomColor()}>
                   {item}
                 </Tag>
@@ -110,9 +124,12 @@ const Products = () => {
             </div>
           ),
 
-          Features: (
+          Action: (
             <div className="flex items-center gap-5">
-              <Button icon={<EyeOutlined />} />
+              <Button
+                icon={<EyeOutlined />}
+                onClick={() => handleViewNavigate(product._id)}
+              />
               <Button
                 icon={<EditOutlined />}
                 onClick={() => handleNavigate(product._id)}
@@ -140,40 +157,49 @@ const Products = () => {
     { title: "Size", dataIndex: "size", key: "size" },
     { title: "Color", dataIndex: "color", key: "color" },
     { title: "Image", dataIndex: "image", key: "image" },
-    { title: "Features", dataIndex: "Features", key: "Features" },
+    { title: "Action", dataIndex: "Action", key: "Action" },
   ];
 
   const paginatedData = dataProducts.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+  const onChangeAllSelection = () => {
+    if (selectedRowKeys.length === dataProducts.length) {
+      setSelectedRowKeys([]);
+    } else {
+      const allProductKeys = dataProducts.map((product) => product.key);
+      setSelectedRowKeys(allProductKeys);
+    }
+  };
 
   return (
-    <>
-      <div className="w-full">
-        <Flex
-          vertical
-          gap="small"
-          style={{
-            width: "100%",
-          }}
-        >
-          <Button type="primary" block onClick={() => navigate("addproduct")}>
-            Add Product
-          </Button>
-        </Flex>
-        <Table
-          dataSource={paginatedData}
-          columns={columns}
-          pagination={{
-            current: currentPage,
-            pageSize: pageSize,
-            total: dataProducts.length,
-            onChange: (page) => setCurrentPage(page), // Cập nhật trang hiện tại
-          }}
-        />
+    <div className="w-full">
+      {hasSelected ? `Selected ${selectedRowKeys.length} items` : null}
+      <div className="flex gap-3">
+        <Button type="primary" block onClick={() => navigate("addproduct")}>
+          Add Product
+        </Button>
+
+        <Button type="primary" block onClick={() => onChangeAllSelection()}>
+          All Delete Products
+        </Button>
       </div>
-    </>
+      <Table
+        rowSelection={{
+          selectedRowKeys,
+          onChange: onSelectChange,
+        }}
+        dataSource={paginatedData}
+        columns={columns}
+        pagination={{
+          current: currentPage,
+          pageSize: pageSize,
+          total: dataProducts.length,
+          onChange: (page) => setCurrentPage(page), // Cập nhật trang hiện tại
+        }}
+      />
+    </div>
   );
 };
 
