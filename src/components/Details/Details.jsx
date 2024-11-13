@@ -6,12 +6,15 @@ import "swiper/css/free-mode";
 import "swiper/css/navigation";
 import "swiper/css/thumbs";
 import { FreeMode, Navigation, Thumbs } from "swiper/modules";
-import { Rate, Button, Flex } from "antd";
+import { Rate, Button, Flex, notification, Image } from "antd";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
-import { useParams } from "react-router-dom";
+import { useOutletContext, useParams } from "react-router-dom";
 import { ListOneProductAPI } from "../../service/ApiProduct";
+import { AddCartAPI } from "../../service/Cart";
+import { useSelector } from "react-redux";
 
 const Details = () => {
+  const [api, contextHolder] = notification.useNotification();
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -23,8 +26,15 @@ const Details = () => {
   const [size, setSize] = useState([]);
   const [stock, setStock] = useState("");
   const [image, setImage] = useState([]);
-
+  const [sizeCart, SetSizeCart] = useState("");
+  const [colorCart, SetcolorCart] = useState("");
+  const { CartListProductsUser } = useOutletContext();
+  const [checked, setChecked] = useState(false);
   const param = useParams();
+  const [SelectedColor, setSelectedColor] = useState("");
+  const [SelectedSize, setSelectedSize] = useState("");
+  const [CheckSelectedSize, setCheckSelectedSize] = useState(false);
+  const { user } = useSelector((state) => state.auth);
 
   const onChange = (value) => {
     console.log("changed", value);
@@ -69,10 +79,66 @@ const Details = () => {
   }, []);
 
   const total = pricediscount ? count * pricediscount : count * price;
-  console.log(total);
+
+  const handleSize = (item) => {
+    setSelectedSize(item);
+    setCheckSelectedSize(true);
+    SetSizeCart(item);
+  };
+
+  const handleColor = (item) => {
+    setChecked(true);
+    setSelectedColor(item);
+    SetcolorCart(item);
+  };
+
+  const handleAddProduct = async () => {
+    // Kiểm tra nếu size hoặc color chưa được chọn
+    if (!sizeCart || !colorCart) {
+      api.open({
+        message: "Lỗi",
+        description:
+          "Vui lòng chọn kích thước và màu sắc trước khi thêm vào giỏ hàng.",
+        duration: 3,
+        type: "warning", // Có thể sử dụng loại 'error' hoặc 'warning' tùy theo ngữ cảnh
+      });
+      return; // Ngăn không cho gọi API nếu điều kiện không thỏa mãn
+    }
+
+    try {
+      const res = await AddCartAPI(
+        user._id,
+        param.id,
+        count,
+        sizeCart,
+        colorCart
+      );
+      if (res && res.data && res.data.cart) {
+        api.open({
+          message: "Đã thêm vào giỏ hàng",
+          description: (
+            <div className="flex gap-2 p-2 ">
+              <img src={image[0]} className="img_cart" alt="lỗi" />
+              <div>
+                <h1 className="whitespace-nowrap">{name}</h1>
+                <h1>{`${colorCart} / ${sizeCart}`}</h1>
+                <h1>{`${pricediscount} / ${price}`}</h1>
+              </div>
+            </div>
+          ),
+          duration: 15,
+        });
+        CartListProductsUser();
+      }
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+      // Thêm xử lý lỗi nếu cần
+    }
+  };
 
   return (
     <div className="Details w-full">
+      {contextHolder}
       <div className="Details_main flex">
         <div className="w-1/2">
           <Swiper
@@ -92,7 +158,12 @@ const Details = () => {
                 return (
                   <>
                     <SwiperSlide key={index}>
-                      <img src={image} />
+                      <Image
+                        src={image}
+                        preview={{
+                          src: image,
+                        }}
+                      />
                     </SwiperSlide>
                   </>
                 );
@@ -164,22 +235,61 @@ const Details = () => {
                 </span>
               </div>
               <div className="flex items-center gap-2 mt-2 cursor-pointer">
-                {color &&
-                  color.length > 0 &&
-                  color.map((color, index) => {
-                    if (color === "đen") {
-                      return <div className="color_black" key={index}></div>;
-                    } else if (color === "trắng") {
-                      return <div className="color_white" key={index}></div>;
-                    } else if (color === "vàng") {
-                      return <div className="color_yellor" key={index}></div>;
-                    } else {
-                      return <div className="color_red" key={index}></div>;
-                    }
-                  })}
+                {color.map((color, index) => {
+                  if (color === "đen") {
+                    return (
+                      <div
+                        className={`${
+                          SelectedColor === color && checked
+                            ? `colorBtn color_black`
+                            : `color_black`
+                        }`}
+                        key={index}
+                        onClick={() => handleColor(color)} // Corrected: Passes a function
+                      ></div>
+                    );
+                  } else if (color === "trắng") {
+                    return (
+                      <div
+                        className={`${
+                          SelectedColor === color && checked
+                            ? `colorBtn`
+                            : `color_white`
+                        }`}
+                        key={index}
+                        onClick={() => handleColor(color)}
+                      ></div>
+                    );
+                  } else if (color === "vàng") {
+                    return (
+                      <div
+                        className={`${
+                          SelectedColor === color && checked
+                            ? `colorBtn color_yellor`
+                            : `color_yellor`
+                        }`}
+                        key={index}
+                        onClick={() => handleColor(color)}
+                      ></div>
+                    );
+                  } else {
+                    return (
+                      <div
+                        className={`${
+                          SelectedColor === color && checked
+                            ? `colorBtn color_red`
+                            : `color_red`
+                        }`}
+                        key={index}
+                        onClick={() => handleColor(color)}
+                      ></div>
+                    );
+                  }
+                })}
               </div>
             </div>
           </div>
+
           <div className="border border-b-2">
             <div className="p-4">
               <div className="flex items-center gap-1">
@@ -193,27 +303,43 @@ const Details = () => {
               <div className="flex items-center gap-1 m-3">
                 {size &&
                   size.length > 0 &&
-                  size.map((item, index) => {
-                    return (
-                      <>
-                        <Button key={index}>{item}</Button>
-                      </>
-                    );
-                  })}
+                  size.map((item, index) => (
+                    <Button
+                      key={index}
+                      onClick={() => handleSize(item)}
+                      className={`${
+                        CheckSelectedSize && SelectedSize === item
+                          ? "bg-black text-[#fff]"
+                          : ""
+                      }`}
+                    >
+                      {item}
+                    </Button>
+                  ))}
               </div>
             </div>
           </div>
           <div className="border border-b-2">
             <div className="p-4">
               <div className="flex items-center gap-1">
-                <h4 className="text-[#b3b3b3] font-normal text-sm">
+                <span className="">Tổng Tiền : {formatPrice(total)}</span>
+              </div>
+            </div>
+          </div>
+          <div className="border border-b-2">
+            <div className="p-4">
+              <div className="flex items-center gap-1">
+                <h4
+                  className="text-[#b3b3b3] font-normal text-sm"
+                  onChange={(e) => setStock(e.target.value)}
+                >
                   {stock} sản phẩm có sẵn
                 </h4>
               </div>
               <div className=" flex items-center gap-1">
                 <div className="flex items-center m-3 number-input-group ">
                   <Button
-                    className=" w-3 border-none outline-none"
+                    className=" w-10 h-10  border-none outline-none"
                     style={{ background: "none" }}
                     onClick={() => handleDecrements()}
                   >
@@ -222,16 +348,16 @@ const Details = () => {
                   <input
                     type="number"
                     disabled
-                    className="w-full text-center ml-4"
+                    className="w-10 h-10 text-center "
                     min={1}
                     value={count}
                   />
                   <Button
-                    className="w-3 border-none outline-none"
+                    className="w-10 h-10 border-none outline-none "
                     style={{ background: "none", outline: "none" }}
                     onClick={() => handleIncrment()}
                   >
-                    <PlusOutlined />
+                    <PlusOutlined className="mr-6" />
                   </Button>
                 </div>
                 <div className="w-3/4">
@@ -246,6 +372,7 @@ const Details = () => {
                       type="primary"
                       block
                       style={{ backgroundColor: "black", color: "white" }}
+                      onClick={handleAddProduct}
                     >
                       Thêm vào giỏ hàng
                     </Button>

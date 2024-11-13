@@ -15,13 +15,14 @@ import { Autoplay, Pagination, Navigation } from "swiper/modules";
 import { useEffect, useRef } from "react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { CartListProduct } from "./service/Cart";
 function App() {
   const progressCircle = useRef(null);
   const progressContent = useRef(null);
   const { user } = useSelector((state) => state.auth);
-  console.log(user);
 
   const [ListProducts, setListProducts] = useState([]);
+  const [ListCart, setListCard] = useState([]);
   const onAutoplayTimeLeft = (s, time, progress) => {
     progressCircle.current.style.setProperty("--progress", 1 - progress);
     progressContent.current.textContent = `${Math.ceil(time / 1000)}s`;
@@ -43,10 +44,38 @@ function App() {
     ListProducsData();
   }, []);
 
+  const CartListProductsUser = async () => {
+    if (!user?._id) {
+      // Handle the case where user._id is not available
+      setError("User is not authenticated");
+      return;
+    }
+
+    try {
+      const res = await CartListProduct(user._id);
+      if (res && res.data && res.data.EC === 0) {
+        setListCard(res.data.data);
+      } else {
+        setError("Failed to fetch cart products");
+      }
+    } catch (error) {
+      console.log(error);
+      setError("An error occurred while fetching the cart");
+    }
+  };
+
+  useEffect(() => {
+    CartListProductsUser();
+  }, [user._id]);
+
   return (
     <div className="container_nav">
       <div className="nav_header">
-        <Header user={user} />
+        <Header
+          user={user}
+          ListCart={ListCart}
+          CartListProductsUser={CartListProductsUser}
+        />
         <div className="nav_menu flex justify-center items-center gap-3">
           <ul className="flex gap-10">
             <li>
@@ -117,7 +146,7 @@ function App() {
         </Swiper>
       </div>
       <div className="content">
-        <Outlet context={{ ListProducts }} />
+        <Outlet context={{ ListProducts, CartListProductsUser }} />
       </div>
     </div>
   );

@@ -6,18 +6,39 @@ import {
   IoCartOutline,
 } from "react-icons/io5";
 import Avatar from "antd/es/avatar/avatar";
-import { Dropdown } from "antd";
-import { LogoutOutlined, SettingOutlined } from "@ant-design/icons";
+import { Dropdown, Button, Drawer, Spin } from "antd";
+import {
+  CloseCircleOutlined,
+  LogoutOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
 import { useDispatch } from "react-redux";
 import { logout } from "../../redux/actions/Auth";
+import { useState } from "react";
+import { RemoveCartOnePorduct } from "../../service/Cart";
+import ClipLoader from "react-spinners/ClipLoader";
 
-const Header = ({ user }) => {
+const Header = ({ user, ListCart, CartListProductsUser }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [loadingSpin, setLoadingSpin] = useState(false);
 
   const handleLogOut = () => {
     dispatch(logout());
     navigate("/login");
+  };
+
+  const showLoading = () => {
+    setOpen(true);
+    setLoading(true);
+
+    // Simple loading mock. You should add cleanup logic in real world.
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   };
 
   const items = [
@@ -53,6 +74,29 @@ const Header = ({ user }) => {
       onClick: handleLogOut, // Move the onClick here
     },
   ];
+  const formatPrice = (price) => {
+    if (price === undefined || price === null) {
+      return "0đ"; // Fallback value or any other default handling
+    }
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
+  };
+
+  const handleRemoveCartProduct = async (id) => {
+    try {
+      setLoadingSpin(true);
+      const res = await RemoveCartOnePorduct(ListCart._id, id, user._id);
+
+      if (res.data) {
+        setTimeout(() => {
+          setLoadingSpin(false);
+          CartListProductsUser();
+        }, 3000);
+      }
+    } catch (error) {
+      setLoadingSpin(false);
+      console.error("Error in handleRemoveCartProduct:", error);
+    }
+  };
 
   return (
     <div className="w-full flex justify-between items-center h-full m-auto">
@@ -83,9 +127,17 @@ const Header = ({ user }) => {
           <li className="px-5">
             <IoNotificationsOutline size={30} />
           </li>
-          <li className="px-5">
+          <li className="px-5 relative" onClick={showLoading}>
             <IoCartOutline size={30} />
+            {
+              ListCart && ListCart.items ? (
+                <span className="cart_items">{ListCart.items.length}</span>
+              ) : (
+                <span className="cart_items">0</span>
+              ) // Show 0 if ListCart is empty or undefined
+            }
           </li>
+
           <li className="px-5">
             {user ? (
               <Dropdown
@@ -114,6 +166,99 @@ const Header = ({ user }) => {
             )}
           </li>
         </ul>
+        <Drawer
+          closable
+          destroyOnClose
+          title={<p>Giỏ Hàng Của Bạn </p>}
+          placement="right"
+          open={open}
+          loading={loading}
+          onClose={() => setOpen(false)}
+          className="relative"
+        >
+          {/* <Button
+            type="primary"
+            style={{
+              marginBottom: 16,
+            }}
+            onClick={showLoading}
+          >
+            Reload
+          </Button> */}
+          {ListCart && ListCart.items && ListCart.items.length > 0 ? (
+            ListCart.items.map((cart, index) => {
+              return (
+                <div className="">
+                  <div
+                    className="flex gap-3 w-full border-b-2 items-center "
+                    key={index}
+                  >
+                    <div>
+                      <img
+                        src={cart.productId.images[0]}
+                        alt={cart.productId.name}
+                        width={100}
+                      />
+                    </div>
+                    <div className="cart_dosi ml-2 flex-1">
+                      <div>
+                        <p className="text-base font-bold ">
+                          {cart.productId.name}
+                        </p>
+                      </div>
+                      <div className="mt-2">
+                        <span>Số lượng : {cart.quantity}</span>
+                      </div>
+                      <div className="mt-2">
+                        <span>Size : {cart.size}</span>
+                      </div>
+                      <div className="mt-2">
+                        <span>Màu : {cart.color}</span>
+                      </div>
+                      <div className="mt-2 whitespace-nowrap">
+                        <span>
+                          Tổng giá : {formatPrice(cart.totalItemPrice)}
+                        </span>
+                      </div>
+                    </div>
+                    <div
+                      className="mt-1 self-start"
+                      onClick={() => handleRemoveCartProduct(cart._id)}
+                    >
+                      <CloseCircleOutlined />
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <span>Giỏ hàng chưa có gì :(, chọn mua đồ bạn nhé)</span>
+          )}
+          {ListCart && ListCart.items && ListCart.items.length > 0 ? (
+            <>
+              <p className="font-semibold text-base ml-5 mt-2 whitespace-nowrap">
+                Tổng giá tiền tất cả sản phẩm :{" "}
+                {ListCart && ListCart.totalPrice !== undefined
+                  ? formatPrice(ListCart.totalPrice)
+                  : "0đ"}
+              </p>
+              <Button
+                className="flex justify-center w-3/4 items-center ml-14 mt-1"
+                type="primary"
+                onClick={() => navigate("cart")}
+              >
+                Thanh Toán
+              </Button>
+            </>
+          ) : (
+            <div></div>
+          )}
+          {loadingSpin && (
+            <div className="overlay flex items-center justify-center w-full h-full">
+              <ClipLoader className="" />
+            </div>
+          )}
+        </Drawer>
       </div>
     </div>
   );
