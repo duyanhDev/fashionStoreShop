@@ -15,7 +15,11 @@ const {
 } = require("../Controllers/Category");
 
 const { RegisterUserAPI, LoginUserAPI } = require("./../Controllers/Auth");
-const { addToCart, getCartProduct } = require("./../Controllers/Cart");
+const {
+  addToCart,
+  getCartProduct,
+  RemoveCartProductfirst,
+} = require("./../Controllers/Cart");
 //product
 
 RouterAPI.get("/products", ListProductsAPI);
@@ -46,4 +50,5 @@ RouterAPI.post("/login", LoginUserAPI);
 // Cart
 RouterAPI.post("/cart", addToCart);
 RouterAPI.get("/cart/:userId", getCartProduct);
+RouterAPI.put("/cart/:cartId/:itemId", RemoveCartProductfirst);
 module.exports = RouterAPI;
