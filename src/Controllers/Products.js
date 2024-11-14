@@ -12,6 +12,7 @@ const AddProductsAPI = async (req, res) => {
     description,
     category,
     brand,
+    care,
     price,
     discount,
     stock,
@@ -53,6 +54,7 @@ const AddProductsAPI = async (req, res) => {
     description,
     category,
     brand,
+    care,
     price,
     discount,
     stock,
@@ -111,8 +113,17 @@ const ListOneProductAPI = async (req, res) => {
 
 const UpdateProductsAPI = async (req, res) => {
   try {
-    const { name, description, category, brand, price, stock, size, color } =
-      req.body;
+    const {
+      name,
+      description,
+      category,
+      brand,
+      care,
+      price,
+      stock,
+      size,
+      color,
+    } = req.body;
     const { id } = req.params;
 
     // Lấy thông tin sản phẩm cũ từ database
@@ -157,6 +168,7 @@ const UpdateProductsAPI = async (req, res) => {
       description: description || existingProduct.description,
       category: category || existingProduct.category,
       brand: brand || existingProduct.brand,
+      care: care || existingProduct.care,
       price: price ? Number(price) : existingProduct.price,
       stock: stock ? Number(stock) : existingProduct.stock,
       size: sizeArray,

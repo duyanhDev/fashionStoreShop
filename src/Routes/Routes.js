@@ -20,6 +20,7 @@ const {
   getCartProduct,
   RemoveCartProductfirst,
 } = require("./../Controllers/Cart");
+const { CreateOrder } = require("../Controllers/Oder");
 //product
 
 RouterAPI.get("/products", ListProductsAPI);
@@ -51,4 +52,6 @@ RouterAPI.post("/login", LoginUserAPI);
 RouterAPI.post("/cart", addToCart);
 RouterAPI.get("/cart/:userId", getCartProduct);
 RouterAPI.put("/cart/:cartId/:itemId", RemoveCartProductfirst);
+
+RouterAPI.post("/order", CreateOrder);
 module.exports = RouterAPI;

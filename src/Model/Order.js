@@ -9,6 +9,7 @@ const orderSchema = new mongoose.Schema({
         ref: "Product",
         required: true,
       },
+      name: { type: String },
       quantity: { type: Number, required: true, min: 1 },
       size: { type: String },
       color: { type: String },
@@ -16,13 +17,17 @@ const orderSchema = new mongoose.Schema({
     },
   ],
   shippingAddress: {
-    street: { type: String },
-    city: { type: String },
-    state: { type: String },
-    zip: { type: String },
-    country: { type: String },
+    fullAddress: { type: String },
+    city: { type: String }, // Thành phố
+    district: { type: String }, // Quận/Huyện
+    ward: { type: String }, // Phường/Xã
   },
-  paymentMethod: { type: String, required: true }, // e.g., "credit_card", "paypal"
+  paymentMethod: {
+    type: String,
+    required: true,
+    enum: ["credit_card", "paypal", "cod"], // "cod" for cash on delivery (ship code)
+  },
+
   paymentStatus: { type: String, default: "Pending" },
   orderStatus: { type: String, default: "Processing" }, // e.g., "Processing", "Shipped", "Delivered"
   totalAmount: { type: Number, required: true },

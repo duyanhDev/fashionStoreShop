@@ -68,8 +68,6 @@ const addToCart = async (req, res) => {
         0
       );
 
-      // Kiểm tra lại tổng giỏ hàng để debug
-
       cart.updatedAt = Date.now();
     } else {
       // Nếu chưa có giỏ hàng, tạo giỏ hàng mới
