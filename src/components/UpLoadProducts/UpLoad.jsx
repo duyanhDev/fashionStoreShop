@@ -26,6 +26,7 @@ const UpLoad = () => {
   const [size, setSize] = useState([]);
   const [color, setColor] = useState([]);
   const [image, setImageFiles] = useState([]);
+  const [care, setCare] = useState("");
   const param = useParams();
   const [categoryId, setCategoryId] = useState();
   const [brand, setBrand] = useState("");
@@ -96,6 +97,7 @@ const UpLoad = () => {
           setName(res.data.data.name || "");
           setDescription(res.data.data.description || "");
           setBrand(res.data.data.brand || "");
+          setCare(res.data.data.care || "");
           setCategory([res.data.data.category.name] || []);
           setPrice(res.data.data.price || "");
           setStock(res.data.data.stock || "");
@@ -164,6 +166,7 @@ const UpLoad = () => {
         description,
         categoryId,
         brand,
+        care,
         price,
         stock,
         size,
@@ -186,6 +189,12 @@ const UpLoad = () => {
           maxLength={200}
           value={brand}
           onChange={(e) => setBrand(e.target.value)}
+        />
+        <Typography.Title level={5}>Care</Typography.Title>
+        <Input
+          maxLength={200}
+          value={care}
+          onChange={(e) => setCare(e.target.value)}
         />
         <Typography.Title level={5} className="mt-4">
           Description

@@ -103,10 +103,12 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
       <div className="flex items-center doin_image">
         <ul className="flex items-center justify-between">
           <li className="px-5">
-            <img
-              src="https://dosi-in.com/images/assets/icons/logo.svg"
-              alt="Logo"
-            />
+            <Link to="/">
+              <img
+                src="https://dosi-in.com/images/assets/icons/logo.svg"
+                alt="Logo"
+              />
+            </Link>
           </li>
           <li>
             <Link className="text_shop text-xl">Shopping</Link>

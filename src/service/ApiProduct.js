@@ -13,6 +13,7 @@ const createProductAPI = async (
   description,
   category,
   brand,
+  care,
   price,
   discount,
   stock,
@@ -26,6 +27,7 @@ const createProductAPI = async (
   formData.append("description", description);
   formData.append("category", category);
   formData.append("brand", brand);
+  formData.append("care", care);
   formData.append("price", price);
   formData.append("discount", discount);
   formData.append("stock", stock);
@@ -56,6 +58,7 @@ const UpdateProductAPI = async (
   description,
   category,
   brand,
+  care,
   price,
   stock,
   size,
@@ -68,6 +71,7 @@ const UpdateProductAPI = async (
   formData.append("description", description);
   formData.append("category", category);
   formData.append("brand", brand);
+  formData.append("care", care);
   formData.append("price", price);
   formData.append("stock", stock);
   formData.append("color", color);

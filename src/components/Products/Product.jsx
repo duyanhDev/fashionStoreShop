@@ -59,6 +59,7 @@ const Products = () => {
           description: product.description,
           category: <Tag color={getRandomColor()}>{product.category.name}</Tag>,
           brand: product.brand,
+          care: product.care,
           price: formatPrice(product.price),
           stock: product.stock,
           size: (
@@ -152,6 +153,7 @@ const Products = () => {
     { title: "Description", dataIndex: "description", key: "description" },
     { title: "Category", dataIndex: "category", key: "category" },
     { title: "Brand", dataIndex: "brand", key: "brand" },
+    { title: "Care", dataIndex: "care", key: "care" },
     { title: "Price", dataIndex: "price", key: "price" },
     { title: "Stock", dataIndex: "stock", key: "stock" },
     { title: "Size", dataIndex: "size", key: "size" },

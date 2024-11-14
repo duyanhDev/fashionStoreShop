@@ -30,6 +30,7 @@ const Create = () => {
   const [color, setColor] = useState([]);
   const [image, setImageFiles] = useState([]);
   const [brand, setBrand] = useState("");
+  const [care, setCare] = useState("");
   const [categoryId, setCategoryId] = useState();
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -134,6 +135,7 @@ const Create = () => {
         description,
         categoryId,
         brand,
+        care,
         price,
         discount,
         stock,
@@ -162,6 +164,7 @@ const Create = () => {
         }, 1000);
         setName("");
         setBrand("");
+        setCare("");
         setDescription("");
         setCategory("");
         setStock("");
@@ -188,6 +191,12 @@ const Create = () => {
           maxLength={200}
           value={brand}
           onChange={(e) => setBrand(e.target.value)}
+        />
+        <Typography.Title level={5}>Care</Typography.Title>
+        <Input
+          maxLength={200}
+          value={care}
+          onChange={(e) => setCare(e.target.value)}
         />
         <Typography.Title level={5} className="mt-4">
           Description

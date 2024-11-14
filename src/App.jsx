@@ -146,7 +146,9 @@ function App() {
         </Swiper>
       </div>
       <div className="content">
-        <Outlet context={{ ListProducts, CartListProductsUser }} />
+        <Outlet
+          context={{ ListProducts, CartListProductsUser, ListCart, user }}
+        />
       </div>
     </div>
   );
