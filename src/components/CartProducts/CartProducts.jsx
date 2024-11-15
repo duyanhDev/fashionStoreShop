@@ -3,7 +3,7 @@ import axios from "./../../untils/axios";
 import "./Cart.css";
 import { Input, Select, Radio, Button, Table, notification } from "antd";
 import { useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { createOrder } from "../../service/Oder";
 import { SmileOutlined } from "@ant-design/icons";
 import ClipLoader from "react-spinners/ClipLoader";
@@ -29,6 +29,8 @@ const CartProducts = ({}) => {
   const [districtName, setDistrictName] = useState("");
   const [wardName, setWardName] = useState("");
   const [fullAddress, setFullAddress] = useState("");
+
+  const navigate = useNavigate();
 
   const formatPrice = (price) => {
     if (price === undefined || price === null) {
@@ -279,7 +281,10 @@ const CartProducts = ({}) => {
         wardName,
         value
       );
-      if (res) {
+
+      if (res && res.data.EC === 0) {
+        console.log(res.data.vnpUrl);
+
         setTimeout(() => {
           setLoadingSpin(false);
           api.open({
@@ -293,6 +298,7 @@ const CartProducts = ({}) => {
               />
             ),
           });
+          window.location.href = res.data.vnpUrl;
         }, 3000);
       }
     } catch (error) {
@@ -461,7 +467,7 @@ const CartProducts = ({}) => {
                   </Radio>
                 </div>
                 <div className="h-50 pay">
-                  <Radio value={4} onChange={onChange}>
+                  <Radio value={"vnpay"} onChange={onChange}>
                     <div className="flex gap-3">
                       <img
                         src="https://mcdn.coolmate.me/image/October2024/mceclip0_81.png"
@@ -526,7 +532,7 @@ const CartProducts = ({}) => {
                         className="w-11 h-full"
                       />
                     );
-                  case 4:
+                  case "vnpay":
                     return (
                       <img
                         src="https://mcdn.coolmate.me/image/October2024/mceclip0_81.png"

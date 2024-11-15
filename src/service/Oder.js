@@ -32,7 +32,7 @@ const createOrder = async (
       paymentMethod,
     });
 
-    return response.data;
+    return response;
   } catch (error) {
     console.error(
       "Error creating order:",

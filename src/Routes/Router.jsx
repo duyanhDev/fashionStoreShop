@@ -7,6 +7,7 @@ import Details from "../components/Details/Details";
 import Home from "../components/Home/Home";
 import Products from "../components/Products/Product";
 import UpLoad from "../components/UpLoadProducts/UpLoad";
+import VNpay from "../components/VNpay/VNpay";
 import View from "../components/VỉewProducts/View";
 
 export const RouterLayout = [
@@ -22,6 +23,10 @@ export const RouterLayout = [
   {
     path: "/cart",
     element: <CartProducts />,
+  },
+  {
+    path: "/vnpay_return",
+    element: <VNpay />,
   },
 ];
 
