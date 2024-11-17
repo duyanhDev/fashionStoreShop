@@ -12,13 +12,7 @@ app.use(fileUpload());
 app.get("/", (req, res) => {
   res.send("Hello World 1234 !");
 });
-app.use(
-  cors({
-    origin: "http://localhost:5173", // Or the appropriate frontend URL
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+app.use(cors());
 app.use("/api/v1/", RouterAPI);
 
 (async () => {

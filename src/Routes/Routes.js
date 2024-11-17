@@ -20,7 +20,7 @@ const {
   getCartProduct,
   RemoveCartProductfirst,
 } = require("./../Controllers/Cart");
-const { CreateOrder } = require("../Controllers/Oder");
+const { CreateOrder, listOderUserId } = require("../Controllers/Oder");
 //product
 
 RouterAPI.get("/products", ListProductsAPI);
@@ -53,5 +53,7 @@ RouterAPI.post("/cart", addToCart);
 RouterAPI.get("/cart/:userId", getCartProduct);
 RouterAPI.put("/cart/:cartId/:itemId", RemoveCartProductfirst);
 
+// oders
 RouterAPI.post("/order", CreateOrder);
+RouterAPI.get("/order/:userId", listOderUserId);
 module.exports = RouterAPI;
