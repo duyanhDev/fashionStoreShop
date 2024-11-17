@@ -1,5 +1,9 @@
 import axios from "./../untils/axios";
 
+const listOderUserIdAPI = async (userId) => {
+  return await axios.get(`http://localhost:9000/api/v1/order/${userId}`);
+};
+
 const createOrder = async (
   userId,
   items, // Ensure items passed has productId, quantity, and price
@@ -7,7 +11,8 @@ const createOrder = async (
   city,
   district,
   ward,
-  paymentMethod
+  paymentMethod,
+  email
 ) => {
   try {
     // Ensure items are in the correct format (each item should have productId, quantity, and price)
@@ -30,6 +35,7 @@ const createOrder = async (
         ward,
       },
       paymentMethod,
+      email,
     });
 
     return response;
@@ -42,4 +48,4 @@ const createOrder = async (
   }
 };
 
-export { createOrder };
+export { listOderUserIdAPI, createOrder };

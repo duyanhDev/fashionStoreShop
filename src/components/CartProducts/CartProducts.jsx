@@ -204,8 +204,6 @@ const CartProducts = ({}) => {
     });
   };
 
-  console.log(Products);
-
   const totalCheckedPrice = checkedItems.reduce((total, itemId) => {
     return total + (priceObj[itemId] || 0);
   }, 0);
@@ -262,7 +260,7 @@ const CartProducts = ({}) => {
       ),
     },
   ];
-  console.log(city, districtName, wardName);
+
   const handleOrder = async () => {
     try {
       setLoadingSpin(true);
@@ -279,7 +277,8 @@ const CartProducts = ({}) => {
         city,
         districtName,
         wardName,
-        value
+        value,
+        email
       );
 
       if (res && res.data.EC === 0) {
@@ -298,7 +297,7 @@ const CartProducts = ({}) => {
               />
             ),
           });
-          window.location.href = res.data.vnpUrl;
+          res.data.vnpUrl ? (window.location.href = res.data.vnpUrl) : null;
         }, 3000);
       }
     } catch (error) {
@@ -558,7 +557,7 @@ const CartProducts = ({}) => {
             <span className="text-xl text-[#2F5ACF] font-bold">
               {checkedItems.length > 0
                 ? formatPrice(totalCheckedPrice)
-                : formatPrice(ListCart.totalPrice)}
+                : formatPrice(0)}
             </span>
           </div>
           <div>

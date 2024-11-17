@@ -19,6 +19,8 @@ import { RemoveCartOnePorduct } from "../../service/Cart";
 import ClipLoader from "react-spinners/ClipLoader";
 
 const Header = ({ user, ListCart, CartListProductsUser }) => {
+  console.log(user);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -57,8 +59,11 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
     },
     {
       key: "3",
-      label: "Billing",
+      label: "Đơn hàng",
       extra: "⌘B",
+      onClick: () => {
+        navigate("/order");
+      },
     },
     {
       key: "4",
@@ -66,6 +71,16 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
       icon: <SettingOutlined />,
       extra: "⌘S",
     },
+    user.isAdmin === true && {
+      key: "4",
+      label: "Admin",
+      icon: <SettingOutlined />,
+      extra: "⌘S",
+      onClick: () => {
+        navigate("/admin");
+      },
+    },
+
     {
       key: "5",
       label: user?.name ? "Đăng Xuất" : "Đăng Nhập",
