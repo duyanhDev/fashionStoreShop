@@ -26,6 +26,10 @@ const cartSchema = new mongoose.Schema({
         type: String,
         require: true, // Chấp nhận giá trị rỗng nếu không có color
       },
+      price: {
+        type: Number,
+        required: true,
+      },
       totalItemPrice: {
         type: Number,
         required: true,

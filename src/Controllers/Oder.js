@@ -6,7 +6,7 @@ const crypto = require("crypto");
 const moment = require("moment");
 require("dotenv").config();
 const nodemailer = require("nodemailer");
-
+const axios = require("axios");
 const CreateOrder = async (req, res) => {
   try {
     const { userId, items, shippingAddress, paymentMethod, email } = req.body;
@@ -30,8 +30,14 @@ const CreateOrder = async (req, res) => {
     }
 
     let totalAmount = 0;
-    let emailContent = `<h3>Your order details:</h3><ul>`; // Declare and initialize email content here
+    let emailContent = `<div>THÔNG TIN ĐƠN HÀNG - DÀNH CHO NGƯỜI MUA:</div><ul>`;
 
+    const formatPrice = (price) => {
+      if (price === undefined || price === null) {
+        return "0đ"; // Return fallback value if price is not valid
+      }
+      return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
+    };
     for (const item of items) {
       if (!item.productId || !item.price || isNaN(item.price)) {
         throw new Error("Each item must have a valid productId and price.");
@@ -45,25 +51,29 @@ const CreateOrder = async (req, res) => {
 
       // Calculate total amount for the order
       totalAmount += item.price * item.quantity;
-      console.log(product.images[0]);
 
       // Add product details to the email content
       emailContent += `
         <li>
-          <strong>Product:</strong> ${product.name} <br>
-          <strong>Quantity:</strong> ${item.quantity} <br>
-          <strong>Size:</strong> ${item.size} <br>
-          <strong>Color:</strong> ${item.color} <br>
-          <strong>Price:</strong> ${item.price} VND <br>
-          <strong>Total:</strong> ${item.price * item.quantity} VND <br>
-          <img src="${product.images[0]}" alt="${product.name}" width="100px" />
+          <img src="${product.images[0]}" alt="${
+        product.name
+      }" width="100px" /> <br>
+          <span>Tên sản phẩm:</span> ${product.name} <br>
+          <span>Số lượng:</span> ${item.quantity} <br>
+          <span>Size:</span> ${item.size} <br>
+          <span>Màu sắc:</span> ${item.color} <br>
+          <span>Giá :</span> ${formatPrice(item.price)} VND <br>
+        
+  
 
         </li>
       `;
     }
 
     emailContent += `</ul>`;
-    emailContent += `<h4><strong>Total Order Amount:</strong> ${totalAmount} VND</h4>`;
+    emailContent += `<h4><span>Tổng giá tiền thanh toán:</span> ${formatPrice(
+      totalAmount
+    )} VND</h4>`;
 
     // Create new order
     const newOrder = new Order({
@@ -157,6 +167,77 @@ const CreateOrder = async (req, res) => {
         message:
           "Order created successfully. Payment will be made upon delivery.",
       });
+    } else if (paymentMethod === "momo") {
+      const endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
+      const accessKey = "F8BBA842ECF85";
+      const secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
+      const orderInfo = "pay with MoMo";
+      const partnerCode = "MOMO";
+      const redirectUrl =
+        "https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b";
+      const ipnUrl =
+        "https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b";
+      const requestType = "payWithMethod";
+      const amount = totalAmount;
+      const orderId = partnerCode + new Date().getTime(); // Generate a unique order ID
+      const requestId = orderId; // Generate a unique request ID
+      const extraData = ""; // Pass empty or encode base64 JSON string if needed
+      const partnerName = "MoMo Payment";
+      const storeId = "Test Store";
+      const orderGroupId = "";
+      const autoCapture = true;
+      const lang = "vi";
+
+      // Create the raw signature string
+      const rawSignature = `accessKey=${accessKey}&amount=${amount}&extraData=${extraData}&ipnUrl=${ipnUrl}&orderId=${orderId}&orderInfo=${orderInfo}&partnerCode=${partnerCode}&redirectUrl=${redirectUrl}&requestId=${requestId}&requestType=${requestType}`;
+
+      // Sign the signature string using HMAC SHA256
+      const signature = crypto
+        .createHmac("sha256", secretKey)
+        .update(rawSignature)
+        .digest("hex");
+
+      // Create the payload for the request
+      const payload = {
+        partnerCode,
+        partnerName,
+        storeId,
+        requestId,
+        amount,
+        orderId,
+        orderInfo,
+        redirectUrl,
+        ipnUrl,
+        lang,
+        requestType,
+        autoCapture,
+        extraData,
+        orderGroupId,
+        signature,
+      };
+
+      try {
+        // Send the request to MoMo API
+        const response = await axios.post(endpoint, payload, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        // Only send the response data back to the client
+        return res.status(200).json({
+          EC: 0,
+          data: response.data, // Extracting only the response data
+        });
+      } catch (error) {
+        console.error("Error creating MoMo payment:", error);
+        // Optionally, return an error response to the client
+        return res.status(500).json({
+          EC: 1,
+          message: "Failed to create MoMo payment",
+          error: error.message, // Provide error details (optional)
+        });
+      }
     } else {
       return res.status(400).json({
         message:
@@ -192,7 +273,7 @@ const listOderUserId = async (req, res) => {
     let { userId } = req.params;
 
     // Use find to get all orders for the given userId
-    let data = await Order.find({ userId: userId });
+    let data = await Order.find({ userId: userId }).sort({ createdAt: -1 });
 
     return res.status(200).json({
       EC: 0,

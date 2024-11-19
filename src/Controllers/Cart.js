@@ -1,8 +1,7 @@
-const { default: mongoose } = require("mongoose");
 const Cart = require("../Model/Cart");
 const Product = require("../Model/Product");
 const addToCart = async (req, res) => {
-  const { userId, productId, quantity, size, color } = req.body;
+  const { userId, productId, quantity, size, color, price } = req.body;
 
   try {
     // Kiểm tra các trường bắt buộc
@@ -49,7 +48,8 @@ const addToCart = async (req, res) => {
           productId,
           quantity,
           size: size, // Đảm bảo size luôn là chuỗi
-          color: color, // Đảm bảo color luôn là chuỗi
+          color: color,
+          price: price, // Đảm bảo color luôn là chuỗi
           totalItemPrice: productPrice * quantity, // Tính tổng cho sản phẩm mới
         });
       }
@@ -79,6 +79,7 @@ const addToCart = async (req, res) => {
             quantity,
             size: size, // Đảm bảo size luôn là chuỗi
             color: color, // Đảm bảo color luôn là chuỗi
+            price: price,
             totalItemPrice: productPrice * quantity, // Tính tổng cho sản phẩm đầu tiên
           },
         ],

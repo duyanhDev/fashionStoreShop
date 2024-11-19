@@ -25,7 +25,7 @@ const orderSchema = new mongoose.Schema({
   paymentMethod: {
     type: String,
     required: true,
-    enum: ["credit_card", "paypal", "cod", "vnpay"], // "cod" for cash on delivery (ship code)
+    enum: ["credit_card", "paypal", "cod", "vnpay", "momo"], // "cod" for cash on delivery (ship code)
   },
 
   paymentStatus: { type: String, default: "Pending" },

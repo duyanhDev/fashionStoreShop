@@ -10,9 +10,6 @@ const CreateCategoryAPI = async (req, res) => {
   try {
     const { name, description } = req.body;
 
-    // Log để kiểm tra giá trị đầu vào
-    console.log("Input data:", { name, description });
-
     // Thêm danh mục cha
     const clothingCategory = await AddCategory(name, description);
 
