@@ -29,15 +29,19 @@ const CartProducts = ({}) => {
   const [districtName, setDistrictName] = useState("");
   const [wardName, setWardName] = useState("");
   const [fullAddress, setFullAddress] = useState("");
-
-  const navigate = useNavigate();
+  console.log(ListCart);
 
   const formatPrice = (price) => {
-    if (price === undefined || price === null) {
-      return "0đ"; // Return fallback value if price is not valid
-    }
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
+    // Nếu price là chuỗi, chuyển đổi nó thành một số
+    const numericPrice =
+      typeof price === "string"
+        ? parseFloat(price.replace(/[^\d,.-]/g, "").replace(",", "."))
+        : price;
+
+    // Định dạng lại giá trị bằng cách thêm dấu chấm ngăn cách hàng nghìn và thêm "đ"
+    return numericPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
   };
+
   const DataProvine = async () => {
     try {
       let api = "https://esgoo.net/api-tinhthanh/1/0.htm";
@@ -117,39 +121,42 @@ const CartProducts = ({}) => {
         id: item.productId._id,
         image: (
           <img
-            src={item.productId.images[0]} // Assuming first image is desired
+            src={item.productId.images[0]}
             alt="Product"
-            style={{ width: "50px", height: "50px" }} // Adjust size as needed
+            style={{ width: "50px", height: "50px" }}
           />
         ),
         name: item.productId.name,
         color: item.color,
         quantity: item.quantity,
         size: item.size,
-        totalItemPrice: item.totalItemPrice,
+        price: formatPrice(item.price),
+        totalItemPrice: item.totalItemPrice + "đ",
       };
     });
 
   const [checkedItems, setCheckedItems] = useState([]);
 
   const handleCheck = (id, name, size, quantity, color, price) => {
-    console.log(id, price);
+    // Chuyển đổi giá trị price từ chuỗi (nếu cần) thành số
+    const numericPrice =
+      typeof price === "string"
+        ? parseFloat(price.replace(/[^\d,.-]/g, "").replace(",", "."))
+        : price;
+
+    console.log("Price in numeric format:", numericPrice);
 
     // Cập nhật state cho id của sản phẩm được chọn
     setProducts((prevState) => {
-      // Kiểm tra xem prevState có phải là mảng không
       if (!Array.isArray(prevState)) {
-        // Nếu không, khởi tạo lại prevState thành mảng rỗng
         prevState = [];
       }
 
-      // Tìm sản phẩm trong mảng
       const existingProductIndex = prevState.findIndex(
         (product) => product.id === id
       );
 
       if (existingProductIndex !== -1) {
-        // Nếu sản phẩm đã tồn tại, cập nhật nó
         return prevState.map((product, index) =>
           index === existingProductIndex
             ? {
@@ -158,14 +165,12 @@ const CartProducts = ({}) => {
                 size,
                 quantity,
                 color,
-                price,
-                // Toggle trạng thái selected
+                price: numericPrice, // Cập nhật giá trị numericPrice
               }
             : product
         );
       }
 
-      // Nếu sản phẩm chưa tồn tại, thêm mới
       return [
         ...prevState,
         {
@@ -174,7 +179,7 @@ const CartProducts = ({}) => {
           quantity,
           size,
           color,
-          price,
+          price: numericPrice, // Cập nhật giá trị numericPrice
         },
       ];
     });
@@ -183,22 +188,17 @@ const CartProducts = ({}) => {
     setPriceObj((prevPriceObj) => {
       const newPriceObj = { ...prevPriceObj };
       if (newPriceObj[id]) {
-        // Nếu sản phẩm đã được chọn, bỏ chọn nó
         delete newPriceObj[id];
       } else {
-        // Nếu sản phẩm chưa được chọn, thêm giá trị vào
-        newPriceObj[id] = price;
+        newPriceObj[id] = numericPrice;
       }
       return newPriceObj;
     });
 
-    // Cập nhật danh sách các sản phẩm đã được kiểm tra (checked)
     setCheckedItems((prevCheckedItems) => {
       if (prevCheckedItems.includes(id)) {
-        // Nếu sản phẩm đã được chọn, bỏ chọn
         return prevCheckedItems.filter((itemId) => itemId !== id);
       } else {
-        // Nếu sản phẩm chưa được chọn, thêm vào danh sách
         return [...prevCheckedItems, id];
       }
     });
@@ -235,7 +235,12 @@ const CartProducts = ({}) => {
       key: "size",
     },
     {
-      title: "Giá",
+      title: "Giá từng sản phẩm",
+      dataIndex: "price",
+      key: "price",
+    },
+    {
+      title: "Tổng tiền",
       dataIndex: "totalItemPrice",
       key: "totalItemPrice",
     },
@@ -261,6 +266,8 @@ const CartProducts = ({}) => {
     },
   ];
 
+  console.log(user._id);
+
   const handleOrder = async () => {
     try {
       setLoadingSpin(true);
@@ -280,7 +287,7 @@ const CartProducts = ({}) => {
         value,
         email
       );
-
+      console.log(res);
       if (res && res.data.EC === 0) {
         console.log(res.data.vnpUrl);
 
@@ -298,6 +305,9 @@ const CartProducts = ({}) => {
             ),
           });
           res.data.vnpUrl ? (window.location.href = res.data.vnpUrl) : null;
+          res.data.data.shortLink
+            ? (window.location.href = res.data.data.shortLink)
+            : null;
         }, 3000);
       }
     } catch (error) {
@@ -453,7 +463,7 @@ const CartProducts = ({}) => {
                   </Radio>
                 </div>
                 <div className="h-50 pay">
-                  <Radio value={3}>
+                  <Radio value={"momo"}>
                     <div className="flex gap-3 items-center">
                       <img
                         src="https://mcdn.coolmate.me/image/October2024/mceclip1_171.png"
@@ -523,7 +533,7 @@ const CartProducts = ({}) => {
                         </p>
                       </div>
                     );
-                  case 3:
+                  case "momo":
                     return (
                       <img
                         src="https://mcdn.coolmate.me/image/October2024/mceclip1_171.png"

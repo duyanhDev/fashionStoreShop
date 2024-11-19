@@ -1,12 +1,13 @@
 import axios from "./../untils/axios";
 
-const AddCartAPI = async (userId, productId, quantity, size, color) => {
+const AddCartAPI = async (userId, productId, quantity, size, color, price) => {
   return await axios.post("http://localhost:9000/api/v1/cart", {
     userId,
     productId,
     quantity,
     size,
     color,
+    price,
   });
 };
 

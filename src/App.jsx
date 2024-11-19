@@ -64,9 +64,10 @@ function App() {
     }
   };
 
-  useEffect(() => {
-    CartListProductsUser();
-  }, [user._id]);
+  user &&
+    useEffect(() => {
+      CartListProductsUser();
+    }, [user._id]);
 
   return (
     <div className="container_nav">

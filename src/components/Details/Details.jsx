@@ -8,7 +8,7 @@ import "swiper/css/thumbs";
 import { FreeMode, Navigation, Thumbs } from "swiper/modules";
 import { Rate, Button, Flex, notification, Image } from "antd";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
-import { useOutletContext, useParams } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { ListOneProductAPI } from "../../service/ApiProduct";
 import { AddCartAPI } from "../../service/Cart";
 import { useSelector } from "react-redux";
@@ -35,6 +35,8 @@ const Details = () => {
   const [SelectedSize, setSelectedSize] = useState("");
   const [CheckSelectedSize, setCheckSelectedSize] = useState(false);
   const { user } = useSelector((state) => state.auth);
+
+  const navigation = useNavigate();
 
   const onChange = (value) => {
     console.log("changed", value);
@@ -92,17 +94,29 @@ const Details = () => {
     SetcolorCart(item);
   };
 
+  const priceShift = discount ? pricediscount : price;
+
   const handleAddProduct = async () => {
-    // Kiểm tra nếu size hoặc color chưa được chọn
+    if (!user) {
+      api.open({
+        message: "Yêu cầu đăng nhập",
+        description: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.",
+        duration: 3,
+        type: "warning",
+      });
+      // navigation("/login");
+      return;
+    }
+
     if (!sizeCart || !colorCart) {
       api.open({
         message: "Lỗi",
         description:
           "Vui lòng chọn kích thước và màu sắc trước khi thêm vào giỏ hàng.",
         duration: 3,
-        type: "warning", // Có thể sử dụng loại 'error' hoặc 'warning' tùy theo ngữ cảnh
+        type: "warning",
       });
-      return; // Ngăn không cho gọi API nếu điều kiện không thỏa mãn
+      return;
     }
 
     try {
@@ -111,8 +125,10 @@ const Details = () => {
         param.id,
         count,
         sizeCart,
-        colorCart
+        colorCart,
+        priceShift
       );
+
       if (res && res.data && res.data.cart) {
         api.open({
           message: "Đã thêm vào giỏ hàng",
@@ -132,7 +148,6 @@ const Details = () => {
       }
     } catch (error) {
       console.error("Error adding product to cart:", error);
-      // Thêm xử lý lỗi nếu cần
     }
   };
 

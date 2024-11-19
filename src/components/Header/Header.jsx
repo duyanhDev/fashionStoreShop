@@ -17,17 +17,15 @@ import { logout } from "../../redux/actions/Auth";
 import { useState } from "react";
 import { RemoveCartOnePorduct } from "../../service/Cart";
 import ClipLoader from "react-spinners/ClipLoader";
-
+import PulseLoader from "react-spinners/PuffLoader";
 const Header = ({ user, ListCart, CartListProductsUser }) => {
-  console.log(user);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [loadingSpin, setLoadingSpin] = useState(false);
-
+  const [loadingCart, setLoadingCart] = useState(true);
   const handleLogOut = () => {
     dispatch(logout());
     navigate("/login");
@@ -71,15 +69,16 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
       icon: <SettingOutlined />,
       extra: "⌘S",
     },
-    user.isAdmin === true && {
-      key: "4",
-      label: "Admin",
-      icon: <SettingOutlined />,
-      extra: "⌘S",
-      onClick: () => {
-        navigate("/admin");
+    user &&
+      user.isAdmin === true && {
+        key: "4",
+        label: "Admin",
+        icon: <SettingOutlined />,
+        extra: "⌘S",
+        onClick: () => {
+          navigate("/admin");
+        },
       },
-    },
 
     {
       key: "5",
@@ -112,7 +111,20 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
       console.error("Error in handleRemoveCartProduct:", error);
     }
   };
-
+  const handlePay = () => {
+    setLoadingCart(true);
+    try {
+      setOpen(false);
+      const timer = setTimeout(() => {
+        setLoadingCart(false);
+      }, 3000);
+      navigate("cart");
+      return () => clearTimeout(timer);
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="w-full flex justify-between items-center h-full m-auto">
       <div className="flex items-center doin_image">
@@ -262,7 +274,7 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
               <Button
                 className="flex justify-center w-3/4 items-center ml-14 mt-1"
                 type="primary"
-                onClick={() => navigate("cart")}
+                onClick={() => handlePay()}
               >
                 Thanh Toán
               </Button>
