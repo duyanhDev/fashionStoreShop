@@ -69,9 +69,33 @@ const UpdateProducts = async (productData) => {
   }
 };
 
+const PutFeedbackProduct = async (id, userId, rating, review) => {
+  try {
+    const feedback = await Products.findOneAndUpdate(
+      { _id: id },
+      {
+        $push: {
+          ratings: {
+            userId,
+            rating,
+            review,
+          },
+        },
+      },
+      { new: true } // Trả về sản phẩm đã được cập nhật
+    );
+
+    return feedback;
+  } catch (error) {
+    console.log(error);
+    throw error; // Ném lỗi ra ngoài nếu cần xử lý thêm
+  }
+};
+
 module.exports = {
   AddProducts,
   ListProducts,
   ListOneProducts,
   UpdateProducts,
+  PutFeedbackProduct,
 };

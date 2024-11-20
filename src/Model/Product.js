@@ -44,9 +44,21 @@ const productSchema = new mongoose.Schema({
       type: String,
     },
   ],
+  // images: [
+  //   {
+  //     type: String,
+  //   },
+  // ],
   images: [
     {
-      type: String,
+      color: {
+        type: String, // Màu sắc của ảnh
+        required: true,
+      },
+      url: {
+        type: String, // URL của ảnh
+        required: true,
+      },
     },
   ],
   ratings: [

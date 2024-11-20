@@ -287,5 +287,103 @@ const listOderUserId = async (req, res) => {
     });
   }
 };
+const UpDateOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-module.exports = { CreateOrder, listOderUserId };
+    const order = await Order.findOneAndUpdate(
+      { _id: id },
+      { orderStatus: "Delivered" },
+      { new: true }
+    );
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    for (const item of order.items) {
+      const product = await Product.findById(item.productId);
+      if (product) {
+        product.stock = Math.max(product.stock - item.quantity, 0);
+        await product.save();
+      } else {
+        return res
+          .status(404)
+          .json({ message: `Product with ID ${item.productId} not found` });
+      }
+    }
+
+    res
+      .status(200)
+      .json({ message: "Order status updated and stock updated successfully" });
+  } catch (error) {
+    console.error("Error updating order:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const getTotalProductsSold = async (req, res) => {
+  try {
+    const orders = await Order.find();
+
+    const totalProductsSold = orders.reduce((total, order) => {
+      return (
+        total +
+        order.items.reduce((orderTotal, item) => orderTotal + item.quantity, 0)
+      );
+    }, 0);
+
+    res.status(200).json({
+      message: "Total products sold retrieved successfully",
+      totalProductsSold,
+    });
+  } catch (error) {
+    console.error("Error retrieving total products sold:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+const getTotalProductsSoldByType = async (req, res) => {
+  try {
+    // Retrieve all orders
+    const orders = await Order.find();
+
+    // Create a map to track product sales
+    const productSales = {};
+
+    // Iterate through all orders to accumulate product quantities
+    orders.forEach((order) => {
+      order.items.forEach((item) => {
+        if (productSales[item.productId]) {
+          // If the product already exists in the map, add to its quantity
+          productSales[item.productId].quantity += item.quantity;
+        } else {
+          // If the product does not exist, add it to the map
+          productSales[item.productId] = {
+            productId: item.productId,
+            name: item.name, // Assuming name is available in the order items
+            quantity: item.quantity,
+          };
+        }
+      });
+    });
+
+    // Convert the productSales map into an array for easier handling in response
+    const salesArray = Object.values(productSales);
+
+    res.status(200).json({
+      message: "Total products sold by type retrieved successfully",
+      productsSold: salesArray,
+    });
+  } catch (error) {
+    console.error("Error retrieving total products sold by type:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+module.exports = {
+  CreateOrder,
+  listOderUserId,
+  UpDateOrder,
+  getTotalProductsSold,
+  getTotalProductsSoldByType,
+};

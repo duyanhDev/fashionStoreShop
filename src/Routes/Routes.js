@@ -5,6 +5,7 @@ const {
   ListProductsAPI,
   ListOneProductAPI,
   UpdateProductsAPI,
+  PutFeedbackProductAPI,
 } = require("./../Controllers/Products");
 const {
   CreateCategoryAPI,
@@ -20,7 +21,12 @@ const {
   getCartProduct,
   RemoveCartProductfirst,
 } = require("./../Controllers/Cart");
-const { CreateOrder, listOderUserId } = require("../Controllers/Oder");
+const {
+  CreateOrder,
+  listOderUserId,
+  UpDateOrder,
+  getTotalProductsSoldByType,
+} = require("../Controllers/Oder");
 //product
 
 RouterAPI.get("/products", ListProductsAPI);
@@ -30,6 +36,8 @@ RouterAPI.post("/products", AddProductsAPI);
 RouterAPI.get("/products/:id", ListOneProductAPI);
 
 RouterAPI.put("/products/:id", UpdateProductsAPI);
+
+RouterAPI.post("/feedback", PutFeedbackProductAPI);
 
 // Category
 
@@ -56,4 +64,6 @@ RouterAPI.put("/cart/:cartId/:itemId", RemoveCartProductfirst);
 // oders
 RouterAPI.post("/order", CreateOrder);
 RouterAPI.get("/order/:userId", listOderUserId);
+RouterAPI.put("/order/:id", UpDateOrder);
+RouterAPI.get("/get-total-products-sold", getTotalProductsSoldByType);
 module.exports = RouterAPI;

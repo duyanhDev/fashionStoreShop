@@ -4,8 +4,80 @@ const {
   ListProducts,
   ListOneProducts,
   UpdateProducts,
+  PutFeedbackProduct,
 } = require("./../services/Product");
 const Products = require("./../Model/Product");
+// const AddProductsAPI = async (req, res) => {
+//   const {
+//     name,
+//     description,
+//     category,
+//     brand,
+//     care,
+//     price,
+//     discount,
+//     stock,
+//     size,
+//     color,
+//   } = req.body;
+
+//   // Parse sizes and colors into arrays
+//   const sizeArray = Array.isArray(size)
+//     ? size
+//     : size.split(",").map((item) => item.trim());
+//   const colorArray = Array.isArray(color)
+//     ? color
+//     : color.split(",").map((item) => item.trim());
+
+//   let imageUrls = [];
+//   if (req.files && req.files.images) {
+//     try {
+//       const files = Array.isArray(req.files.images)
+//         ? req.files.images
+//         : [req.files.images];
+
+//       // Upload each image and store the URL
+//       for (const file of files) {
+//         const resultImage = await uploadFileToCloudinary(file);
+//         imageUrls.push(resultImage.secure_url); // Collect the URL
+//       }
+
+//       console.log("Uploaded image URLs:", imageUrls);
+//     } catch (uploadError) {
+//       console.error("Error uploading images:", uploadError.message);
+//       return res
+//         .status(500)
+//         .json({ success: false, message: "Error uploading images" });
+//     }
+//   }
+//   const productData = {
+//     name,
+//     description,
+//     category,
+//     brand,
+//     care,
+//     price,
+//     discount,
+//     stock,
+//     size: sizeArray, // Directly using the size array
+//     color: colorArray, // Directly using the color array
+//     images: imageUrls.length ? imageUrls : [],
+//   };
+
+//   try {
+//     const data = await AddProducts(productData);
+//     return res.status(200).json({
+//       EC: 0,
+//       data: data,
+//       message: "Product added successfully",
+//     });
+//   } catch (error) {
+//     console.error("Error adding product:", error.message);
+//     return res
+//       .status(500)
+//       .json({ success: false, message: "Error adding product" });
+//   }
+// };
 const AddProductsAPI = async (req, res) => {
   const {
     name,
@@ -28,20 +100,27 @@ const AddProductsAPI = async (req, res) => {
     ? color
     : color.split(",").map((item) => item.trim());
 
-  let imageUrls = [];
+  // Upload images and associate them with colors
+  let images = [];
   if (req.files && req.files.images) {
     try {
       const files = Array.isArray(req.files.images)
         ? req.files.images
         : [req.files.images];
 
-      // Upload each image and store the URL
-      for (const file of files) {
-        const resultImage = await uploadFileToCloudinary(file);
-        imageUrls.push(resultImage.secure_url); // Collect the URL
+      // Ensure the number of colors matches the number of uploaded images
+      if (files.length !== colorArray.length) {
+        return res.status(400).json({
+          success: false,
+          message: "Number of images must match the number of colors",
+        });
       }
 
-      console.log("Uploaded image URLs:", imageUrls);
+      // Upload each image and associate it with the corresponding color
+      for (let i = 0; i < files.length; i++) {
+        const resultImage = await uploadFileToCloudinary(files[i]);
+        images.push({ color: colorArray[i], url: resultImage.secure_url });
+      }
     } catch (uploadError) {
       console.error("Error uploading images:", uploadError.message);
       return res
@@ -49,6 +128,7 @@ const AddProductsAPI = async (req, res) => {
         .json({ success: false, message: "Error uploading images" });
     }
   }
+
   const productData = {
     name,
     description,
@@ -60,7 +140,7 @@ const AddProductsAPI = async (req, res) => {
     stock,
     size: sizeArray, // Directly using the size array
     color: colorArray, // Directly using the color array
-    images: imageUrls.length ? imageUrls : [],
+    images, // Images array containing color-image associations
   };
 
   try {
@@ -196,9 +276,24 @@ const UpdateProductsAPI = async (req, res) => {
     });
   }
 };
+
+const PutFeedbackProductAPI = async (req, res) => {
+  try {
+    const { id, userId, rating, review } = req.body;
+    console.log(id, userId, rating, review);
+
+    const data = await PutFeedbackProduct(id, userId, rating, review);
+
+    return res.status(200).json({
+      EC: "cập nhật thành công",
+      data: data,
+    });
+  } catch (error) {}
+};
 module.exports = {
   AddProductsAPI,
   ListProductsAPI,
   ListOneProductAPI,
   UpdateProductsAPI,
+  PutFeedbackProductAPI,
 };
