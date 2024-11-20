@@ -44,6 +44,8 @@ function App() {
     ListProducsData();
   }, []);
 
+  console.log(ListProducts);
+
   const CartListProductsUser = async () => {
     if (!user?._id) {
       // Handle the case where user._id is not available

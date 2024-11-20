@@ -93,9 +93,18 @@ const UpdateProductAPI = async (
   }
 };
 
+const PutFeedbackProductAPI = async (id, userId, rating, review) => {
+  return await axios.post("http://localhost:9000/api/v1/feedback", {
+    id,
+    userId,
+    rating,
+    review,
+  });
+};
 export {
   createProductAPI,
   getListProductsAPI,
   ListOneProductAPI,
   UpdateProductAPI,
+  PutFeedbackProductAPI,
 };

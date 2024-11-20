@@ -6,13 +6,17 @@ import "swiper/css/free-mode";
 import "swiper/css/navigation";
 import "swiper/css/thumbs";
 import { FreeMode, Navigation, Thumbs } from "swiper/modules";
-import { Rate, Button, Flex, notification, Image } from "antd";
+import { Rate, Button, Flex, notification, Image, Avatar, Input } from "antd";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
-import { ListOneProductAPI } from "../../service/ApiProduct";
+import {
+  ListOneProductAPI,
+  PutFeedbackProductAPI,
+} from "../../service/ApiProduct";
 import { AddCartAPI } from "../../service/Cart";
 import { useSelector } from "react-redux";
-
+import { fetchTotalProductsSoldAPI } from "../../service/totalProduct";
+import ReactPaginate from "react-paginate";
 const Details = () => {
   const [api, contextHolder] = notification.useNotification();
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
@@ -34,9 +38,22 @@ const Details = () => {
   const [SelectedColor, setSelectedColor] = useState("");
   const [SelectedSize, setSelectedSize] = useState("");
   const [CheckSelectedSize, setCheckSelectedSize] = useState(false);
+  const [feedback, setFeedBack] = useState([]);
+  const ratings = 5;
+  const [review, setReivew] = useState("");
   const { user } = useSelector((state) => state.auth);
+  const [sumProducts, setSumProducts] = useState([]);
 
-  const navigation = useNavigate();
+  const itemsPerPage = 5;
+  const [currentPage, setCurrentPage] = useState(0);
+
+  const pageCount = Math.ceil(feedback.length / itemsPerPage);
+  const offset = currentPage * itemsPerPage;
+  const currentFeedback = feedback.slice(offset, offset + itemsPerPage);
+
+  const handlePageClick = ({ selected }) => {
+    setCurrentPage(selected);
+  };
 
   const onChange = (value) => {
     console.log("changed", value);
@@ -59,6 +76,9 @@ const Details = () => {
   const FetchAPIDetaillProuduct = async () => {
     try {
       const res = await ListOneProductAPI(param.id);
+
+      console.log(res);
+
       if (res && res.data && res.data.EC === 0) {
         setName(res.data.data.name || "");
         setDescription(res.data.data.description);
@@ -70,6 +90,7 @@ const Details = () => {
         setStock(res.data.data.stock || "");
         setSize(res.data.data.size || []);
         setColor(res.data.data.color || []);
+        setFeedBack(res.data.data.ratings || []);
       }
     } catch (error) {
       console.log(error);
@@ -134,7 +155,7 @@ const Details = () => {
           message: "Đã thêm vào giỏ hàng",
           description: (
             <div className="flex gap-2 p-2 ">
-              <img src={image[0]} className="img_cart" alt="lỗi" />
+              <img src={image[0].url} className="img_cart" alt="lỗi" />
               <div>
                 <h1 className="whitespace-nowrap">{name}</h1>
                 <h1>{`${colorCart} / ${sizeCart}`}</h1>
@@ -150,7 +171,38 @@ const Details = () => {
       console.error("Error adding product to cart:", error);
     }
   };
+  const fetchTotalProductsSold = async () => {
+    try {
+      const res = await fetchTotalProductsSoldAPI();
+      if (res && res.data) {
+        const data = res.data.productsSold.filter(
+          (product) => product.productId === param.id
+        );
 
+        setSumProducts(data);
+      }
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    fetchTotalProductsSold();
+  }, []);
+
+  const handleFeedBack = async () => {
+    try {
+      const res = await PutFeedbackProductAPI(
+        param.id,
+        user._id,
+        ratings,
+        review
+      );
+
+      if (res && res.data) {
+        setReivew("");
+        FetchAPIDetaillProuduct();
+      }
+    } catch (error) {}
+  };
   return (
     <div className="Details w-full">
       {contextHolder}
@@ -174,9 +226,9 @@ const Details = () => {
                   <>
                     <SwiperSlide key={index}>
                       <Image
-                        src={image}
+                        src={image.url}
                         preview={{
-                          src: image,
+                          src: image.url,
                         }}
                       />
                     </SwiperSlide>
@@ -200,7 +252,7 @@ const Details = () => {
                 return (
                   <>
                     <SwiperSlide key={index}>
-                      <img src={image} />
+                      <img src={image.url} />
                     </SwiperSlide>
                   </>
                 );
@@ -351,6 +403,16 @@ const Details = () => {
                   {stock} sản phẩm có sẵn
                 </h4>
               </div>
+              {sumProducts && sumProducts.length > 0 && (
+                <div className="flex items-center gap-1">
+                  <h4
+                    className="text-[#b3b3b3] font-normal text-sm"
+                    onChange={(e) => setStock(e.target.value)}
+                  >
+                    {sumProducts[0].quantity} sản phẩm đã bán
+                  </h4>
+                </div>
+              )}
               <div className=" flex items-center gap-1">
                 <div className="flex items-center m-3 number-input-group ">
                   <Button
@@ -395,6 +457,69 @@ const Details = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+      <div className="feedback">
+        <div className="w-1/5 star ">
+          <div className=" ">
+            <h1 className="text-center font-bold text-xl">ĐÁNH GIÁ SẢN PHẨM</h1>
+          </div>
+          <div className="mt-2">
+            <h1 className="text-center text-6xl font-bold">5</h1>
+          </div>
+          <div className="text-center mt-2">
+            <Rate defaultValue={5} size={30} />
+          </div>
+          <div className="text-center mt-2">
+            <p className="text-[#4d4d4d] text-xl italic">
+              {feedback && feedback.length} đánh giá
+            </p>
+          </div>
+        </div>
+        <div className="flex-1">
+          <div className="text-center font-bold text-xl">PHẢN HỒI</div>
+          {currentFeedback &&
+            currentFeedback.map((item) => {
+              return (
+                <div className="" key={item._id}>
+                  <div className="w-full m-4 flex items-center gap-3">
+                    {user ? (
+                      <img
+                        className="w-10 h-10 rounded-full"
+                        src={user.avatar}
+                        alt="avatar lỗi"
+                      />
+                    ) : (
+                      <Avatar>U</Avatar>
+                    )}
+                    <p>{user.name}</p>
+                  </div>
+                  <div className="ml-5">{item.review}</div>
+                </div>
+              );
+            })}
+          <ReactPaginate
+            previousLabel={"Trước"}
+            nextLabel={"Sau"}
+            breakLabel={"..."}
+            pageCount={pageCount}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={3}
+            onPageChange={handlePageClick}
+            containerClassName={"pagination"}
+            activeClassName={"active"}
+          />
+          <div className="w-full text-center flex justify-center gap-2">
+            <Input
+              showCount
+              maxLength={50}
+              onChange={(e) => setReivew(e.target.value)}
+              className="w-4/5"
+              placeholder="Phản hồi sản phẩm tại đây nhé!!"
+              value={review}
+            />
+            <Button onClick={handleFeedBack}>Gửi phản hồi</Button>
           </div>
         </div>
       </div>

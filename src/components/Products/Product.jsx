@@ -108,7 +108,7 @@ const Products = () => {
                 .map((image, index) => (
                   <Image
                     key={index} // Use index as key (consider using a unique ID if available)
-                    src={image}
+                    src={image.url}
                     alt={`${product.name} image ${index + 1}`} // More descriptive alt text
                     width={50}
                     height={50}
@@ -146,6 +146,8 @@ const Products = () => {
     };
     fetchData();
   }, []);
+
+  console.log(dataProducts);
 
   const columns = [
     { title: "Index", dataIndex: "Index", key: "Index" },

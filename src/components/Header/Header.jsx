@@ -19,6 +19,8 @@ import { RemoveCartOnePorduct } from "../../service/Cart";
 import ClipLoader from "react-spinners/ClipLoader";
 import PulseLoader from "react-spinners/PuffLoader";
 const Header = ({ user, ListCart, CartListProductsUser }) => {
+  console.log(ListCart);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -224,7 +226,7 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
                   >
                     <div>
                       <img
-                        src={cart.productId.images[0]}
+                        src={cart.productId.images[0].url}
                         alt={cart.productId.name}
                         width={100}
                       />

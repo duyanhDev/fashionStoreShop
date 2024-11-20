@@ -83,7 +83,7 @@ const Home = () => {
                       }}
                       cover={
                         <div className="hover_children">
-                          <img alt="example" src={item.images[0]} />
+                          <img alt="example" src={item.images[0].url} />
 
                           <div className="p-2 h-20 size g-2 hover">
                             <p className="font-bold text-[#000]">

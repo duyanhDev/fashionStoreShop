@@ -57,7 +57,7 @@ export default function Clothing({ ListProducts }) {
                   <div className="border-b">
                     <img
                       className="w-full h-64 object-cover"
-                      src={product.images[0]}
+                      src={product.images[0].url}
                       alt={product.name}
                     />
                   </div>
@@ -125,7 +125,7 @@ export default function Clothing({ ListProducts }) {
                     <div className="border-b">
                       <img
                         className="w-full h-64 object-cover"
-                        src={product.images[0]}
+                        src={product.images[0].url}
                         alt={product.name}
                       />
                     </div>
@@ -194,7 +194,7 @@ export default function Clothing({ ListProducts }) {
                     <div className="border-b">
                       <img
                         className="w-full h-64 object-cover"
-                        src={product.images[0]}
+                        src={product.images[0].url}
                         alt={product.name}
                       />
                     </div>
@@ -264,7 +264,7 @@ export default function Clothing({ ListProducts }) {
                     <div className="border-b">
                       <img
                         className="w-full h-64 object-cover"
-                        src={product.images[0]}
+                        src={product.images[0].url}
                         alt={product.name}
                       />
                     </div>
