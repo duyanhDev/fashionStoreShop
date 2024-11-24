@@ -48,4 +48,32 @@ const createOrder = async (
   }
 };
 
-export { listOderUserIdAPI, createOrder };
+// all order
+
+// sum all price all product
+
+const ListAllSumProduct = async () => {
+  return await axios.get("http://localhost:9000/api/v1/get-quantity-all");
+};
+
+// sum price oder one proudct
+const ListOderProductsAll = async () => {
+  return await axios.get("http://localhost:9000/api/v1/get-order-all");
+};
+
+const UpDateOrderProductAPI = async (id) => {
+  return await axios.put(`http://localhost:9000/api/v1/order/${id}`);
+};
+
+const OrderStatusOneProduct = async (id) => {
+  return await axios.get(`http://localhost:9000/api/v1/get-order-one/${id}`);
+};
+
+export {
+  listOderUserIdAPI,
+  createOrder,
+  ListOderProductsAll,
+  UpDateOrderProductAPI,
+  ListAllSumProduct,
+  OrderStatusOneProduct,
+};

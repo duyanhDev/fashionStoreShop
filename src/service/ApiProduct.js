@@ -19,7 +19,8 @@ const createProductAPI = async (
   stock,
   size,
   color,
-  images = []
+  images = [],
+  costPrice
 ) => {
   const formData = new FormData();
 
@@ -36,6 +37,7 @@ const createProductAPI = async (
   images.forEach((file) => {
     formData.append("images", file);
   });
+  formData.append("costPrice", costPrice);
 
   try {
     const response = await axios.post("api/v1/products", formData, {
@@ -63,7 +65,8 @@ const UpdateProductAPI = async (
   stock,
   size,
   color,
-  images = []
+  images = [],
+  costPrice
 ) => {
   const formData = new FormData();
 
@@ -79,6 +82,7 @@ const UpdateProductAPI = async (
   images.forEach((file) => {
     formData.append("images", file);
   });
+  formData.append("costPrice", costPrice);
 
   try {
     const response = await axios.put(`api/v1/products/${id}`, formData, {

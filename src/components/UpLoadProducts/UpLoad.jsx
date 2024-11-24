@@ -7,6 +7,7 @@ import {
   Space,
   InputNumber,
   Upload,
+  message,
 } from "antd";
 import ImgCrop from "antd-img-crop";
 import { useEffect, useState } from "react";
@@ -30,8 +31,12 @@ const UpLoad = () => {
   const param = useParams();
   const [categoryId, setCategoryId] = useState();
   const [brand, setBrand] = useState("");
+  const [messageApi, contextHolder] = message.useMessage();
+  const [costPrice, setCostPrice] = useState("");
+
   // xử lí ảnh
   const [fileList, setFileList] = useState([{}]);
+  console.log(param);
 
   const onChangeImg = ({ fileList: newFileList }) => {
     setFileList(newFileList);
@@ -58,6 +63,8 @@ const UpLoad = () => {
       reader.readAsDataURL(file);
     });
   };
+
+  console.log(fileList);
 
   const handleNameChange = (e) => {
     setName(e.target.value);
@@ -94,6 +101,8 @@ const UpLoad = () => {
         const res = await ListOneProductAPI(param.id);
 
         if (res && res.data.EC === 0) {
+          console.log(res.data.data);
+
           setName(res.data.data.name || "");
           setDescription(res.data.data.description || "");
           setBrand(res.data.data.brand || "");
@@ -103,10 +112,11 @@ const UpLoad = () => {
           setStock(res.data.data.stock || "");
           setSize(res.data.data.size || []);
           setColor(res.data.data.color || []);
+          setCostPrice(res.data.data.costPrice || 0);
           setFileList(
             res.data.data.images.map((image) => ({
-              url: image,
-              name: image || "Image",
+              url: image.url,
+              name: image.url || "Image",
             })) || []
           );
         }
@@ -171,16 +181,37 @@ const UpLoad = () => {
         stock,
         size,
         color,
-        image
+        image,
+        costPrice
       );
-      if (res) {
-        console.log(res);
-      }
-    } catch (error) {}
-  };
+      console.log(res);
 
+      if (res) {
+        const key = "updatable";
+
+        // Display loading message and success notification
+        messageApi.open({
+          key,
+          type: "loading",
+          content: "Loading...",
+        });
+        setTimeout(() => {
+          messageApi.open({
+            key,
+            type: "success",
+            content: "Products added successfully!",
+            duration: 2,
+          });
+        }, 1000);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  console.log(costPrice);
   return (
     <div className="w-full ml-6 flex ">
+      {contextHolder}
       <div className="w-3/5">
         <Typography.Title level={5}>Name</Typography.Title>
         <Input maxLength={200} value={name} onChange={handleNameChange} />
@@ -241,6 +272,17 @@ const UpLoad = () => {
               options={opitonCategory}
             />
           </Space>
+        </div>
+        <div className="ml-5 mt-2">
+          <Typography.Title level={5}>costPrice</Typography.Title>
+
+          <Input
+            type="number"
+            style={{ width: "50%" }}
+            min={1}
+            value={costPrice}
+            onChange={(e) => setCostPrice(e.target.value)}
+          />
         </div>
         <div className="ml-5 mt-2">
           <Typography.Title level={5}>Price</Typography.Title>

@@ -104,8 +104,8 @@ const View = () => {
           setColor(res.data.data.color || []);
           setFileList(
             res.data.data.images.map((image) => ({
-              url: image,
-              name: image || "Image",
+              url: image.url,
+              name: image.url || "Image",
             })) || []
           );
         }

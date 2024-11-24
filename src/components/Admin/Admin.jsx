@@ -12,7 +12,9 @@ const Admin = () => {
   return (
     <div className="container">
       <div className="nav flex justify-between  ">
-        <div className="w-1/6 text-center p-4">DIOR</div>
+        <div className="w-1/6 text-center p-4">
+          <Link to="/">DOIIN</Link>
+        </div>
         <div className="flex justify-between w-5/6 h-20 p-4 ">
           <div className="relative w-80 h-8 flex items-center cursor-pointer">
             <input
@@ -40,6 +42,12 @@ const Admin = () => {
               </Link>
             </li>
             <li>
+              <Link to="/admin/products" className="nav-link">
+                <FiHome />
+                Products
+              </Link>
+            </li>
+            <li>
               <Link to="category" className="nav-link">
                 <FaOpencart />
                 Category
@@ -58,7 +66,7 @@ const Admin = () => {
               </Link>
             </li>
             <li>
-              <Link to="/orders" className="nav-link">
+              <Link to="order" className="nav-link">
                 <RiBillLine />
                 Orders
               </Link>

@@ -6,4 +6,8 @@ const LoginAuth = async (email, password) => {
   });
 };
 
-export { LoginAuth };
+const UserAuth = async () => {
+  return await axios.get("http://localhost:9000/api/v1/users");
+};
+
+export { LoginAuth, UserAuth };

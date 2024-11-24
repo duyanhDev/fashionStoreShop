@@ -13,7 +13,7 @@ import {
 import ImgCrop from "antd-img-crop";
 import { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css"; // Import styles for Quill
+import "react-quill/dist/quill.snow.css";
 
 import { ListCategoryAPI } from "../../service/ApiCategory";
 import { createProductAPI } from "../../service/ApiProduct";
@@ -24,6 +24,7 @@ const Create = () => {
   const [category, setCategory] = useState([]);
   const [opitonCategory, setOptionCategory] = useState([]);
   const [price, setPrice] = useState("");
+  const [costPrice, setCostPrice] = useState("");
   const [discount, setDisscount] = useState(0);
   const [stock, setStock] = useState("");
   const [size, setSize] = useState([]);
@@ -114,7 +115,7 @@ const Create = () => {
     { label: "XXL", value: "XXL" },
   ];
 
-  const colorArr = ["đen", "trắng", "vàng", "đỏ", "be"];
+  const colorArr = ["đen", "trắng", "xanh", "nâu", "be"];
   const optionsColor = colorArr.map((color) => ({
     label: color,
     value: color,
@@ -141,7 +142,8 @@ const Create = () => {
         stock,
         size,
         color,
-        image
+        image,
+        costPrice
       );
       console.log(res);
 
@@ -173,11 +175,10 @@ const Create = () => {
         setDisscount("");
         setPrice("");
         setImageFiles("");
+        setCostPrice("");
       }
     } catch (error) {}
   };
-
-  console.log(discount);
 
   return (
     <div className="w-full ml-6 flex ">
@@ -203,7 +204,7 @@ const Create = () => {
         </Typography.Title>
         <Input.TextArea
           showCount
-          maxLength={100}
+          maxLength={1000}
           value={description}
           onChange={handleDescriptionChange}
           placeholder="disable resize"
@@ -222,7 +223,6 @@ const Create = () => {
             Create
           </Button>
         </Flex>
-
         <div className="ml-5 mt-2">
           <Typography.Title level={5}>Category</Typography.Title>
           <Space
@@ -243,6 +243,18 @@ const Create = () => {
               options={opitonCategory} // Use options with IDs and names
             />
           </Space>
+        </div>
+        costPrice
+        <div className="ml-5 mt-2">
+          <Typography.Title level={5}>costPrice</Typography.Title>
+          <InputNumber
+            style={{
+              width: "50%",
+            }}
+            min={1}
+            value={costPrice}
+            onChange={(e) => setCostPrice(e.target.value)}
+          />
         </div>
         <div className="ml-5 mt-2">
           <Typography.Title level={5}>Price</Typography.Title>
@@ -300,7 +312,6 @@ const Create = () => {
             />
           </Space>
         </div>
-
         <div className="ml-5 mt-2">
           <Typography.Title level={5}>Color</Typography.Title>
           <Space
@@ -322,7 +333,6 @@ const Create = () => {
             />
           </Space>
         </div>
-
         <div className="ml-5 mt-2">
           <ImgCrop rotationSlider>
             <Upload

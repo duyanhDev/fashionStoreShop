@@ -139,7 +139,25 @@ const Details = () => {
       });
       return;
     }
-
+    if (stock <= 0) {
+      api.open({
+        message: "Sản phẩm đã bán hết",
+        description:
+          "Vui lòng khách hàng đợi shop nhập thêm hoặc mua sản phẩm mới",
+        duration: 3,
+        type: "warning",
+      });
+      return;
+    }
+    if (count > stock) {
+      api.open({
+        message: `Sản phẩm  hiện giờ chỉ còn ${stock} sản phẩm`,
+        description: `Khách hàng chỉnh số lượng cho phù hợp với số lượng sản phẩm`,
+        duration: 3,
+        type: "warning",
+      });
+      return;
+    }
     try {
       const res = await AddCartAPI(
         user._id,
@@ -400,7 +418,7 @@ const Details = () => {
                   className="text-[#b3b3b3] font-normal text-sm"
                   onChange={(e) => setStock(e.target.value)}
                 >
-                  {stock} sản phẩm có sẵn
+                  {`${stock > 0 ? `${stock} sản phẩm có sẵn` : "Đã bán hết"} `}
                 </h4>
               </div>
               {sumProducts && sumProducts.length > 0 && (
@@ -493,7 +511,7 @@ const Details = () => {
                     ) : (
                       <Avatar>U</Avatar>
                     )}
-                    <p>{user.name}</p>
+                    {user && <p>{user.name}</p>}
                   </div>
                   <div className="ml-5">{item.review}</div>
                 </div>

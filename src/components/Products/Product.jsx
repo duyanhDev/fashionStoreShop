@@ -41,10 +41,10 @@ const Products = () => {
 
   const navigate = useNavigate();
   const handleNavigate = (id) => {
-    navigate(`uploadproducts/${id}`);
+    navigate(`/admin/uploadproducts/${id}`);
   };
   const handleViewNavigate = (id) => {
-    navigate(`viewproduct/${id}`);
+    navigate(`/admin/viewproduct/${id}`);
   };
 
   useEffect(() => {
@@ -56,12 +56,19 @@ const Products = () => {
           key: product._id,
           Index: index + 1,
           name: product.name,
-          description: product.description,
+          description: (
+            <p className="whitespace-nowrap overflow-hidden text-ellipsis w-36 h-40 ">
+              {product.description}
+            </p>
+          ),
           category: <Tag color={getRandomColor()}>{product.category.name}</Tag>,
           brand: product.brand,
           care: product.care,
+          costPrice: product.costPrice ? formatPrice(product.costPrice) : 0,
           price: formatPrice(product.price),
-          stock: product.stock,
+          totalCost: formatPrice(product.totalCost),
+          stock:
+            product.stock && product.stock > 0 ? product.stock : "Đã hết hàng",
           size: (
             <div className="flex flex-wrap items-center gap-1 w-52">
               {product.size.slice(0, 10).map((item, index) => (
@@ -156,7 +163,9 @@ const Products = () => {
     { title: "Category", dataIndex: "category", key: "category" },
     { title: "Brand", dataIndex: "brand", key: "brand" },
     { title: "Care", dataIndex: "care", key: "care" },
+    { title: "costPrice", dataIndex: "costPrice", key: "costPrice" },
     { title: "Price", dataIndex: "price", key: "price" },
+    { title: "totalCost", dataIndex: "totalCost", key: "totalCost" },
     { title: "Stock", dataIndex: "stock", key: "stock" },
     { title: "Size", dataIndex: "size", key: "size" },
     { title: "Color", dataIndex: "color", key: "color" },
@@ -181,7 +190,11 @@ const Products = () => {
     <div className="w-full">
       {hasSelected ? `Selected ${selectedRowKeys.length} items` : null}
       <div className="flex gap-3">
-        <Button type="primary" block onClick={() => navigate("addproduct")}>
+        <Button
+          type="primary"
+          block
+          onClick={() => navigate("/admin/addproduct")}
+        >
           Add Product
         </Button>
 

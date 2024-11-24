@@ -1,0 +1,33 @@
+.car_oder {
+  position: relative;
+  width: 500px;
+  animation: amition 4s linear forwards /* infinite; */;
+}
+.ant-steps-item-title {
+  font-size: 14px; /* Hoặc giá trị nhỏ hơn phù hợp */
+}
+.ant-steps-item-title {
+  white-space: nowrap;
+}
+
+@keyframes amition {
+  0% {
+    left: 0;
+  }
+
+  25% {
+    left: 150px;
+  }
+
+  50% {
+    left: 270px;
+  }
+
+  75% {
+    left: 390px;
+  }
+
+  100% {
+    left: 550px;
+  }
+}

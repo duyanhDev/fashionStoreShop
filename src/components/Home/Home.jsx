@@ -38,6 +38,15 @@ const Home = () => {
   const handleDetails = (id) => {
     navigate(`product/${id}`);
   };
+
+  const defaultProps = {
+    center: {
+      lat: 21.028511, // Latitude của Hà Nội
+      lng: 105.804817, // Longitude của Hà Nội
+    },
+    zoom: 11, // Độ zoom (tùy chỉnh theo nhu cầu)
+  };
+
   return (
     <div className="m-auto ">
       <div className="m-3">

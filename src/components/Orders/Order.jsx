@@ -1,11 +1,12 @@
 import { Table } from "antd";
 import { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { listOderUserIdAPI } from "../../service/Oder";
 import moment from "moment";
 const Order = () => {
   const { user } = useOutletContext();
   const [OrderProducts, setOderProducts] = useState([]);
+  const navigate = useNavigate();
   const columns = [
     {
       title: "STT",
@@ -14,6 +15,8 @@ const Order = () => {
     {
       title: "Tên sản phẩm",
       dataIndex: "name",
+      sorter: (a, b) => a.name.localeCompare(b.name),
+      width: "20%",
     },
     {
       title: "Số lượng",
@@ -30,6 +33,13 @@ const Order = () => {
     {
       title: "Giá",
       dataIndex: "price",
+      sorter: (a, b) => {
+        // Chuyển giá thành kiểu số để có thể so sánh chính xác
+        const priceA = parseFloat(a.price.replace(/[^\d.-]/g, "")); // Loại bỏ các ký tự không phải số
+        const priceB = parseFloat(b.price.replace(/[^\d.-]/g, ""));
+        return priceA - priceB; // Sắp xếp từ thấp đến cao
+      },
+      render: (text) => formatPrice(text), // Hiển thị giá theo định dạng bạn muốn
     },
     {
       title: "Địa chỉ",
@@ -67,6 +77,10 @@ const Order = () => {
       title: "Ngày đặt hàng",
       dataIndex: "createdAt",
     },
+    {
+      title: "Xem đơn hàng",
+      dataIndex: "Check",
+    },
   ];
   const formatPrice = (price) => {
     if (price === undefined || price === null) {
@@ -91,10 +105,24 @@ const Order = () => {
         district: item.shippingAddress.district,
         ward: item.shippingAddress.ward,
         paymentMethod: item.paymentMethod,
-        paymentStatus: item.paymentStatus,
-        orderStatus: item.orderStatus,
+        paymentStatus:
+          item.paymentStatus && item.paymentStatus === "Completed"
+            ? "Đã thanh toán"
+            : "Chờ thanh toán",
+        orderStatus:
+          item.orderStatus && item.orderStatus === "Delivered"
+            ? "Đơn hàng đã giao thành công"
+            : "Đang giao",
         totalAmount: formatPrice(item.totalAmount),
         createdAt: moment(item.createdAt).format("DD/MM/YYYY"),
+        Check: (
+          <p
+            className="cursor-pointer"
+            onClick={() => handleOrderStatus(item._id)}
+          >
+            Xem đơn hàng
+          </p>
+        ),
       };
     });
 
@@ -159,8 +187,9 @@ const Order = () => {
     FetchOrderProducts();
   }, [user._id]);
 
-  console.log(OrderProducts);
-
+  const handleOrderStatus = (id) => {
+    navigate(`/orderstatus/${id}`);
+  };
   return (
     <>
       <Table

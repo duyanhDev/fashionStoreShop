@@ -121,7 +121,7 @@ const CartProducts = ({}) => {
         id: item.productId._id,
         image: (
           <img
-            src={item.productId.images[0]}
+            src={item.productId.images[0].url}
             alt="Product"
             style={{ width: "50px", height: "50px" }}
           />
@@ -245,7 +245,7 @@ const CartProducts = ({}) => {
       key: "totalItemPrice",
     },
     {
-      title: "Check",
+      title: "Chọn sản phẩm",
       dataIndex: "id",
       key: "id",
       render: (_, record) => (
@@ -266,8 +266,6 @@ const CartProducts = ({}) => {
     },
   ];
 
-  console.log(user._id);
-
   const handleOrder = async () => {
     try {
       setLoadingSpin(true);
@@ -276,7 +274,21 @@ const CartProducts = ({}) => {
         ...item,
         productId: item.id, // Assuming `id` is the field that should be mapped to `productId`
       }));
-
+      if (
+        !Name ||
+        !email ||
+        !number ||
+        !fullAddress ||
+        !district ||
+        !wardName
+      ) {
+        notification.error({
+          message: "Lỗi đặt hàng",
+          description: "Vui lòng nhập đầy đủ thông tin trước khi đặt hàng.",
+        });
+        setLoadingSpin(false);
+        return;
+      }
       let res = await createOrder(
         user._id,
         formattedItems, // Pass items with productId
@@ -287,7 +299,7 @@ const CartProducts = ({}) => {
         value,
         email
       );
-      console.log(res);
+
       if (res && res.data.EC === 0) {
         console.log(res.data.vnpUrl);
 
@@ -327,13 +339,17 @@ const CartProducts = ({}) => {
               <Input
                 placeholder="Nhập họ và tên"
                 onChange={(e) => setName(e.target.value)}
+                value={Name}
+                status={!Name && "error"}
               />
             </div>
             <div className="w-1/3">
               <label className="text-sm">Số điện thoại</label>
               <Input
                 placeholder="Nhập số điện thoại"
-                onCanPlay={(e) => setNumber(e.target.value)}
+                onChange={(e) => setNumber(e.target.value)}
+                value={number}
+                status={!number && "error"}
               />
             </div>
           </div>
@@ -343,6 +359,8 @@ const CartProducts = ({}) => {
               <Input
                 placeholder="Nhập email của bạn"
                 onChange={(e) => setEmail(e.target.value)}
+                value={email}
+                status={!email && "error"}
               />
             </div>
           </div>
@@ -352,11 +370,15 @@ const CartProducts = ({}) => {
               <Input
                 placeholder="Nhập địa chỉ của bạn"
                 onChange={(e) => setFullAddress(e.target.value)}
+                value={fullAddress}
+                status={!fullAddress && "error"}
               />
               <div className="mt-2">
                 <div className="flex gap-2">
                   <Select
                     placeholder="Chọn Tỉnh/Thành Phố"
+                    status={!id && "error"}
+                    value={id}
                     style={{
                       flex: 1,
                     }}
@@ -380,6 +402,7 @@ const CartProducts = ({}) => {
                       flex: 1,
                     }}
                     value={selectedDistrict} // Đặt giá trị quận/huyện đã chọn
+                    status={!selectedDistrict && "error"}
                     options={[
                       {
                         value: "",
@@ -399,6 +422,7 @@ const CartProducts = ({}) => {
                       flex: 1,
                     }}
                     value={WarnDistrict}
+                    status={!WarnDistrict && "error"}
                     options={[
                       {
                         value: "",
