@@ -15,7 +15,11 @@ const {
   DeleteOneCategoryAPI,
 } = require("../Controllers/Category");
 
-const { RegisterUserAPI, LoginUserAPI } = require("./../Controllers/Auth");
+const {
+  RegisterUserAPI,
+  LoginUserAPI,
+  ListUserAPI,
+} = require("./../Controllers/Auth");
 const {
   addToCart,
   getCartProduct,
@@ -26,6 +30,9 @@ const {
   listOderUserId,
   UpDateOrder,
   getTotalProductsSoldByType,
+  ListOderProducts,
+  getTotalProductsSold,
+  getOrderOneProduct,
 } = require("../Controllers/Oder");
 //product
 
@@ -55,6 +62,7 @@ RouterAPI.delete("/category/:id", DeleteOneCategoryAPI);
 
 RouterAPI.post("/register", RegisterUserAPI);
 RouterAPI.post("/login", LoginUserAPI);
+RouterAPI.get("/users", ListUserAPI);
 
 // Cart
 RouterAPI.post("/cart", addToCart);
@@ -66,4 +74,8 @@ RouterAPI.post("/order", CreateOrder);
 RouterAPI.get("/order/:userId", listOderUserId);
 RouterAPI.put("/order/:id", UpDateOrder);
 RouterAPI.get("/get-total-products-sold", getTotalProductsSoldByType);
+RouterAPI.get("/get-quantity-all", getTotalProductsSold);
+// all hóa đơn thanh toán order
+RouterAPI.get("/get-order-all", ListOderProducts);
+RouterAPI.get("/get-order-one/:id", getOrderOneProduct);
 module.exports = RouterAPI;

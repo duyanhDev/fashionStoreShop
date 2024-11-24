@@ -1,6 +1,6 @@
 const { uploadFileToCloudinary } = require("./../services/Cloudinary");
 const { RegisterUser, LoginUser } = require("./../services/Auth");
-
+const Users = require("./../Model/User");
 const RegisterUserAPI = async (req, res) => {
   try {
     const { name, email, password, isAdmin } = req.body;
@@ -54,7 +54,21 @@ const LoginUserAPI = async (req, res) => {
     });
   }
 };
+
+const ListUserAPI = async (req, res) => {
+  try {
+    const users = await Users.find({});
+
+    return res.status(200).json({
+      EC: 0,
+      data: users,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
 module.exports = {
   RegisterUserAPI,
   LoginUserAPI,
+  ListUserAPI,
 };

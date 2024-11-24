@@ -44,19 +44,14 @@ const productSchema = new mongoose.Schema({
       type: String,
     },
   ],
-  // images: [
-  //   {
-  //     type: String,
-  //   },
-  // ],
   images: [
     {
       color: {
-        type: String, // Màu sắc của ảnh
+        type: String,
         required: true,
       },
       url: {
-        type: String, // URL của ảnh
+        type: String,
         required: true,
       },
     },
@@ -81,6 +76,10 @@ const productSchema = new mongoose.Schema({
       },
     },
   ],
+  costPrice: {
+    type: Number, // Giá nhập hàng cho một sản phẩm
+    required: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -97,5 +96,12 @@ productSchema.pre("save", function (next) {
   this.discountedPrice = this.price * (1 - this.discount / 100);
   next();
 });
+
+// Virtual để tính số tiền nhập hàng (totalCost)
+productSchema.virtual("totalCost").get(function () {
+  return this.costPrice * this.stock;
+});
+productSchema.set("toJSON", { virtuals: true });
+productSchema.set("toObject", { virtuals: true });
 
 module.exports = mongoose.model("Product", productSchema);

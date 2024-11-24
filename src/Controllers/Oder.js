@@ -48,14 +48,15 @@ const CreateOrder = async (req, res) => {
       if (!product) {
         throw new Error("Product not found.");
       }
+      console.log(item.price);
 
       // Calculate total amount for the order
-      totalAmount += item.price * item.quantity;
+      totalAmount += item.price;
 
       // Add product details to the email content
       emailContent += `
         <li>
-          <img src="${product.images[0]}" alt="${
+          <img src="${product.images[0].url}" alt="${
         product.name
       }" width="100px" /> <br>
           <span>Tên sản phẩm:</span> ${product.name} <br>
@@ -215,7 +216,8 @@ const CreateOrder = async (req, res) => {
         orderGroupId,
         signature,
       };
-
+      newOrder.paymentStatus = "Completed";
+      await newOrder.save();
       try {
         // Send the request to MoMo API
         const response = await axios.post(endpoint, payload, {
@@ -293,8 +295,11 @@ const UpDateOrder = async (req, res) => {
 
     const order = await Order.findOneAndUpdate(
       { _id: id },
-      { orderStatus: "Delivered" },
-      { new: true }
+      {
+        orderStatus: "Delivered",
+        paymentStatus: "Completed",
+      },
+      { new: true } // Chỉ định trả về đối tượng đã cập nhật
     );
 
     if (!order) {
@@ -342,32 +347,28 @@ const getTotalProductsSold = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+// lấy tổng số lương sản pjhaamr bán
 const getTotalProductsSoldByType = async (req, res) => {
   try {
-    // Retrieve all orders
     const orders = await Order.find();
 
-    // Create a map to track product sales
     const productSales = {};
 
-    // Iterate through all orders to accumulate product quantities
     orders.forEach((order) => {
       order.items.forEach((item) => {
         if (productSales[item.productId]) {
-          // If the product already exists in the map, add to its quantity
           productSales[item.productId].quantity += item.quantity;
         } else {
-          // If the product does not exist, add it to the map
           productSales[item.productId] = {
             productId: item.productId,
-            name: item.name, // Assuming name is available in the order items
+            name: item.name,
             quantity: item.quantity,
           };
         }
       });
     });
 
-    // Convert the productSales map into an array for easier handling in response
     const salesArray = Object.values(productSales);
 
     res.status(200).json({
@@ -380,10 +381,38 @@ const getTotalProductsSoldByType = async (req, res) => {
   }
 };
 
+const ListOderProducts = async (req, res) => {
+  try {
+    let data = await Order.find({}).sort({ createdAt: -1 });
+    return res.status(200).json({
+      EC: 0,
+      data: data,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getOrderOneProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const data = await Order.findOne({ _id: id });
+    return res.status(200).json({
+      EC: 0,
+      data: data,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   CreateOrder,
   listOderUserId,
   UpDateOrder,
   getTotalProductsSold,
   getTotalProductsSoldByType,
+  ListOderProducts,
+  getOrderOneProduct,
 };

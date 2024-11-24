@@ -17,7 +17,11 @@ const AddProducts = async (productData) => {
 
 const ListProducts = async () => {
   try {
-    const data = await Products.find({}).populate("category", "name");
+    const products = await Products.find({}).populate("category", "name");
+
+    // Chuyển đổi từng sản phẩm để bao gồm virtual fields
+    const data = products.map((product) => product.toJSON());
+
     return data;
   } catch (error) {
     console.log("list products error:", error);
@@ -55,6 +59,7 @@ const UpdateProducts = async (productData) => {
         size: productData.size,
         color: productData.color,
         images: productData.images,
+        costPrice: productData.costPrice,
       },
       { new: true } // Trả về document sau khi update
     );

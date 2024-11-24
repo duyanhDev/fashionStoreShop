@@ -90,6 +90,7 @@ const AddProductsAPI = async (req, res) => {
     stock,
     size,
     color,
+    costPrice,
   } = req.body;
 
   // Parse sizes and colors into arrays
@@ -141,6 +142,7 @@ const AddProductsAPI = async (req, res) => {
     size: sizeArray, // Directly using the size array
     color: colorArray, // Directly using the color array
     images, // Images array containing color-image associations
+    costPrice,
   };
 
   try {
@@ -203,6 +205,7 @@ const UpdateProductsAPI = async (req, res) => {
       stock,
       size,
       color,
+      costPrice,
     } = req.body;
     const { id } = req.params;
 
@@ -229,16 +232,39 @@ const UpdateProductsAPI = async (req, res) => {
         : color.split(",").map((item) => item.trim())
       : existingProduct.color;
 
-    // Xử lý images: thêm ảnh mới vào mảng ảnh cũ
-    let imageUrls = [...existingProduct.images]; // Giữ lại ảnh cũ
+    // Xử lý hình ảnh
+    let images = [...existingProduct.images];
     if (req.files && req.files.images) {
       const files = Array.isArray(req.files.images)
         ? req.files.images
         : [req.files.images];
 
-      for (const file of files) {
-        const resultImage = await uploadFileToCloudinary(file);
-        imageUrls.push(resultImage.secure_url);
+      // Xử lý màu mới và ảnh tương ứng
+      try {
+        const existingColors = existingProduct.color || [];
+        const newColors = colorArray.filter(
+          (color) => !existingColors.includes(color)
+        );
+
+        if (files.length !== newColors.length) {
+          return res.status(400).json({
+            success: false,
+            message:
+              "Số lượng ảnh mới phải khớp với số lượng màu mới được thêm vào",
+          });
+        }
+
+        // Gắn ảnh mới với màu mới
+        for (let i = 0; i < newColors.length; i++) {
+          const resultImage = await uploadFileToCloudinary(files[i]);
+          images.push({ color: newColors[i], url: resultImage.secure_url });
+        }
+      } catch (uploadError) {
+        console.error("Lỗi khi tải lên hình ảnh:", uploadError.message);
+        return res.status(500).json({
+          success: false,
+          message: "Lỗi khi tải lên hình ảnh",
+        });
       }
     }
 
@@ -253,15 +279,14 @@ const UpdateProductsAPI = async (req, res) => {
       stock: stock ? Number(stock) : existingProduct.stock,
       size: sizeArray,
       color: colorArray,
-      images: imageUrls,
+      images: images,
+      costPrice: costPrice || existingProduct.costPrice,
     };
 
     // Update sản phẩm
-    const updatedProduct = await Products.findByIdAndUpdate(
-      id,
-      updateFields,
-      { new: true } // Trả về document sau khi update
-    );
+    const updatedProduct = await Products.findByIdAndUpdate(id, updateFields, {
+      new: true, // Trả về document sau khi update
+    });
 
     return res.status(200).json({
       success: true,
