@@ -10,6 +10,10 @@
   white-space: nowrap;
 }
 
+.full_order {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
 @keyframes amition {
   0% {
     left: 0;

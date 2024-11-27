@@ -1,4 +1,5 @@
 // routes.js
+import BotChatAI from "../ChatAI/BotChat";
 import Create from "../components/AddProducts/Create";
 import Admin from "../components/Admin/Admin";
 import CartProducts from "../components/CartProducts/CartProducts";
@@ -45,6 +46,10 @@ export const RouterLayout = [
   {
     path: "/orderstatus/:id",
     element: <OderStatus />,
+  },
+  {
+    path: "/ChatAI",
+    element: <BotChatAI />,
   },
 ];
 

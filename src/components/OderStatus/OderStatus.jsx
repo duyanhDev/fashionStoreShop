@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { OrderStatusOneProduct } from "../../service/Oder";
 import { useEffect, useState } from "react";
 import moment from "moment";
+
 const customDot = (dot, { status, index }) => (
   <Popover
     content={
@@ -20,6 +21,7 @@ const OderStatus = () => {
   const param = useParams();
   const [orderStatus, SetOrderStatus] = useState("");
   const [createdAt, setCreatedAt] = useState("");
+  const [data, setData] = useState([]);
   const fetchAPIOrderStatus = async () => {
     try {
       const res = await OrderStatusOneProduct(param.id);
@@ -27,14 +29,17 @@ const OderStatus = () => {
       if (res && res.data && res.data.EC === 0) {
         SetOrderStatus(res.data.data.orderStatus);
         setCreatedAt(res.data.data.createdAt);
+        setData(res.data.data);
       }
     } catch (error) {}
   };
-  const description = moment(createdAt).format("DD/MM/YYYY");
+  // const description = moment(createdAt).format("DD/MM/YYYY");
 
   useEffect(() => {
     fetchAPIOrderStatus();
-  }, param.id);
+  }, [param.id]);
+  console.log(data);
+
   return (
     <div className="m-auto " style={{ width: "1300px" }}>
       <iframe
@@ -74,6 +79,18 @@ const OderStatus = () => {
             },
           ]}
         />
+      </div>
+
+      <div className="flex justify-center mt-4 full_order">
+        <div className="flex-1 text-center ">
+          <h1>ĐỊA CHỈ NHẬN HÀNG</h1>
+          <p>Người nhận : {data.username}</p>
+          <p>Số điện thoại : (+84) {data.phone}</p>
+          <p>
+            Địa chỉ : {data.shippingAddress?.fullAddress || "Không có địa chỉ"}
+          </p>
+        </div>
+        <div className="flex-1">2</div>
       </div>
     </div>
   );

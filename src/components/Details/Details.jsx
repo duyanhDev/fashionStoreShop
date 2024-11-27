@@ -77,8 +77,6 @@ const Details = () => {
     try {
       const res = await ListOneProductAPI(param.id);
 
-      console.log(res);
-
       if (res && res.data && res.data.EC === 0) {
         setName(res.data.data.name || "");
         setDescription(res.data.data.description);
@@ -96,6 +94,7 @@ const Details = () => {
       console.log(error);
     }
   };
+  console.log(feedback);
 
   useEffect(() => {
     FetchAPIDetaillProuduct();
@@ -505,13 +504,13 @@ const Details = () => {
                     {user ? (
                       <img
                         className="w-10 h-10 rounded-full"
-                        src={user.avatar}
+                        src={item && item.userId.avatar}
                         alt="avatar lỗi"
                       />
                     ) : (
                       <Avatar>U</Avatar>
                     )}
-                    {user && <p>{user.name}</p>}
+                    {item && <p>{item.userId.name}</p>}
                   </div>
                   <div className="ml-5">{item.review}</div>
                 </div>

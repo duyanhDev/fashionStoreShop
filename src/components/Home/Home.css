@@ -88,3 +88,9 @@
 .hover_children:hover .hover {
     visibility: visible;
 }
+
+.category_main .swiper-slide.swiper-slide-active {
+    width       : 268.4px !important;
+    margin-right: 20px !important;
+
+}

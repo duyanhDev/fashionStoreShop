@@ -289,6 +289,48 @@ export default function UserStatsCard() {
           </ResponsiveContainer>
         </div>
       </div>
+      {/* Tổng số tiền nhập đơn hàng */}
+      <div className="bg-red-600 rounded-lg p-6 text-white w-56 h-64">
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-3xl font-bold">
+                {formatPrice(priceTotalProduct)}
+              </h2>
+            </div>
+            <p className="text-indigo-200 mt-1">Tổng số tiền nhập hàng</p>
+          </div>
+          <button
+            onClick={() => setShowMenu(!showMenu)}
+            className="text-indigo-200 hover:text-white"
+          >
+            <div className="flex flex-col gap-1">
+              <div className="w-1 h-1 bg-current rounded-full"></div>
+              <div className="w-1 h-1 bg-current rounded-full"></div>
+              <div className="w-1 h-1 bg-current rounded-full"></div>
+            </div>
+          </button>
+        </div>
+
+        <div className="h-16">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={data}>
+              <Tooltip
+                content={<CustomTooltip />}
+                cursor={{ stroke: "rgba(255,255,255,0.2)" }}
+              />
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="#e2e8f0"
+                strokeWidth={2}
+                dot={{ r: 2, fill: "#e2e8f0" }}
+                activeDot={{ r: 4, fill: "#fff" }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
       {/* Tổng thu nhập  */}
       <div className="bg-red-600 rounded-lg p-6 text-white w-56 h-64">
         <div className="flex justify-between items-start mb-4">

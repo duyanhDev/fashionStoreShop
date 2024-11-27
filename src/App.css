@@ -126,3 +126,39 @@ body {
 .swiper-button-next:after {
   color: #fff;
 }
+
+.absolute.mt-3.w-full.hover_item.m-auto {
+  right: 0;
+  position: absolute;
+  margin: auto;
+  width: 1300px;
+  left: 0;
+  margin-top: 8px;
+  background-color: #fff;
+  height: 350px;
+  border-radius: 5px;
+}
+
+.hover_item .short_fitter div {
+  padding: 10px 0;
+}
+.hover_item {
+  visibility: hidden;
+}
+.hover_item a {
+  color: #484848;
+  font-size: 14px;
+  font-weight: 50000;
+  line-height: 1;
+}
+.product_hover::after {
+  width: 100px;
+  height: 100px;
+  content: "";
+  position: absolute;
+  margin-left: -68px;
+  top: 27px;
+}
+.product_hover:hover .hover_item {
+  visibility: visible;
+}

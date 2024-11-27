@@ -6,6 +6,8 @@ const listOderUserIdAPI = async (userId) => {
 
 const createOrder = async (
   userId,
+  username,
+  phone,
   items, // Ensure items passed has productId, quantity, and price
   fullAddress,
   city,
@@ -27,6 +29,8 @@ const createOrder = async (
 
     const response = await axios.post("http://localhost:9000/api/v1/order", {
       userId,
+      username,
+      phone,
       items: formattedItems, // Ensure items are formatted correctly
       shippingAddress: {
         fullAddress,

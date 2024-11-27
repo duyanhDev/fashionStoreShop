@@ -1,13 +1,42 @@
 .content_dosin {
-    width        : 273.8px;
-    height       : 400px;
-    border       : 1px solid #ccc;
-    border-radius: 5px;
-
-
+  width: 265.8px;
+  height: 400px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 .item_content {
-    margin-top : 5px;
-    margin-left: 10px;
+  margin-top: 5px;
+  margin-left: 10px;
+}
+.pagination {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.pagination li {
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.pagination .active a {
+  font-weight: bold;
+  color: white;
+  background-color: #007bff;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.pagination a {
+  text-decoration: none;
+  padding: 5px 10px;
+  color: #007bff;
+}
+
+.pagination a:hover {
+  background-color: #f0f0f0;
+  border-radius: 5px;
 }

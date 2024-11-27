@@ -291,6 +291,8 @@ const CartProducts = ({}) => {
       }
       let res = await createOrder(
         user._id,
+        Name,
+        number,
         formattedItems, // Pass items with productId
         fullAddress,
         city,

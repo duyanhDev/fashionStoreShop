@@ -26,12 +26,12 @@ const Home = () => {
 
   const SkeletonCard = () => (
     <Card
-      style={{ width: 280 }}
+      style={{ width: 265.8 }}
       cover={
         <Skeleton.Image active={true} style={{ width: "100%", height: 200 }} />
       }
     >
-      <Skeleton active={true} paragraph={{ rows: 2 }} className="mt-2" />
+      <Skeleton active={true} paragraph={{ rows: 3 }} />
     </Card>
   );
 
@@ -39,16 +39,8 @@ const Home = () => {
     navigate(`product/${id}`);
   };
 
-  const defaultProps = {
-    center: {
-      lat: 21.028511, // Latitude của Hà Nội
-      lng: 105.804817, // Longitude của Hà Nội
-    },
-    zoom: 11, // Độ zoom (tùy chỉnh theo nhu cầu)
-  };
-
   return (
-    <div className="m-auto ">
+    <div className="m-auto mx-5">
       <div className="m-3">
         <h1 className=" text-xl font-bold h1_main">SẢN PHẨM NỔI BẬT</h1>
         {/* <div className="">
@@ -84,15 +76,19 @@ const Home = () => {
                   <SwiperSlide
                     key={item._id}
                     onClick={() => handleDetails(item._id)}
+                    className="w-full"
                   >
                     <Card
                       hoverable
-                      style={{
-                        width: 280,
-                      }}
+                      style={{}}
+                      className="w-full"
                       cover={
                         <div className="hover_children">
-                          <img alt="example" src={item.images[0].url} />
+                          <img
+                            className="w-full h-64 object-cover"
+                            alt="example"
+                            src={item.images[0].url}
+                          />
 
                           <div className="p-2 h-20 size g-2 hover">
                             <p className="font-bold text-[#000]">
@@ -122,9 +118,14 @@ const Home = () => {
                         <p className="text-[#111] font-semibold p-1">
                           {item.brand}
                         </p>
-                        <p className="text-[#111] font-semibold text-nowrap p-1">
-                          {item.name}
-                        </p>
+                        <div
+                          className="item_content"
+                          style={{ maxWidth: "200px" }}
+                        >
+                          <span className="whitespace-nowrap overflow-hidden text-ellipsis block">
+                            {item.name}
+                          </span>
+                        </div>
                         <span className="line-through text-[#222] opacity-60 p-1">
                           {item.discount ? (
                             <span>{formatPrice(item.price)}</span>
