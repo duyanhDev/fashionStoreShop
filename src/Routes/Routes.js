@@ -34,6 +34,8 @@ const {
   getTotalProductsSold,
   getOrderOneProduct,
 } = require("../Controllers/Oder");
+const { BotChatAPI } = require("../Controllers/BotChatApi");
+
 //product
 
 RouterAPI.get("/products", ListProductsAPI);
@@ -78,4 +80,5 @@ RouterAPI.get("/get-quantity-all", getTotalProductsSold);
 // all hóa đơn thanh toán order
 RouterAPI.get("/get-order-all", ListOderProducts);
 RouterAPI.get("/get-order-one/:id", getOrderOneProduct);
+RouterAPI.post("/ChatAI", BotChatAPI);
 module.exports = RouterAPI;

@@ -6,7 +6,11 @@ const reviewSchema = new mongoose.Schema({
     ref: "Product",
     required: true,
   },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Users",
+    required: true,
+  },
   rating: { type: Number, min: 1, max: 5, required: true },
   reviewText: { type: String },
   createdAt: { type: Date, default: Date.now },

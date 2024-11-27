@@ -32,10 +32,13 @@ const ListProducts = async () => {
 // oneupdate
 const ListOneProducts = async (id) => {
   try {
-    const data = await Products.findOne({ _id: id }).populate(
-      "category",
-      "name"
-    );
+    const data = await Products.findOne({ _id: id })
+      .populate("category", "name")
+      .populate({
+        path: "ratings.userId", // Lấy thông tin userId trong ratings
+        select: "name avatar", // Chỉ lấy trường name từ model Users
+      });
+
     return data;
   } catch (error) {
     console.log("list products error:", error);

@@ -9,7 +9,15 @@ const nodemailer = require("nodemailer");
 const axios = require("axios");
 const CreateOrder = async (req, res) => {
   try {
-    const { userId, items, shippingAddress, paymentMethod, email } = req.body;
+    const {
+      userId,
+      username,
+      phone,
+      items,
+      shippingAddress,
+      paymentMethod,
+      email,
+    } = req.body;
 
     // Validate input data
     if (!userId || !items || !paymentMethod || !shippingAddress) {
@@ -79,6 +87,8 @@ const CreateOrder = async (req, res) => {
     // Create new order
     const newOrder = new Order({
       userId,
+      username,
+      phone,
       items,
       shippingAddress,
       paymentMethod,
@@ -274,7 +284,6 @@ const listOderUserId = async (req, res) => {
   try {
     let { userId } = req.params;
 
-    // Use find to get all orders for the given userId
     let data = await Order.find({ userId: userId }).sort({ createdAt: -1 });
 
     return res.status(200).json({
