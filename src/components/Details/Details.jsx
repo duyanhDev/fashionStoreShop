@@ -8,7 +8,7 @@ import "swiper/css/thumbs";
 import { FreeMode, Navigation, Thumbs } from "swiper/modules";
 import { Rate, Button, Flex, notification, Image, Avatar, Input } from "antd";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
-import { useNavigate, useOutletContext, useParams } from "react-router-dom";
+import { useOutletContext, useParams } from "react-router-dom";
 import {
   ListOneProductAPI,
   PutFeedbackProductAPI,
@@ -94,7 +94,6 @@ const Details = () => {
       console.log(error);
     }
   };
-  console.log(feedback);
 
   useEffect(() => {
     FetchAPIDetaillProuduct();

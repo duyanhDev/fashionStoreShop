@@ -20,6 +20,7 @@ import { createProductAPI } from "../../service/ApiProduct";
 import { useNavigate } from "react-router-dom";
 const Create = () => {
   const [name, setName] = useState("");
+  const [gender, setGender] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState([]);
   const [opitonCategory, setOptionCategory] = useState([]);
@@ -116,9 +117,15 @@ const Create = () => {
   ];
 
   const colorArr = ["đen", "trắng", "xanh", "nâu", "be"];
+  const genderArr = ["male", "female", "unisex"];
   const optionsColor = colorArr.map((color) => ({
     label: color,
     value: color,
+  }));
+
+  const optionGender = genderArr.map((gender) => ({
+    label: gender,
+    value: gender,
   }));
 
   const onChange = (value) => {
@@ -128,11 +135,15 @@ const Create = () => {
   const onChangeStock = (value) => {
     setStock(value);
   };
+  const onChangeGender = (value) => {
+    setGender(value);
+  };
 
   const handleCreate = async () => {
     try {
       const res = await createProductAPI(
         name,
+        gender,
         description,
         categoryId,
         brand,
@@ -145,9 +156,10 @@ const Create = () => {
         image,
         costPrice
       );
-      console.log(res);
 
       if (res) {
+        console.log(res);
+
         const key = "updatable";
 
         // Display loading message and success notification
@@ -186,6 +198,26 @@ const Create = () => {
       <div className="w-3/5">
         <Typography.Title level={5}>Name</Typography.Title>
         <Input maxLength={200} value={name} onChange={handleNameChange} />
+        <div className="mt-2">
+          <Typography.Title level={5}>Gender</Typography.Title>
+          <Space
+            style={{
+              width: "50%",
+            }}
+            direction="vertical"
+          >
+            <Select
+              allowClear
+              style={{
+                width: "100%",
+              }}
+              placeholder="Please select"
+              value={gender}
+              onChange={onChangeGender}
+              options={optionGender}
+            />
+          </Space>
+        </div>
 
         <Typography.Title level={5}>Brand</Typography.Title>
         <Input
@@ -244,13 +276,12 @@ const Create = () => {
             />
           </Space>
         </div>
-        costPrice
+
         <div className="ml-5 mt-2">
           <Typography.Title level={5}>costPrice</Typography.Title>
-          <InputNumber
-            style={{
-              width: "50%",
-            }}
+          <Input
+            type="number"
+            style={{ width: "50%" }}
             min={1}
             value={costPrice}
             onChange={(e) => setCostPrice(e.target.value)}

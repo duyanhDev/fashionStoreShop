@@ -1,12 +1,16 @@
 import React, { useState } from "react";
 import { PostChatBotAI } from "../service/ChatBot";
+import { useOutletContext } from "react-router-dom";
 
 const BotChatAI = () => {
   const [messages, setMessages] = useState([
     { id: 1, text: "Xin chào! Tôi là trợ lý ảo.", sender: "bot" },
   ]);
+  const { user } = useOutletContext();
+
   const [inputMessage, setInputMessage] = useState("");
 
+  // Icons for user and bot
   const UserIcon = () => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -58,34 +62,58 @@ const BotChatAI = () => {
     </svg>
   );
 
+  // Handle sending messages
   const handleSendMessage = async () => {
+    if (inputMessage.trim() === "") return;
+
+    // Add user message to the list
+    const newUserMessage = {
+      id: messages.length + 1,
+      text: inputMessage,
+      sender: "user",
+    };
+    setMessages((prev) => [...prev, newUserMessage]);
+    setInputMessage("");
+
     try {
-      const res = await PostChatBotAI(inputMessage);
+      // Send message to the bot
+      const res = await PostChatBotAI(inputMessage.trim());
+      if (res.data?.message?.content) {
+        // Format content from bot's response
+        const formattedContent = res.data.message.content
+          .replace(/(?:\*|[*] )(.*)/g, "<li>$1</li>") // Convert Markdown to HTML list
+          .replace(/(?:[*]{2})(.*)(?:[*]{2})/g, "<strong>$1</strong>"); // Convert **bold** to <strong>
 
-      if (res.data) {
-        if (inputMessage.trim() === "") return;
-
-        const newUserMessage = {
-          id: messages.length + 1,
-          text: inputMessage,
-          sender: "user",
-        };
-
+        // Create bot's response with formatted content
         const botResponse = {
           id: messages.length + 2,
-          text: res.data.message.content,
+          text: formattedContent,
           sender: "bot",
         };
-        console.log(botResponse);
 
-        setMessages([...messages, newUserMessage, botResponse]);
-        setInputMessage("");
+        // Add bot's response to the list
+        setMessages((prev) => [
+          ...prev,
+          {
+            ...botResponse,
+            text: formattedContent, // Ensure the formatted content is used
+          },
+        ]);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error sending message:", error);
+      const errorMessage = {
+        id: messages.length + 2,
+        text: "Xin lỗi, có lỗi xảy ra khi xử lý tin nhắn của bạn.",
+        sender: "bot",
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    }
   };
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
+      {/* Message list */}
       <div className="flex-grow overflow-y-auto p-4 space-y-4">
         {messages.map((msg) => (
           <div
@@ -102,19 +130,36 @@ const BotChatAI = () => {
                   : "bg-white text-gray-800 border"
               }`}
             >
-              {msg.text}
+              {/* Render content conditionally */}
+              {msg.sender === "bot" ? (
+                <ul
+                  dangerouslySetInnerHTML={{
+                    __html: `<ul>${msg.text}</ul>`,
+                  }}
+                />
+              ) : (
+                msg.text
+              )}
             </div>
-            {msg.sender === "user" && <UserIcon />}
+            {msg.sender === "user" && (
+              <div className="flex items-center space-x-2">
+                <UserIcon />
+                <p className="text-sm text-gray-600">
+                  {user?.name || "Người dùng"}
+                </p>
+              </div>
+            )}
           </div>
         ))}
       </div>
 
+      {/* Input box */}
       <div className="p-4 bg-white border-t flex items-center space-x-2">
         <input
           type="text"
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+          onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
           placeholder="Nhập tin nhắn..."
           className="flex-grow px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />

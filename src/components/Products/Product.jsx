@@ -56,6 +56,7 @@ const Products = () => {
           key: product._id,
           Index: index + 1,
           name: product.name,
+          gender: product.gender,
           description: (
             <p className="whitespace-nowrap overflow-hidden text-ellipsis w-36 h-40 ">
               {product.description}
@@ -159,6 +160,7 @@ const Products = () => {
   const columns = [
     { title: "Index", dataIndex: "Index", key: "Index" },
     { title: "Name", dataIndex: "name", key: "name" },
+    { title: "Gender", dataIndex: "gender", key: "gender" },
     { title: "Description", dataIndex: "description", key: "description" },
     { title: "Category", dataIndex: "category", key: "category" },
     { title: "Brand", dataIndex: "brand", key: "brand" },

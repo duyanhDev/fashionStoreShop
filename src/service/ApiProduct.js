@@ -10,6 +10,7 @@ const ListOneProductAPI = async (id) => {
 
 const createProductAPI = async (
   name,
+  gender,
   description,
   category,
   brand,
@@ -25,6 +26,7 @@ const createProductAPI = async (
   const formData = new FormData();
 
   formData.append("name", name);
+  formData.append("gender", gender);
   formData.append("description", description);
   formData.append("category", category);
   formData.append("brand", brand);
@@ -57,6 +59,7 @@ const createProductAPI = async (
 const UpdateProductAPI = async (
   id,
   name,
+  gender,
   description,
   category,
   brand,
@@ -69,8 +72,8 @@ const UpdateProductAPI = async (
   costPrice
 ) => {
   const formData = new FormData();
-
   formData.append("name", name);
+  formData.append("gender", gender);
   formData.append("description", description);
   formData.append("category", category);
   formData.append("brand", brand);

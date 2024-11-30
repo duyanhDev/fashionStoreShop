@@ -19,6 +19,7 @@ import { ListCategoryAPI } from "../../service/ApiCategory";
 
 const UpLoad = () => {
   const [name, setName] = useState("");
+  const [gender, setGender] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState([]);
   const [opitonCategory, setOptionCategory] = useState([]);
@@ -101,9 +102,8 @@ const UpLoad = () => {
         const res = await ListOneProductAPI(param.id);
 
         if (res && res.data.EC === 0) {
-          console.log(res.data.data);
-
           setName(res.data.data.name || "");
+          setGender(res.data.data.gender || "");
           setDescription(res.data.data.description || "");
           setBrand(res.data.data.brand || "");
           setCare(res.data.data.care || "");
@@ -167,12 +167,22 @@ const UpLoad = () => {
     label: color,
     value: color,
   }));
+  const genderArr = ["male", "female", "unisex"];
+
+  const optionGender = genderArr.map((gender) => ({
+    label: gender,
+    value: gender,
+  }));
+  const onChangeGender = (value) => {
+    setGender(value);
+  };
 
   const hanldeUpdateProducts = async () => {
     try {
       const res = await UpdateProductAPI(
         param.id,
         name,
+        gender,
         description,
         categoryId,
         brand,
@@ -215,6 +225,26 @@ const UpLoad = () => {
       <div className="w-3/5">
         <Typography.Title level={5}>Name</Typography.Title>
         <Input maxLength={200} value={name} onChange={handleNameChange} />
+        <div className="mt-2">
+          <Typography.Title level={5}>Gender</Typography.Title>
+          <Space
+            style={{
+              width: "50%",
+            }}
+            direction="vertical"
+          >
+            <Select
+              allowClear
+              style={{
+                width: "100%",
+              }}
+              placeholder="Please select"
+              value={gender}
+              onChange={onChangeGender}
+              options={optionGender}
+            />
+          </Space>
+        </div>
         <Typography.Title level={5}>Brand</Typography.Title>
         <Input
           maxLength={200}

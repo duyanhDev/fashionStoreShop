@@ -4,6 +4,7 @@ import Create from "../components/AddProducts/Create";
 import Admin from "../components/Admin/Admin";
 import CartProducts from "../components/CartProducts/CartProducts";
 import Category from "../components/Category/Category";
+import ClothingMale from "../components/ClothingMale/ClothingMale";
 import Details from "../components/Details/Details";
 import Home from "../components/Home/Home";
 import DeliveryMap from "../components/Map/Map";
@@ -50,6 +51,10 @@ export const RouterLayout = [
   {
     path: "/ChatAI",
     element: <BotChatAI />,
+  },
+  {
+    path: "/category/:gender",
+    element: <ClothingMale />,
   },
 ];
 
