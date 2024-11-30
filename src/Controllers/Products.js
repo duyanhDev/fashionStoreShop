@@ -5,8 +5,10 @@ const {
   ListOneProducts,
   UpdateProducts,
   PutFeedbackProduct,
+  CategoryGender,
 } = require("./../services/Product");
 const Products = require("./../Model/Product");
+const { ConnectionStates } = require("mongoose");
 // const AddProductsAPI = async (req, res) => {
 //   const {
 //     name,
@@ -81,6 +83,7 @@ const Products = require("./../Model/Product");
 const AddProductsAPI = async (req, res) => {
   const {
     name,
+    gender,
     description,
     category,
     brand,
@@ -92,6 +95,7 @@ const AddProductsAPI = async (req, res) => {
     color,
     costPrice,
   } = req.body;
+  console.log(gender);
 
   // Parse sizes and colors into arrays
   const sizeArray = Array.isArray(size)
@@ -132,6 +136,7 @@ const AddProductsAPI = async (req, res) => {
 
   const productData = {
     name,
+    gender,
     description,
     category,
     brand,
@@ -197,6 +202,7 @@ const UpdateProductsAPI = async (req, res) => {
   try {
     const {
       name,
+      gender,
       description,
       category,
       brand,
@@ -271,6 +277,7 @@ const UpdateProductsAPI = async (req, res) => {
     // Tạo object chứa các trường cần update
     const updateFields = {
       name: name || existingProduct.name,
+      gender: gender || existingProduct.gender,
       description: description || existingProduct.description,
       category: category || existingProduct.category,
       brand: brand || existingProduct.brand,
@@ -305,12 +312,24 @@ const UpdateProductsAPI = async (req, res) => {
 const PutFeedbackProductAPI = async (req, res) => {
   try {
     const { id, userId, rating, review } = req.body;
-    console.log(id, userId, rating, review);
-
     const data = await PutFeedbackProduct(id, userId, rating, review);
 
     return res.status(200).json({
       EC: "cập nhật thành công",
+      data: data,
+    });
+  } catch (error) {}
+};
+
+const CategoryGenderAPI = async (req, res) => {
+  const { gender } = req.params;
+  console.log(gender);
+
+  try {
+    const data = await CategoryGender(gender);
+
+    return res.status(200).json({
+      EC: 0,
       data: data,
     });
   } catch (error) {}
@@ -321,4 +340,5 @@ module.exports = {
   ListOneProductAPI,
   UpdateProductsAPI,
   PutFeedbackProductAPI,
+  CategoryGenderAPI,
 };

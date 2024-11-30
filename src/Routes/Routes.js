@@ -6,6 +6,7 @@ const {
   ListOneProductAPI,
   UpdateProductsAPI,
   PutFeedbackProductAPI,
+  CategoryGenderAPI,
 } = require("./../Controllers/Products");
 const {
   CreateCategoryAPI,
@@ -48,6 +49,10 @@ RouterAPI.put("/products/:id", UpdateProductsAPI);
 
 RouterAPI.post("/feedback", PutFeedbackProductAPI);
 
+// gender products
+
+RouterAPI.get("/category/:gender", CategoryGenderAPI);
+
 // Category
 
 RouterAPI.post("/category", CreateCategoryAPI);
@@ -81,4 +86,5 @@ RouterAPI.get("/get-quantity-all", getTotalProductsSold);
 RouterAPI.get("/get-order-all", ListOderProducts);
 RouterAPI.get("/get-order-one/:id", getOrderOneProduct);
 RouterAPI.post("/ChatAI", BotChatAPI);
+
 module.exports = RouterAPI;

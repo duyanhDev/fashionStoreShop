@@ -100,10 +100,18 @@ const PutFeedbackProduct = async (id, userId, rating, review) => {
   }
 };
 
+const CategoryGender = async (gender) => {
+  try {
+    const data = await Products.find({ gender: gender });
+    return data;
+  } catch (error) {}
+};
+
 module.exports = {
   AddProducts,
   ListProducts,
   ListOneProducts,
   UpdateProducts,
   PutFeedbackProduct,
+  CategoryGender,
 };

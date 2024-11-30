@@ -5,6 +5,12 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  gender: {
+    type: String,
+    enum: ["male", "female", "unisex"],
+    default: "unisex",
+    required: true,
+  },
   description: {
     type: String,
   },
