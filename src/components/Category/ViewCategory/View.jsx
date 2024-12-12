@@ -25,6 +25,9 @@ const View = ({ isModalOpen, setIsModel, isCategory }) => {
   const handleCancel = () => {
     setIsModel(false);
   };
+
+  console.log(name);
+
   return (
     <>
       <Modal

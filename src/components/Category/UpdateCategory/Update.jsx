@@ -15,6 +15,7 @@ const Update = ({ isModalOpen, setIsModel, isCategory, FetchApiCategory }) => {
       try {
         const res = await ListOneCategoryAPI(isCategory);
         if (res && res.data && res.data.EC === 0) {
+          console.log(res.data.data);
           setName(res.data.data.name || "");
           setDescription(res.data.data.description || "");
         }
@@ -24,6 +25,8 @@ const Update = ({ isModalOpen, setIsModel, isCategory, FetchApiCategory }) => {
     };
     fetchCategory();
   }, [isCategory]);
+
+  console.log(isCategory);
 
   useEffect(() => {
     const handleEnterPress = (event) => {

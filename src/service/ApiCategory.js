@@ -25,10 +25,15 @@ const UpdateOneCatogryAPI = async (id, name, description) => {
 const DeleteOneCategoryAPI = async (id) => {
   return await axios.delete(`http://localhost:9000/api/v1/category/${id}`);
 };
+
+const CategoryProductsGender = async (gender) => {
+  return axios.get(`http://localhost:9000/api/v1/categoryProducts/${gender}`);
+};
 export {
   ListCategoryAPI,
   AddCategoryAPI,
   ListOneCategoryAPI,
   UpdateOneCatogryAPI,
   DeleteOneCategoryAPI,
+  CategoryProductsGender,
 };

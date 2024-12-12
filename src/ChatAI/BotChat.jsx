@@ -4,9 +4,13 @@ import { useOutletContext } from "react-router-dom";
 
 const BotChatAI = () => {
   const [messages, setMessages] = useState([
-    { id: 1, text: "Xin chào! Tôi là trợ lý ảo.", sender: "bot" },
+    {
+      id: 1,
+      text: "Xin chào! Tôi là trợ lý ảo. một số gợi ý để biết thông tin về trang web hoặc sản phẩm : người viết ra trang web này là ai ? : gợi ý sản phẩm",
+      sender: "bot",
+    },
   ]);
-  const { user } = useOutletContext();
+  const { user, ListProducts } = useOutletContext();
 
   const [inputMessage, setInputMessage] = useState("");
 
@@ -66,47 +70,160 @@ const BotChatAI = () => {
   const handleSendMessage = async () => {
     if (inputMessage.trim() === "") return;
 
-    // Add user message to the list
     const newUserMessage = {
-      id: messages.length + 1,
+      id: Date.now(),
       text: inputMessage,
       sender: "user",
     };
     setMessages((prev) => [...prev, newUserMessage]);
     setInputMessage("");
 
-    try {
-      // Send message to the bot
-      const res = await PostChatBotAI(inputMessage.trim());
-      if (res.data?.message?.content) {
-        // Format content from bot's response
-        const formattedContent = res.data.message.content
-          .replace(/(?:\*|[*] )(.*)/g, "<li>$1</li>") // Convert Markdown to HTML list
-          .replace(/(?:[*]{2})(.*)(?:[*]{2})/g, "<strong>$1</strong>"); // Convert **bold** to <strong>
+    const lowerCaseMessage = inputMessage.trim().toLowerCase();
 
-        // Create bot's response with formatted content
+    // Hàm kiểm tra từ khóa
+    const checkKeywords = (keywords) =>
+      keywords.some((keyword) => lowerCaseMessage.includes(keyword));
+
+    // Nhóm từ khóa
+    const keywordGroups = {
+      products: ["sản phẩm", "list", "danh sách", "hàng hóa"],
+      highPriceProducts: ["giá cao", "cao cấp", "đắt tiền", "premium"],
+      author: ["người viết", "tác giả", "sáng lập", "creator"],
+    };
+
+    // Xử lý sản phẩm
+    if (checkKeywords(keywordGroups.products)) {
+      const productSuggestions = ListProducts.map(
+        (product, index) => `
+          <li>
+            <strong>${index + 1}. ${product.name}</strong>
+            <p>Giá: ${product.price.toLocaleString()}đ</p>
+          </li>`
+      ).join("");
+
+      const botResponse = {
+        id: Date.now() + 1,
+        text: `
+          <strong>🛒 Danh sách sản phẩm của chúng tôi:</strong>
+          <ul>${productSuggestions}</ul>
+        `,
+        sender: "bot",
+      };
+
+      setMessages((prev) => [...prev, botResponse]);
+      return;
+    }
+
+    // Xử lý sản phẩm cao cấp
+    if (checkKeywords(keywordGroups.highPriceProducts)) {
+      const productPricesMax = ListProducts.filter(
+        (product) => product.price > 2000000
+      )
+        .map(
+          (product, index) => `
+        <li>
+          <strong>${index + 1}. ${product.name}</strong>
+          <p>Giá: ${product.price.toLocaleString()}đ</p>
+        </li>`
+        )
+        .join("");
+
+      const productRes = {
+        id: Date.now() + 2,
+        text:
+          productPricesMax.length > 0
+            ? `
+            <strong>💎 Sản phẩm cao cấp của chúng tôi:</strong>
+            <ul>${productPricesMax}</ul>
+          `
+            : "🔍 Hiện tại không có sản phẩm cao cấp nào.",
+        sender: "bot",
+      };
+
+      setMessages((prev) => [...prev, productRes]);
+      return;
+    }
+
+    // Xử lý thông tin tác giả
+    if (checkKeywords(keywordGroups.author)) {
+      const authorProfile = {
+        name: "Đặng Trinh Duy Anh",
+        education: "Đại học Thủ Dầu Một",
+        skills: [
+          "Phát triển ứng dụng web hiện đại",
+          "Thành thạo React và Node.js",
+          "Quản lý cơ sở dữ liệu với MongoDB",
+          "Xây dựng hệ thống API mạnh mẽ",
+        ],
+        bio: "Một lập trình viên đầy nhiệt huyết với tầm nhìn đổi mới công nghệ. Luôn tìm cách học hỏi, sáng tạo và áp dụng những công nghệ mới để giải quyết các bài toán phức tạp.",
+        contact: "duyanh@gmail.com",
+        socialMedia: {
+          github: "https://github.com/duyanh",
+          linkedin: "https://linkedin.com/in/duyanh",
+        },
+        relationshipStatus: "Độc thân",
+      };
+
+      const authorResponse = {
+        id: Date.now() + 3,
+        text: `
+          <strong>👨‍💻 Giới thiệu người sáng lập:</strong>
+          <ul>
+            <li><strong>Họ và tên:</strong> ${authorProfile.name}</li>
+            <li><strong>Học vấn:</strong> ${authorProfile.education}</li>
+            <li>
+              <strong>Kỹ năng nổi bật:</strong>
+              <ul>
+                ${authorProfile.skills
+                  .map((skill) => `<li>✅ ${skill}</li>`)
+                  .join("")}
+              </ul>
+            </li>
+            <li><strong>Tiểu sử:</strong> ${authorProfile.bio}</li>
+            <li>
+              <strong>Liên hệ:</strong> 
+              <p>📧 Email: ${authorProfile.contact}</p>
+              <p>🔗 GitHub: ${authorProfile.socialMedia.github}</p>
+              <p>🔗 LinkedIn: ${authorProfile.socialMedia.linkedin}</p>
+            </li>
+            <li><strong>Trạng thái:</strong> ${
+              authorProfile.relationshipStatus
+            }</li>
+          </ul>
+        `,
+        sender: "bot",
+      };
+
+      setMessages((prev) => [...prev, authorResponse]);
+      return;
+    }
+
+    // Xử lý tin nhắn AI nếu không khớp các từ khóa
+    try {
+      const res = await PostChatBotAI(inputMessage.trim());
+
+      if (res.data?.message?.content) {
+        const formattedContent = res.data.message.content
+          .replace(/(?:\*|[*] )(.*)/g, "<li>$1</li>")
+          .replace(/(?:[*]{2})(.*)(?:[*]{2})/g, "<strong>$1</strong>");
+
         const botResponse = {
-          id: messages.length + 2,
+          id: Date.now() + 1,
           text: formattedContent,
           sender: "bot",
         };
 
-        // Add bot's response to the list
-        setMessages((prev) => [
-          ...prev,
-          {
-            ...botResponse,
-            text: formattedContent, // Ensure the formatted content is used
-          },
-        ]);
+        setMessages((prev) => [...prev, botResponse]);
       }
     } catch (error) {
       console.error("Error sending message:", error);
+
       const errorMessage = {
-        id: messages.length + 2,
-        text: "Xin lỗi, có lỗi xảy ra khi xử lý tin nhắn của bạn.",
+        id: Date.now() + 1,
+        text: "❌ Xin lỗi, có lỗi xảy ra khi xử lý tin nhắn của bạn.",
         sender: "bot",
       };
+
       setMessages((prev) => [...prev, errorMessage]);
     }
   };

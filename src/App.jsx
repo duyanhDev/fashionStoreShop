@@ -1,4 +1,4 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import "./App.css";
 import Header from "./components/Header/Header";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -44,8 +44,6 @@ function App() {
     ListProducsData();
   }, []);
 
-  console.log(ListProducts);
-
   const CartListProductsUser = async () => {
     if (!user?._id) {
       // Handle the case where user._id is not available
@@ -82,7 +80,9 @@ function App() {
         <div className="nav_menu flex justify-center items-center gap-3">
           <ul className="flex gap-10">
             <li className="product_hover">
-              <Link className="">Sản phẩm</Link>
+              <Link to="/category/unisex" className="">
+                Sản phẩm
+              </Link>
               <div className="absolute mt-3 w-full hover_item m-auto flex  ">
                 <div className="flex flex-1 justify-between  border-r-2  border-black short_fitter ">
                   <div className="ml-4 ">
@@ -218,7 +218,7 @@ function App() {
             </li>
 
             <li className="product_hover">
-              <Link>Nam</Link>
+              <Link to={"category/male"}>Nam</Link>
               <div className="absolute mt-3 w-full hover_item m-auto flex  ">
                 <div className="flex flex-1 justify-between  border-r-2  border-black short_fitter ">
                   <div className="ml-4 ">
@@ -357,7 +357,7 @@ function App() {
               </div>
             </li>
             <li className="product_hover">
-              <Link>Nữ</Link>
+              <Link to="category/female">Nữ</Link>
             </li>
             <li>
               <Link>Phụ kiện</Link>
