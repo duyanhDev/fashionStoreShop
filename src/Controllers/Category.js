@@ -42,6 +42,7 @@ const ListCategoryOneAPI = async (req, res) => {
     const { id } = req.params;
 
     const data = await ListOneCategory(id);
+    console.log(data);
 
     return res.status(200).json({
       EC: 0,

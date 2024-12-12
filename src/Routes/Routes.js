@@ -51,7 +51,7 @@ RouterAPI.post("/feedback", PutFeedbackProductAPI);
 
 // gender products
 
-RouterAPI.get("/category/:gender", CategoryGenderAPI);
+RouterAPI.get("/categoryProducts/:gender", CategoryGenderAPI);
 
 // Category
 
