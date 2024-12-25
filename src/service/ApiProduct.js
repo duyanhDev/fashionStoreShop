@@ -108,10 +108,19 @@ const PutFeedbackProductAPI = async (id, userId, rating, review) => {
     review,
   });
 };
+
+const toggleLikeRatingAPI = async (productId, ratingId, userId) => {
+  return await axios.post("http://localhost:9000/api/v1/like", {
+    productId,
+    ratingId,
+    userId,
+  });
+};
 export {
   createProductAPI,
   getListProductsAPI,
   ListOneProductAPI,
   UpdateProductAPI,
   PutFeedbackProductAPI,
+  toggleLikeRatingAPI,
 };

@@ -19,7 +19,6 @@ const LoginForm = () => {
       let res = await LoginAuth(email, password);
 
       if (res && res.data.EC === 0) {
-        console.log("Login successful:", res.data.data.token);
         dispatch(login(res.data.data.token, res.data.data.user));
 
         navigate("/");

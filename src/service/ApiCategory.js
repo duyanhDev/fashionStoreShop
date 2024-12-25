@@ -26,8 +26,16 @@ const DeleteOneCategoryAPI = async (id) => {
   return await axios.delete(`http://localhost:9000/api/v1/category/${id}`);
 };
 
-const CategoryProductsGender = async (gender) => {
-  return axios.get(`http://localhost:9000/api/v1/categoryProducts/${gender}`);
+const CategoryProductsGender = async (gender, page) => {
+  return axios.get(
+    `http://localhost:9000/api/v1/categoryProducts/${gender}/${page}`
+  );
+};
+
+const CategoryGenderFitterAPI = async (gender, category, page) => {
+  return axios.get(
+    `http://localhost:9000/api/v1/categoryfilter/${gender}/${category}/${page}`
+  );
 };
 export {
   ListCategoryAPI,
@@ -36,4 +44,5 @@ export {
   UpdateOneCatogryAPI,
   DeleteOneCategoryAPI,
   CategoryProductsGender,
+  CategoryGenderFitterAPI,
 };

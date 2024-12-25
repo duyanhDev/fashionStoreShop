@@ -1,14 +1,33 @@
 import { useEffect, useState } from "react";
 import "./ClothingMale.css";
 import { Radio, Space, Slider, Button, Card, Skeleton } from "antd";
-import { Link, useParams } from "react-router-dom";
-import { CategoryProductsGender } from "../../service/ApiCategory";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  CategoryGenderFitterAPI,
+  CategoryProductsGender,
+  ListCategoryAPI,
+} from "../../service/ApiCategory";
+import ReactPaginate from "react-paginate";
 
 const ClothingMale = () => {
-  const [priceFitter, setPriceFitter] = useState(1000000);
+  const [priceFitter, setPriceFitter] = useState(0);
+  const [hiddenPrice, SetHiddenPrice] = useState(false);
+  const [Category, setCategory] = useState([]);
   const [products, setProducts] = useState([]);
+  const [priceProducts, SetPriceProducts] = useState([]);
   const param = useParams();
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [value, setValue] = useState(1);
+  const [valueCategory, setValueCategory] = useState("");
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [selectedValues, setSelectedValues] = useState([]);
+  const [color, setColor] = useState("");
+  const [hiddenProducts, setHiddenProducts] = useState(false);
+  const location = useLocation();
+  const Navigate = useNavigate();
+
   const formatPrice = (price) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
   };
@@ -17,12 +36,35 @@ const ClothingMale = () => {
     100: <span className="increase">{priceFitter}VND</span>,
   };
 
-  const [value, setValue] = useState(1);
-  const [selectedValues, setSelectedValues] = useState([]);
-  const [color, setColor] = useState("");
-  const onChange = (e) => {
-    console.log("radio checked", e.target.value);
-    setValue(e.target.value);
+  const onChange = async (e) => {
+    setLoading(true);
+    setValueCategory(e.target.value);
+    setHiddenProducts(true);
+    setCurrentPage(1); // Reset to first page when changing category
+
+    try {
+      const res = await CategoryGenderFitterAPI(
+        param.gender,
+        e.target.value,
+        1
+      );
+      await new Promise((resolve) => setTimeout(resolve, 3000)); // Wait for 3 seconds
+      if (res?.data?.EC === 0) {
+        setProducts(res.data.data);
+        setTotalPages(res.data.totalPages);
+
+        if (hiddenPrice && priceFitter > 0) {
+          const filteredProducts = res.data.data.filter(
+            (product) => Number(product.discountedPrice) >= priceFitter
+          );
+          SetPriceProducts(filteredProducts);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching category products:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCheckboxChange = (e) => {
@@ -35,8 +77,6 @@ const ClothingMale = () => {
   };
 
   const handleOnClickColor = (value) => {
-    console.log(value);
-
     setColor(value);
   };
   const SkeletonCard = () => (
@@ -49,42 +89,124 @@ const ClothingMale = () => {
       <Skeleton active={true} paragraph={{ rows: 3 }} />
     </Card>
   );
-  const FetchLoadProductGender = async () => {
-    setTimeout(() => {
-      setLoading(true); // Đặt loading sau 500ms
-    }, 300);
+  const fetchProducts = async () => {
+    setLoading(true); // Set loading state first
+
     try {
-      const res = await CategoryProductsGender(param.gender);
-      if (res && res.data && res.data.EC === 0) {
-        setTimeout(() => {
-          setProducts(res.data.data);
-          setLoading(false);
-        }, 2000);
+      const res = valueCategory
+        ? await CategoryGenderFitterAPI(
+            param.gender,
+            valueCategory,
+            currentPage
+          )
+        : await CategoryProductsGender(param.gender, currentPage);
+
+      await new Promise((resolve) => setTimeout(resolve, 3000)); // Wait for 3 seconds
+
+      if (res?.data?.EC === 0) {
+        setProducts(res.data.data);
+        setTotalPages(res.data.totalPages);
+
+        if (hiddenPrice && priceFitter > 0) {
+          const filteredProducts = res.data.data.filter(
+            (product) => Number(product.discountedPrice) >= priceFitter
+          );
+          SetPriceProducts(filteredProducts);
+        }
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching products:", error);
     } finally {
-      setLoading(false);
+      setLoading(false); // Set loading to false only after everything is done
     }
   };
+
+  // Thay đổi dependency của useEffect
   useEffect(() => {
-    FetchLoadProductGender();
-  }, [param.gender]);
+    fetchProducts();
+  }, [param.gender, currentPage, valueCategory]);
+  const handlePageClick = (event) => {
+    setCurrentPage(event.selected + 1); // React-Paginate is zero-indexed
+  };
 
-  console.log(products);
+  useEffect(() => {
+    ListCategoryAPI()
+      .then((res) => {
+        if (res?.data?.EC === 0) {
+          setCategory(res.data.data);
+        }
+      })
+      .catch(console.error);
+  }, []);
 
+  useEffect(() => {
+    // Nếu đang ở chế độ lọc giá và có giá trị lọc
+    if (hiddenPrice && priceFitter > 0) {
+      FilterPriceProduct(priceFitter);
+    }
+  }, [currentPage]); // Phụ thuộc vào sự thay đổi của trang
+
+  const FilterPriceProduct = async (value, categoryValue = valueCategory) => {
+    setLoading(true);
+    setPriceFitter(value);
+
+    setTimeout(async () => {
+      try {
+        let res;
+        if (categoryValue) {
+          res = await CategoryGenderFitterAPI(
+            param.gender,
+            categoryValue,
+            currentPage
+          );
+        } else {
+          res = await CategoryProductsGender(param.gender, currentPage);
+        }
+
+        if (res && res.data && res.data.EC === 0) {
+          const filteredProducts = res.data.data.filter((product) => {
+            const price = Number(product.discountedPrice);
+            return price >= value;
+          });
+
+          SetHiddenPrice(true);
+          SetPriceProducts(filteredProducts);
+          setProducts(res.data.data);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lọc sản phẩm:", error);
+      } finally {
+        setLoading(false);
+      }
+    }, 3000);
+  };
+
+  useEffect(() => {
+    setPriceFitter(0);
+    setCurrentPage(1);
+    SetHiddenPrice(false);
+  }, [location.pathname]);
   return (
     <section>
       <div className="flex colletion">
         <div className="colletion_left">
           <div>
             <h1>Loại sản phẩm</h1>
-            <Radio.Group className="mr-5" onChange={onChange} value={value}>
+            <Radio.Group
+              className="mr-5"
+              onChange={onChange}
+              value={valueCategory}
+            >
               <Space direction="vertical">
-                <Radio value={1}>Áo</Radio>
-                <Radio value={2}>Quần</Radio>
-                <Radio value={3}>Giày</Radio>
-                <Radio value={4}>Túi</Radio>
+                {Category &&
+                  Category.length > 0 &&
+                  Category.map((Category) => {
+                    return (
+                      <Radio value={Category._id} key={Category._id}>
+                        {Category.name}
+                      </Radio>
+                    );
+                  })}
               </Space>
             </Radio.Group>
           </div>
@@ -213,11 +335,14 @@ const ClothingMale = () => {
               <Slider
                 className="w-full"
                 marks={marks}
-                defaultValue={priceFitter}
+                value={priceFitter} // Đồng bộ giá trị
                 min={0}
                 max={1000000}
-                step={100000}
-                onChange={(value) => setPriceFitter(value)}
+                step={50000}
+                onChange={(value) => {
+                  setPriceFitter(value); // Cập nhật giá trị khi kéo thanh trượt
+                  FilterPriceProduct(value); // Gọi hàm lọc sản phẩm
+                }}
               />
             </div>
           </div>
@@ -230,7 +355,7 @@ const ClothingMale = () => {
               </Link>
               <Link className="ml-3 font-normal products_link relative">
                 {" "}
-                234 sản phẩm
+                {products.length} sản phẩm
               </Link>
             </div>
           </div>
@@ -375,11 +500,64 @@ const ClothingMale = () => {
             {/* sản phẩm */}
             <div className="mt-3 male_left">
               <div className="flex flex-wrap gap-2">
-                {loading
+                {hiddenProducts
+                  ? loading
+                    ? [...Array(12)].map((_, index) => (
+                        <SkeletonCard key={index} />
+                      ))
+                    : products &&
+                      !hiddenPrice &&
+                      products.length > 0 &&
+                      products.map((product, index) => {
+                        return (
+                          <div
+                            className="main_product_male cursor-pointer mt-5"
+                            key={index + 1}
+                          >
+                            <div className="w-10 h-10 absolute right-0">
+                              <span className="percent">
+                                {product.discount}%
+                              </span>
+                            </div>
+                            <div>
+                              <img
+                                src={product.images[0].url}
+                                alt="ảnh"
+                                className="image_product_gender"
+                              />
+                            </div>
+                            <div className="mt-2">
+                              <h1 className=" main_product_male_h1">
+                                {product.name}
+                              </h1>
+                              <div className="flex gap-5 items-center justify-center">
+                                <span className="line-through text-red-500">
+                                  {formatPrice(product.price)}
+                                </span>
+                                <span>
+                                  {formatPrice(product.discountedPrice)}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="text-center m-2">
+                              <Button
+                                className=""
+                                onClick={() =>
+                                  Navigate(`/product/${product._id}`)
+                                }
+                              >
+                                Xem chi tiết sản phẩm
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })
+                  : loading
                   ? [...Array(12)].map((_, index) => (
                       <SkeletonCard key={index} />
                     ))
                   : products &&
+                    !hiddenPrice &&
                     products.length > 0 &&
                     products.map((product, index) => {
                       return (
@@ -411,12 +589,120 @@ const ClothingMale = () => {
                             </div>
                           </div>
                           <div className="text-center m-2">
-                            <Button>Xem chi tiết sản phẩm</Button>
+                            <Button
+                              className=""
+                              onClick={() =>
+                                Navigate(`/product/${product._id}`)
+                              }
+                            >
+                              Xem chi tiết sản phẩm
+                            </Button>
                           </div>
                         </div>
                       );
                     })}
+                {/* /// */}
+                {loading
+                  ? [...Array(12)].map((_, index) => (
+                      <SkeletonCard key={index} />
+                    ))
+                  : // Kiểm tra và hiển thị sản phẩm lọc giá hoặc sản phẩm gốc
+                  (hiddenPrice && priceFitter > 0 ? priceProducts : products) &&
+                    hiddenPrice &&
+                    (priceFitter > 0 ? priceProducts : products).length > 0
+                  ? (hiddenPrice && priceFitter > 0
+                      ? priceProducts
+                      : products
+                    ).map((product, index) => (
+                      <div
+                        className="main_product_male cursor-pointer mt-5"
+                        key={index + 1}
+                      >
+                        <div className="w-10 h-10 absolute right-0">
+                          <span className="percent">{product.discount}%</span>
+                        </div>
+                        <div>
+                          <img
+                            src={product.images[0].url}
+                            alt="ảnh"
+                            className="image_product_gender"
+                          />
+                        </div>
+                        <div className="mt-2">
+                          <h1 className=" main_product_male_h1">
+                            {product.name}
+                          </h1>
+                          <div className="flex gap-5 items-center justify-center">
+                            <span className="line-through text-red-500">
+                              {formatPrice(product.price)}
+                            </span>
+                            <span>{formatPrice(product.discountedPrice)}</span>
+                          </div>
+                        </div>
+                        <div className="text-center m-2">
+                          <Button
+                            className=""
+                            onClick={() => Navigate(`/product/${product._id}`)}
+                          >
+                            Xem chi tiết sản phẩm
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  : // Chỉ hiển thị khi có giá trị lọc mà không có sản phẩm
+                    hiddenPrice &&
+                    priceFitter > 0 &&
+                    priceProducts.length === 0 && (
+                      <>
+                        <div className="flex justify-center w-full items-center mt-6">
+                          <img
+                            src="https://cdn2.cellphones.com.vn/insecure/rs:fill:150:0/q:90/plain/https://cellphones.com.vn/media/wysiwyg/Review-empty.png"
+                            alt="loi"
+                          />
+                        </div>
+                        <div className="flex justify-center items-center w-full mt-8">
+                          <p className="font-semibold text-xl">
+                            Hiện tại shop chưa tìm được sản phẩm?
+                          </p>
+                        </div>
+                      </>
+                    )}
               </div>
+              <ReactPaginate
+                previousLabel={
+                  <svg
+                    viewBox="64 64 896 896"
+                    focusable="false"
+                    data-icon="left"
+                    width="1em"
+                    height="1em"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 000 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path>
+                  </svg>
+                }
+                nextLabel={
+                  <svg
+                    viewBox="64 64 896 896"
+                    focusable="false"
+                    data-icon="right"
+                    width="16px"
+                    height="16px"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path d="M765.7 486.8L314.9 134.7A7.97 7.97 0 00302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 000-50.4z"></path>
+                  </svg>
+                }
+                breakLabel={"..."}
+                pageCount={totalPages}
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={5}
+                onPageChange={handlePageClick}
+                containerClassName={"pagination"}
+                activeClassName={"active"}
+              />
             </div>
           </div>
         </div>
