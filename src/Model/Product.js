@@ -76,6 +76,23 @@ const productSchema = new mongoose.Schema({
       review: {
         type: String,
       },
+      likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Users" }],
+      replies: [
+        {
+          userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Users",
+          },
+          content: {
+            type: String,
+            required: true,
+          },
+          createdAt: {
+            type: Date,
+            default: Date.now,
+          },
+        },
+      ],
       createdAt: {
         type: Date,
         default: Date.now,

@@ -6,6 +6,8 @@ const {
   UpdateProducts,
   PutFeedbackProduct,
   CategoryGender,
+  CategoryGenderFitter,
+  toggleLikeRating,
 } = require("./../services/Product");
 const Products = require("./../Model/Product");
 const { ConnectionStates } = require("mongoose");
@@ -144,9 +146,9 @@ const AddProductsAPI = async (req, res) => {
     price,
     discount,
     stock,
-    size: sizeArray, // Directly using the size array
-    color: colorArray, // Directly using the color array
-    images, // Images array containing color-image associations
+    size: sizeArray,
+    color: colorArray,
+    images,
     costPrice,
   };
 
@@ -322,17 +324,76 @@ const PutFeedbackProductAPI = async (req, res) => {
 };
 
 const CategoryGenderAPI = async (req, res) => {
+  const page = parseInt(req.params.page || "1", 10); // Ensure page is an integer
   const { gender } = req.params;
-  console.log(gender);
 
   try {
-    const data = await CategoryGender(gender);
+    const { products, totalPages, currentPage } = await CategoryGender(
+      gender,
+      page
+    );
 
     return res.status(200).json({
       EC: 0,
-      data: data,
+      data: products,
+      totalPages,
+      currentPage,
     });
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error in CategoryGenderAPI:", error);
+    return res.status(500).json({
+      EC: 1,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+const toggleLikeRatingAPI = async (req, res) => {
+  try {
+    const { productId, ratingId, userId } = req.body;
+
+    // Call the toggleLikeRating function
+    const { product, action } = await toggleLikeRating(
+      productId,
+      ratingId,
+      userId
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: `Rating successfully ${action}`,
+      product,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const CategoryGenderFitterAPI = async (req, res) => {
+  const page = parseInt(req.params.page || "1", 10); // Ensure page is an integer
+  const { gender, category } = req.params;
+  try {
+    const { products, totalPages, currentPage } = await CategoryGenderFitter(
+      gender,
+      category,
+      page
+    );
+    return res.status(200).json({
+      EC: 0,
+      data: products,
+      totalPages,
+      currentPage,
+    });
+  } catch (error) {
+    console.error("Error in CategoryGenderAPI:", error);
+    return res.status(500).json({
+      EC: 1,
+      message: "Internal Server Error",
+    });
+  }
 };
 module.exports = {
   AddProductsAPI,
@@ -341,4 +402,6 @@ module.exports = {
   UpdateProductsAPI,
   PutFeedbackProductAPI,
   CategoryGenderAPI,
+  CategoryGenderFitterAPI,
+  toggleLikeRatingAPI,
 };

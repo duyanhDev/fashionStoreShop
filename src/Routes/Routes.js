@@ -7,6 +7,8 @@ const {
   UpdateProductsAPI,
   PutFeedbackProductAPI,
   CategoryGenderAPI,
+  CategoryGenderFitterAPI,
+  toggleLikeRatingAPI,
 } = require("./../Controllers/Products");
 const {
   CreateCategoryAPI,
@@ -49,9 +51,15 @@ RouterAPI.put("/products/:id", UpdateProductsAPI);
 
 RouterAPI.post("/feedback", PutFeedbackProductAPI);
 
+RouterAPI.post("/like", toggleLikeRatingAPI);
+
 // gender products
 
-RouterAPI.get("/categoryProducts/:gender", CategoryGenderAPI);
+RouterAPI.get("/categoryProducts/:gender/:page", CategoryGenderAPI);
+RouterAPI.get(
+  "/categoryfilter/:gender/:category/:page",
+  CategoryGenderFitterAPI
+);
 
 // Category
 

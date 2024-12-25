@@ -77,6 +77,7 @@ const UpdateProducts = async (productData) => {
   }
 };
 
+// đánh giá
 const PutFeedbackProduct = async (id, userId, rating, review) => {
   try {
     const feedback = await Products.findOneAndUpdate(
@@ -100,11 +101,70 @@ const PutFeedbackProduct = async (id, userId, rating, review) => {
   }
 };
 
-const CategoryGender = async (gender) => {
+const toggleLikeRating = async (productId, ratingId, userId) => {
+  // Find the product by ID
+  const product = await Products.findById(productId);
+  if (!product) {
+    throw new Error("Product not found");
+  }
+
+  // Find the rating by ID within the product's ratings
+  const rating = product.ratings.id(ratingId);
+  if (!rating) {
+    throw new Error("Rating not found");
+  }
+
+  const isLiked = rating.likes.includes(userId);
+  if (isLiked) {
+    rating.likes = rating.likes.filter((id) => id.toString() !== userId);
+  } else {
+    rating.likes.push(userId);
+  }
+
+  await product.save();
+
+  return {
+    product,
+    action: isLiked ? "unliked" : "liked",
+  };
+};
+
+const CategoryGender = async (gender, page) => {
   try {
-    const data = await Products.find({ gender: gender });
-    return data;
-  } catch (error) {}
+    const perPage = 10;
+    const skip = (page - 1) * perPage;
+
+    const [products, count] = await Promise.all([
+      Products.find({ gender }).skip(skip).limit(perPage),
+      Products.countDocuments({ gender }),
+    ]);
+
+    const totalPages = Math.ceil(count / perPage);
+
+    return { products, totalPages, currentPage: page };
+  } catch (error) {
+    console.error("Error fetching products by gender:", error);
+    throw new Error("Error fetching products");
+  }
+};
+
+const CategoryGenderFitter = async (gender, category, page) => {
+  try {
+    const perPage = 10;
+    const skip = (page - 1) * perPage;
+
+    const [products, count] = await Promise.all([
+      Products.find({ gender, category }).skip(skip).limit(perPage),
+      Products.countDocuments({ gender, category }),
+    ]);
+
+    const totalPages = Math.ceil(count / perPage);
+
+    return { products, totalPages, currentPage: page };
+  } catch (error) {
+    console.error("Error fetching products by gender and category:", error);
+    throw new Error("Error fetching products");
+  }
 };
 
 module.exports = {
@@ -114,4 +174,6 @@ module.exports = {
   UpdateProducts,
   PutFeedbackProduct,
   CategoryGender,
+  CategoryGenderFitter,
+  toggleLikeRating,
 };
