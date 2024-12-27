@@ -91,13 +91,13 @@ const PutFeedbackProduct = async (id, userId, rating, review) => {
           },
         },
       },
-      { new: true } // Trả về sản phẩm đã được cập nhật
+      { new: true }
     );
 
     return feedback;
   } catch (error) {
     console.log(error);
-    throw error; // Ném lỗi ra ngoài nếu cần xử lý thêm
+    throw error;
   }
 };
 

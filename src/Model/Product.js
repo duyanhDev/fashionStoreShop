@@ -87,10 +87,33 @@ const productSchema = new mongoose.Schema({
             type: String,
             required: true,
           },
+
           createdAt: {
             type: Date,
             default: Date.now,
           },
+          replies: [
+            {
+              userId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Users",
+              },
+              content: {
+                type: String,
+                required: true,
+              },
+              likes: [
+                {
+                  type: mongoose.Schema.Types.ObjectId,
+                  ref: "Users",
+                },
+              ], // Người dùng like phản hồi cấp 2
+              createdAt: {
+                type: Date,
+                default: Date.now,
+              },
+            },
+          ],
         },
       ],
       createdAt: {

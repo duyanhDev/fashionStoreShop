@@ -1,12 +1,14 @@
 const Order = require("./../Model/Order");
 const Users = require("./../Model/User");
 const Product = require("../Model/Product");
+const Cart = require("../Model/Cart");
 const qs = require("qs");
 const crypto = require("crypto");
 const moment = require("moment");
 require("dotenv").config();
 const nodemailer = require("nodemailer");
 const axios = require("axios");
+
 const CreateOrder = async (req, res) => {
   try {
     const {
@@ -17,6 +19,8 @@ const CreateOrder = async (req, res) => {
       shippingAddress,
       paymentMethod,
       email,
+      CartId,
+      productId,
     } = req.body;
 
     // Validate input data
@@ -120,6 +124,25 @@ const CreateOrder = async (req, res) => {
       }
     });
 
+    const CartItem = await Cart.findOne({ _id: CartId });
+
+    if (!CartItem) {
+      throw new Error("Sản phẩm không có trong giỏ hàng");
+    }
+
+    const idsToDelete = productId; // productId là mảng các _id cần xóa
+
+    // Sử dụng $pull để xóa các phần tử trong mảng items
+    const resultCart = await Cart.updateOne(
+      { _id: CartId },
+      { $pull: { items: { productId: { $in: idsToDelete } } } }
+    );
+
+    if (resultCart.modifiedCount > 0) {
+      console.log(`${idsToDelete.length} sản phẩm đã được xóa khỏi giỏ hàng.`);
+    } else {
+      console.log("Không có sản phẩm nào được xóa.");
+    }
     // Handle VNPay payment method
     if (paymentMethod === "vnpay") {
       const { vnp_TmnCode, vnp_HashSecret, vnp_ReturnUrl } = process.env;
