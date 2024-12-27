@@ -17,10 +17,8 @@ import { logout } from "../../redux/actions/Auth";
 import { useState } from "react";
 import { RemoveCartOnePorduct } from "../../service/Cart";
 import ClipLoader from "react-spinners/ClipLoader";
-import PulseLoader from "react-spinners/PuffLoader";
-const Header = ({ user, ListCart, CartListProductsUser }) => {
-  console.log(ListCart);
 
+const Header = ({ user, ListCart, CartListProductsUser }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

@@ -7,8 +7,10 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import { createOrder } from "../../service/Oder";
 import { SmileOutlined } from "@ant-design/icons";
 import ClipLoader from "react-spinners/ClipLoader";
+
 const CartProducts = ({}) => {
-  const { ListCart, user } = useOutletContext();
+  const { ListCart, user, CartListProductsUser } = useOutletContext();
+
   const [loadingSpin, setLoadingSpin] = useState(false);
   const [api, contextHolder] = notification.useNotification();
 
@@ -29,7 +31,8 @@ const CartProducts = ({}) => {
   const [districtName, setDistrictName] = useState("");
   const [wardName, setWardName] = useState("");
   const [fullAddress, setFullAddress] = useState("");
-  console.log(ListCart);
+  const [CartId, setCartId] = useState("");
+  const [productId, setProductId] = useState([]);
 
   const formatPrice = (price) => {
     // Nếu price là chuỗi, chuyển đổi nó thành một số
@@ -100,8 +103,6 @@ const CartProducts = ({}) => {
   };
 
   const handleDistrictChange = (value, name) => {
-    console.log(value);
-
     setSelectedDistrict(value);
     setDistrictName(name.label);
   };
@@ -137,14 +138,30 @@ const CartProducts = ({}) => {
 
   const [checkedItems, setCheckedItems] = useState([]);
 
-  const handleCheck = (id, name, size, quantity, color, price) => {
+  const handleCheck = (
+    id,
+    name,
+    size,
+    quantity,
+    color,
+    price,
+    itemID,
+    productId
+  ) => {
     // Chuyển đổi giá trị price từ chuỗi (nếu cần) thành số
+    setProductId((prev) => {
+      if (prev.includes(productId)) {
+        return prev.filter((item) => item !== productId);
+      } else {
+        return [...prev, productId];
+      }
+    });
     const numericPrice =
       typeof price === "string"
         ? parseFloat(price.replace(/[^\d,.-]/g, "").replace(",", "."))
         : price;
 
-    console.log("Price in numeric format:", numericPrice);
+    setCartId(itemID);
 
     // Cập nhật state cho id của sản phẩm được chọn
     setProducts((prevState) => {
@@ -258,7 +275,9 @@ const CartProducts = ({}) => {
               record.size,
               record.quantity,
               record.color,
-              record.totalItemPrice
+              record.totalItemPrice,
+              ListCart._id,
+              record.id
             )
           }
         />
@@ -299,11 +318,13 @@ const CartProducts = ({}) => {
         districtName,
         wardName,
         value,
-        email
+        email,
+        CartId,
+        productId
       );
 
       if (res && res.data.EC === 0) {
-        console.log(res.data.vnpUrl);
+        await CartListProductsUser();
 
         setTimeout(() => {
           setLoadingSpin(false);
@@ -318,6 +339,7 @@ const CartProducts = ({}) => {
               />
             ),
           });
+
           res.data.vnpUrl ? (window.location.href = res.data.vnpUrl) : null;
           res.data.data.shortLink
             ? (window.location.href = res.data.data.shortLink)

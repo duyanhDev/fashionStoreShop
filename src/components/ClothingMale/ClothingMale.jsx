@@ -21,10 +21,10 @@ const ClothingMale = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [value, setValue] = useState(1);
   const [valueCategory, setValueCategory] = useState("");
-  const [totalProducts, setTotalProducts] = useState(0);
   const [selectedValues, setSelectedValues] = useState([]);
   const [color, setColor] = useState("");
   const [hiddenProducts, setHiddenProducts] = useState(false);
+  const [Fitter, setFitter] = useState(false);
   const location = useLocation();
   const Navigate = useNavigate();
 
@@ -41,7 +41,7 @@ const ClothingMale = () => {
     setValueCategory(e.target.value);
     setHiddenProducts(true);
     setCurrentPage(1); // Reset to first page when changing category
-
+    setFitter(true);
     try {
       const res = await CategoryGenderFitterAPI(
         param.gender,
@@ -186,6 +186,17 @@ const ClothingMale = () => {
     setCurrentPage(1);
     SetHiddenPrice(false);
   }, [location.pathname]);
+
+  const handleFitterProduct = async () => {
+    setLoading(true);
+    try {
+      setLoading(false);
+      setFitter(false);
+      setValueCategory("");
+    } catch (error) {
+      setLoading(false);
+    }
+  };
   return (
     <section>
       <div className="flex colletion">
@@ -494,6 +505,11 @@ const ClothingMale = () => {
                   <li className="male_clothing">
                     <span>Giày nam</span>
                   </li>
+                  {Fitter && (
+                    <li className="male_clothing" onClick={handleFitterProduct}>
+                      <span>Xóa Lọc</span>
+                    </li>
+                  )}
                 </ul>
               </div>
             </div>
