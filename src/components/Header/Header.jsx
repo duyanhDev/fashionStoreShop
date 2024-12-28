@@ -6,7 +6,7 @@ import {
   IoCartOutline,
 } from "react-icons/io5";
 import Avatar from "antd/es/avatar/avatar";
-import { Dropdown, Button, Drawer, Spin } from "antd";
+import { Dropdown, Button, Drawer } from "antd";
 import {
   CloseCircleOutlined,
   LogoutOutlined,
@@ -14,18 +14,26 @@ import {
 } from "@ant-design/icons";
 import { useDispatch } from "react-redux";
 import { logout } from "../../redux/actions/Auth";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RemoveCartOnePorduct } from "../../service/Cart";
 import ClipLoader from "react-spinners/ClipLoader";
+import {
+  FetcDataNocatifions,
+  UpdateDataNocatifions,
+} from "../../service/ApiNocatifions";
 
 const Header = ({ user, ListCart, CartListProductsUser }) => {
+  console.log(user);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
+  const [showHiden, setShowHiden] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingSpin, setLoadingSpin] = useState(false);
   const [loadingCart, setLoadingCart] = useState(true);
+  const [DataNotifications, setDataNotifications] = useState([]);
   const handleLogOut = () => {
     dispatch(logout());
     navigate("/login");
@@ -125,6 +133,67 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
       setLoading(false);
     }
   };
+
+  const handleShowNocations = () => {
+    setShowHiden(true);
+    setLoading(true);
+
+    // Simple loading mock. You should add cleanup logic in real world.
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  };
+
+  const FetchDataNocatifionsAPI = async () => {
+    try {
+      let res = await FetcDataNocatifions(user._id);
+      if (res && res.data && res.data.EC === 0) {
+        setDataNotifications(res.data.data);
+      }
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    FetchDataNocatifionsAPI();
+  }, []);
+
+  function formatTimeAgo(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - date) / 1000);
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    const diffInDays = Math.floor(diffInHours / 24);
+    const diffInMonths = Math.floor(diffInDays / 30);
+
+    if (diffInSeconds < 60) {
+      return "Vừa xong";
+    } else if (diffInMinutes < 60) {
+      return `${diffInMinutes} phút trước`;
+    } else if (diffInHours < 24) {
+      return `${diffInHours} giờ trước`;
+    } else if (diffInDays < 30) {
+      return `${diffInDays} ngày trước`;
+    } else if (diffInMonths < 12) {
+      return `${diffInMonths} tháng trước`;
+    } else {
+      return date.toLocaleDateString("vi-VN");
+    }
+  }
+
+  const handleBtnNocafition = async (id, orderId) => {
+    try {
+      navigate(`/orderstatus/${orderId}`);
+      let res = await UpdateDataNocatifions(id);
+
+      if (res && res.data && res.data.EC === 0) {
+        FetchDataNocatifionsAPI();
+        setShowHiden(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className="w-full flex justify-between items-center h-full m-auto">
       <div className="flex items-center doin_image">
@@ -153,8 +222,15 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
       </div>
       <div className="w-3/12 flex justify-between doin_right px-5">
         <ul className="flex justify-end w-full">
-          <li className="px-5">
+          <li className="px-5 relative" onClick={handleShowNocations}>
             <IoNotificationsOutline size={30} />
+            {DataNotifications && DataNotifications.length > 0 ? (
+              <span className="cart_items mr-1">
+                {DataNotifications.filter((item) => !item.read).length}
+              </span>
+            ) : (
+              <span className="cart_items mr-1">0</span>
+            )}
           </li>
           <li className="px-5 relative" onClick={showLoading}>
             <IoCartOutline size={30} />
@@ -286,6 +362,51 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
             <div className="overlay flex items-center justify-center w-full h-full">
               <ClipLoader className="" />
             </div>
+          )}
+        </Drawer>
+
+        <Drawer
+          closable
+          destroyOnClose
+          title={<p>Thông Báo</p>}
+          placement="right"
+          open={showHiden}
+          loading={loading}
+          onClose={() => setShowHiden(false)}
+        >
+          <Button
+            type="primary"
+            style={{
+              marginBottom: 16,
+            }}
+            onClick={handleShowNocations}
+          >
+            Reload
+          </Button>
+          {DataNotifications && DataNotifications.length > 0 ? (
+            DataNotifications.map((item) => {
+              return (
+                item.read === false && (
+                  <>
+                    <div
+                      className="border-b-2 p-1 cursor-pointer"
+                      onClick={() =>
+                        handleBtnNocafition(item._id, item.orderId)
+                      }
+                    >
+                      {item.message}
+                      <div className="mt-1">
+                        {formatTimeAgo(item.createdAt)}
+                      </div>
+                    </div>
+                  </>
+                )
+              );
+            })
+          ) : (
+            <>
+              <p>Hiện tại không có thông báo nào</p>
+            </>
           )}
         </Drawer>
       </div>

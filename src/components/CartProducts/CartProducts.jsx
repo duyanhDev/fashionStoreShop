@@ -10,6 +10,7 @@ import ClipLoader from "react-spinners/ClipLoader";
 
 const CartProducts = ({}) => {
   const { ListCart, user, CartListProductsUser } = useOutletContext();
+  console.log(user);
 
   const [loadingSpin, setLoadingSpin] = useState(false);
   const [api, contextHolder] = notification.useNotification();
@@ -320,7 +321,8 @@ const CartProducts = ({}) => {
         value,
         email,
         CartId,
-        productId
+        productId,
+        user.isAdmin
       );
 
       if (res && res.data.EC === 0) {

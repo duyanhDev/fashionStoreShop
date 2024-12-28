@@ -42,6 +42,8 @@ const ClothingMale = () => {
     setHiddenProducts(true);
     setCurrentPage(1); // Reset to first page when changing category
     setFitter(true);
+    const newUrl = `${location.pathname}?category=${e.target.value}`;
+    Navigate(newUrl, { replace: true });
     try {
       const res = await CategoryGenderFitterAPI(
         param.gender,
@@ -149,7 +151,8 @@ const ClothingMale = () => {
   const FilterPriceProduct = async (value, categoryValue = valueCategory) => {
     setLoading(true);
     setPriceFitter(value);
-
+    const newUrl = `${location.pathname}?price=${value}`;
+    Navigate(newUrl, { replace: true });
     setTimeout(async () => {
       try {
         let res;

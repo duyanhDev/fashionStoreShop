@@ -16,7 +16,8 @@ const createOrder = async (
   paymentMethod,
   email,
   CartId,
-  productId
+  productId,
+  isAdmin
 ) => {
   try {
     // Ensure items are in the correct format (each item should have productId, quantity, and price)
@@ -44,6 +45,7 @@ const createOrder = async (
       email,
       CartId,
       productId,
+      isAdmin,
     });
 
     return response;
