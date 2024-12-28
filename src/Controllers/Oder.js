@@ -2,6 +2,7 @@ const Order = require("./../Model/Order");
 const Users = require("./../Model/User");
 const Product = require("../Model/Product");
 const Cart = require("../Model/Cart");
+const Notifications = require("../Model/Notifications");
 const qs = require("qs");
 const crypto = require("crypto");
 const moment = require("moment");
@@ -21,6 +22,7 @@ const CreateOrder = async (req, res) => {
       email,
       CartId,
       productId,
+      isAdmin,
     } = req.body;
 
     // Validate input data
@@ -143,6 +145,43 @@ const CreateOrder = async (req, res) => {
     } else {
       console.log("Không có sản phẩm nào được xóa.");
     }
+
+    const nameProduct = newOrder.items.map((item) => item.name);
+    console.log(nameProduct);
+
+    const productIdItem = newOrder.items.map((item) => item.productId); // Assuming newOrder.items is an array of products with productId
+
+    // Convert productId into the correct format for the products field
+    const formattedProducts = productIdItem.map((id) => ({ productId: id }));
+
+    // Notification for user
+    const userNotification = new Notifications({
+      userId,
+      orderId: newOrder._id,
+      products: formattedProducts, // Pass the correctly formatted products
+      isAdmin: isAdmin,
+      message: `Bạn đã đặt hàng thành công với các sản phẩm: ${nameProduct}`,
+    });
+    await userNotification.save();
+    const admins = await Users.find({ isAdmin: true });
+
+    if (!admins.length) {
+      console.log("No admins found!");
+      return;
+    }
+    // Notification for admin
+    for (const admin of admins) {
+      const adminNotification = new Notifications({
+        userId: admin._id, // Admin userId
+        orderId: newOrder._id,
+        products: formattedProducts,
+        isAdmin: true,
+        message: `Có một đơn hàng mới từ người dùng [Tên người dùng].`,
+      });
+
+      await adminNotification.save();
+    }
+
     // Handle VNPay payment method
     if (paymentMethod === "vnpay") {
       const { vnp_TmnCode, vnp_HashSecret, vnp_ReturnUrl } = process.env;

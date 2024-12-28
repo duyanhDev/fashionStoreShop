@@ -39,6 +39,11 @@ const {
 } = require("../Controllers/Oder");
 const { BotChatAPI } = require("../Controllers/BotChatApi");
 
+const {
+  getNotificationsAPI,
+  updateReadNocatifionsAPI,
+} = require("../Controllers/Notifications");
+
 //product
 
 RouterAPI.get("/products", ListProductsAPI);
@@ -95,4 +100,8 @@ RouterAPI.get("/get-order-all", ListOderProducts);
 RouterAPI.get("/get-order-one/:id", getOrderOneProduct);
 RouterAPI.post("/ChatAI", BotChatAPI);
 
+// notifications
+
+RouterAPI.get("/notification/:userId", getNotificationsAPI);
+RouterAPI.post("/notification/:id", updateReadNocatifionsAPI);
 module.exports = RouterAPI;
