@@ -13,6 +13,7 @@ import OrderAdmin from "../components/OderAdmin/OrderAdmin";
 import OderStatus from "../components/OderStatus/OderStatus";
 import Order from "../components/Orders/Order";
 import Products from "../components/Products/Product";
+import ViewSearch from "../components/Sumsearch/ViewSearch";
 import UpLoad from "../components/UpLoadProducts/UpLoad";
 import UserStatsCard from "../components/UserChar/UserChart";
 import VNpay from "../components/VNpay/VNpay";
@@ -55,6 +56,10 @@ export const RouterLayout = [
   {
     path: "/category/:gender",
     element: <ClothingMale />,
+  },
+  {
+    path: "/search",
+    element: <ViewSearch />,
   },
 ];
 

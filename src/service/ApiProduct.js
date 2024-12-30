@@ -116,6 +116,14 @@ const toggleLikeRatingAPI = async (productId, ratingId, userId) => {
     userId,
   });
 };
+
+// tìm kiếm
+
+const searchProductsByNameAPI = async (keyword, page = 1) => {
+  return await axios.get(`/api/v1/search/${page}`, {
+    params: { keyword },
+  });
+};
 export {
   createProductAPI,
   getListProductsAPI,
@@ -123,4 +131,5 @@ export {
   UpdateProductAPI,
   PutFeedbackProductAPI,
   toggleLikeRatingAPI,
+  searchProductsByNameAPI,
 };

@@ -162,3 +162,6 @@ body {
 .product_hover:hover .hover_item {
   visibility: visible;
 }
+img {
+  pointer-events: auto;
+}

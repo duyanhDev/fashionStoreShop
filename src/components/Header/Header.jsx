@@ -13,7 +13,7 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import { useDispatch } from "react-redux";
-import { logout } from "../../redux/actions/Auth";
+import { logout, Search as SearchAction } from "../../redux/actions/Auth";
 import { useEffect, useState } from "react";
 import { RemoveCartOnePorduct } from "../../service/Cart";
 import ClipLoader from "react-spinners/ClipLoader";
@@ -21,19 +21,24 @@ import {
   FetcDataNocatifions,
   UpdateDataNocatifions,
 } from "../../service/ApiNocatifions";
+import Search from "../SearchProducts/Search";
+import { searchProductsByNameAPI } from "../../service/ApiProduct";
 
 const Header = ({ user, ListCart, CartListProductsUser }) => {
-  console.log(user);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const [data, setData] = useState([]);
+  const page = 1;
   const [open, setOpen] = useState(false);
   const [showHiden, setShowHiden] = useState(false);
+  const [openSerch, setOpenSearch] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showSearch, setShowSearch] = useState();
   const [loadingSpin, setLoadingSpin] = useState(false);
   const [loadingCart, setLoadingCart] = useState(true);
   const [DataNotifications, setDataNotifications] = useState([]);
+  const [keywordSearch, setKeywordSearch] = useState("");
+  const [totalPage, setTotalPage] = useState("");
   const handleLogOut = () => {
     dispatch(logout());
     navigate("/login");
@@ -194,6 +199,52 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
       console.log(error);
     }
   };
+  // tìm kiếm
+
+  const handleSearchProducts = () => {
+    setOpenSearch(true);
+    setShowSearch(true);
+  };
+
+  const handleChangeInput = (e) => {
+    setKeywordSearch(e.target.value);
+    setShowSearch(false);
+  };
+
+  const FetchSearhProductsAPI = async () => {
+    try {
+      const res = await searchProductsByNameAPI(keywordSearch, page);
+      if (res && res.data && res.data.EC === 0) {
+        setData(res.data.data);
+        setTotalPage(res.data.totalPages);
+      }
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    if (keywordSearch && keywordSearch.trim() !== "") {
+      FetchSearhProductsAPI();
+    }
+  }, [keywordSearch]);
+
+  // tìm kiếm btn
+
+  const btnHandleChangeSearch = () => {
+    setOpenSearch(false);
+    console.log(keywordSearch);
+
+    const keyword = keywordSearch.trim();
+    if (!keyword) {
+      console.error("Keyword is empty");
+      return;
+    }
+
+    // Điều hướng đến trang tìm kiếm và gọi dispatch
+    navigate(`search?q=${keyword}`);
+    dispatch(SearchAction(data, totalPage));
+    setKeywordSearch("");
+  };
+
   return (
     <div className="w-full flex justify-between items-center h-full m-auto">
       <div className="flex items-center doin_image">
@@ -217,8 +268,30 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
           type="text"
           placeholder="Tìm kiếm sản phẩm"
           className="w-full outline-none"
+          onClick={handleSearchProducts}
+          onChange={handleChangeInput}
+          value={keywordSearch}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && keywordSearch.trim()) {
+              btnHandleChangeSearch(); // Gọi hàm tìm kiếm khi nhấn Enter
+            }
+          }}
         />
-        <IoSearch color="#ccc" className="absolute left-0 m-4 text-2xl" />
+        <IoSearch
+          color="#ccc"
+          className="absolute right-0 m-4 text-2xl"
+          onClick={btnHandleChangeSearch}
+        />
+        <Search
+          open={openSerch}
+          setOpen={setOpenSearch}
+          show={showSearch}
+          setShow={setShowSearch}
+          keywordSearch={keywordSearch}
+          setKeywordSearch={setKeywordSearch}
+          data={data}
+          setData={setData}
+        />
       </div>
       <div className="w-3/12 flex justify-between doin_right px-5">
         <ul className="flex justify-end w-full">
@@ -383,31 +456,24 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
           >
             Reload
           </Button>
-          {DataNotifications && DataNotifications.length > 0 ? (
+          {DataNotifications &&
+            DataNotifications.length > 0 &&
             DataNotifications.map((item) => {
-              return (
-                item.read === false && (
-                  <>
-                    <div
-                      className="border-b-2 p-1 cursor-pointer"
-                      onClick={() =>
-                        handleBtnNocafition(item._id, item.orderId)
-                      }
-                    >
-                      {item.message}
-                      <div className="mt-1">
-                        {formatTimeAgo(item.createdAt)}
-                      </div>
-                    </div>
-                  </>
-                )
+              return item.read === false ? (
+                <div
+                  className="border-b-2 p-1 cursor-pointer"
+                  onClick={() => handleBtnNocafition(item._id, item.orderId)}
+                  key={item._id}
+                >
+                  {item.message}
+                  <div className="mt-1">{formatTimeAgo(item.createdAt)}</div>
+                </div>
+              ) : (
+                <>
+                  <p>Hiện tại không có thông báo nào</p>
+                </>
               );
-            })
-          ) : (
-            <>
-              <p>Hiện tại không có thông báo nào</p>
-            </>
-          )}
+            })}
         </Drawer>
       </div>
     </div>
