@@ -1,6 +1,14 @@
 const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema({
+  normalizedName: {
+    type: String,
+  },
+  searchKeywords: [
+    {
+      type: String,
+    },
+  ],
   name: {
     type: String,
     required: true,
@@ -140,6 +148,24 @@ const productSchema = new mongoose.Schema({
 productSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
   this.discountedPrice = this.price * (1 - this.discount / 100);
+  this.normalizedName = this.name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  // Tạo từ khóa tìm kiếm kết hợp nhiều thông tin
+  this.searchKeywords = [
+    this.name,
+    this.normalizedName,
+    this.brand,
+    ...this.name.split(" "),
+    ...this.normalizedName.split(" "),
+    this.gender,
+    // Thêm màu sắc vào từ khóa tìm kiếm
+    ...this.color,
+    // Thêm size vào từ khóa tìm kiếm
+    ...this.size,
+  ].filter(Boolean); // Loại bỏ các giá trị null/undefined/empty
   next();
 });
 
@@ -149,5 +175,14 @@ productSchema.virtual("totalCost").get(function () {
 });
 productSchema.set("toJSON", { virtuals: true });
 productSchema.set("toObject", { virtuals: true });
+
+productSchema.index({ name: "text" });
+productSchema.index({ normalizedName: 1 });
+productSchema.index({ searchKeywords: 1 });
+productSchema.index({ brand: 1 });
+productSchema.index({ gender: 1 });
+productSchema.index({ category: 1 });
+productSchema.index({ color: 1 });
+productSchema.index({ size: 1 });
 
 module.exports = mongoose.model("Product", productSchema);

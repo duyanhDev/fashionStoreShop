@@ -97,7 +97,6 @@ const AddProductsAPI = async (req, res) => {
     color,
     costPrice,
   } = req.body;
-  console.log(gender);
 
   // Parse sizes and colors into arrays
   const sizeArray = Array.isArray(size)

@@ -37,6 +37,8 @@ const {
   getTotalProductsSold,
   getOrderOneProduct,
 } = require("../Controllers/Oder");
+
+const { searchProductsByNameAPI } = require("../Controllers/SearchProductsAPI");
 const { BotChatAPI } = require("../Controllers/BotChatApi");
 
 const {
@@ -104,4 +106,9 @@ RouterAPI.post("/ChatAI", BotChatAPI);
 
 RouterAPI.get("/notification/:userId", getNotificationsAPI);
 RouterAPI.post("/notification/:id", updateReadNocatifionsAPI);
+
+// search
+
+RouterAPI.get("/search/:page", searchProductsByNameAPI);
+
 module.exports = RouterAPI;

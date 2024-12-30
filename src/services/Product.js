@@ -167,6 +167,96 @@ const CategoryGenderFitter = async (gender, category, page) => {
   }
 };
 
+// tìm kiếm
+
+const searchProductsByName = async (keyword, page) => {
+  try {
+    const perPage = 10;
+    const skip = (page - 1) * perPage;
+
+    // Chuẩn hóa từ khóa tìm kiếm
+    const searchTerm = keyword
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+    // Query tổng hợp
+    const query = {
+      $or: [
+        { name: { $regex: keyword, $options: "i" } },
+        { normalizedName: { $regex: searchTerm, $options: "i" } },
+        { searchKeywords: { $regex: searchTerm, $options: "i" } },
+        { brand: { $regex: keyword, $options: "i" } },
+        { color: { $regex: keyword, $options: "i" } },
+        { size: { $regex: keyword, $options: "i" } },
+      ],
+    };
+
+    // Sử dụng aggregate để sắp xếp kết quả theo độ phù hợp
+    const products = await Products.aggregate([
+      { $match: query },
+      {
+        $addFields: {
+          relevanceScore: {
+            $add: [
+              // Ưu tiên match chính xác tên
+              {
+                $cond: [
+                  { $eq: [{ $toLower: "$name" }, keyword.toLowerCase()] },
+                  10,
+                  0,
+                ],
+              },
+              // Ưu tiên match bắt đầu bằng keyword
+              {
+                $cond: [
+                  {
+                    $regexMatch: {
+                      input: "$name",
+                      regex: new RegExp(`^${keyword}`, "i"),
+                    },
+                  },
+                  5,
+                  0,
+                ],
+              },
+              // Điểm cho match một phần
+              {
+                $cond: [
+                  {
+                    $regexMatch: {
+                      input: "$name",
+                      regex: new RegExp(keyword, "i"),
+                    },
+                  },
+                  1,
+                  0,
+                ],
+              },
+            ],
+          },
+        },
+      },
+      { $sort: { relevanceScore: -1, createdAt: -1 } },
+      { $skip: skip },
+      { $limit: perPage },
+    ]);
+
+    const count = await Products.countDocuments(query);
+    const totalPages = Math.ceil(count / perPage);
+
+    return {
+      products,
+      totalPages,
+      currentPage: page,
+      total: count,
+    };
+  } catch (error) {
+    console.error("Error in searchProductsByName:", error);
+    throw new Error("Error while searching products");
+  }
+};
+
 module.exports = {
   AddProducts,
   ListProducts,
@@ -176,4 +266,5 @@ module.exports = {
   CategoryGender,
   CategoryGenderFitter,
   toggleLikeRating,
+  searchProductsByName,
 };

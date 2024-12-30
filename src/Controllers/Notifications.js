@@ -7,7 +7,6 @@ const getNotificationsAPI = async (req, res) => {
   try {
     const { userId } = req.params;
     const result = await getNotifications(userId);
-    console.log(result);
 
     return res.status(200).json({
       EC: 0,
