@@ -10,7 +10,7 @@ const {
   toggleLikeRating,
 } = require("./../services/Product");
 const Products = require("./../Model/Product");
-const { ConnectionStates } = require("mongoose");
+
 // const AddProductsAPI = async (req, res) => {
 //   const {
 //     name,
@@ -310,6 +310,7 @@ const UpdateProductsAPI = async (req, res) => {
   }
 };
 
+// sửa feeckack
 const PutFeedbackProductAPI = async (req, res) => {
   try {
     const { id, userId, rating, review } = req.body;

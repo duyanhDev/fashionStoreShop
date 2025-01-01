@@ -33,6 +33,10 @@ const NotificationSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    isCheck: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

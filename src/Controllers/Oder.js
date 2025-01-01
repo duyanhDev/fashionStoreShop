@@ -22,7 +22,6 @@ const CreateOrder = async (req, res) => {
       email,
       CartId,
       productId,
-      isAdmin,
     } = req.body;
 
     // Validate input data
@@ -159,8 +158,9 @@ const CreateOrder = async (req, res) => {
       userId,
       orderId: newOrder._id,
       products: formattedProducts, // Pass the correctly formatted products
-      isAdmin: isAdmin,
+      isAdmin: false,
       message: `Bạn đã đặt hàng thành công với các sản phẩm: ${nameProduct}`,
+      isCheck: false,
     });
     await userNotification.save();
     const admins = await Users.find({ isAdmin: true });
@@ -177,6 +177,7 @@ const CreateOrder = async (req, res) => {
         products: formattedProducts,
         isAdmin: true,
         message: `Có một đơn hàng mới từ người dùng [Tên người dùng].`,
+        isCheck: true,
       });
 
       await adminNotification.save();
