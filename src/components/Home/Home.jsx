@@ -146,7 +146,7 @@ const Home = () => {
         </Swiper>
       </div>
       <div className=" mt-4">
-        <h1 className="ml-4 mt-3 text-xl font-bold">GỢI Ý SẢN PHẨM CHO BẠN</h1>
+        <h1 className="ml-4 mt-3 text-xl font-bold">TẤT CẢ SẢN PHẨM</h1>
         <Clothing ListProducts={ListProducts} />
       </div>
     </div>

@@ -33,14 +33,15 @@ const ViewSearch = ({}) => {
   };
 
   useEffect(() => {
-    // Only reset DataProducts when search keyword changes
     setDataProducts(data);
     setPage(1);
   }, [searchKeyword]);
 
   return (
     <div className="m-10">
-      <span className="text-black font-bold">Sản phẩm</span>
+      <div className="border-b-2 h-10">
+        <span className="text-black font-bold mt-4 text-2xl">KẾT QUẢ</span>
+      </div>
       <div className="mt-2 flex flex-wrap items-center gap-10 ">
         {DataProducts && DataProducts.length > 0 ? (
           DataProducts.map((product) => {

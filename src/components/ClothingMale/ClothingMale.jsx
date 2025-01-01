@@ -28,6 +28,11 @@ const ClothingMale = () => {
   const location = useLocation();
   const Navigate = useNavigate();
 
+  /// sort
+
+  const [hiddenSort, setHiddentSort] = useState(false);
+  const [sort, setSort] = useState(false);
+
   const formatPrice = (price) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
   };
@@ -119,16 +124,15 @@ const ClothingMale = () => {
     } catch (error) {
       console.error("Error fetching products:", error);
     } finally {
-      setLoading(false); // Set loading to false only after everything is done
+      setLoading(false);
     }
   };
 
-  // Thay đổi dependency của useEffect
   useEffect(() => {
     fetchProducts();
   }, [param.gender, currentPage, valueCategory]);
   const handlePageClick = (event) => {
-    setCurrentPage(event.selected + 1); // React-Paginate is zero-indexed
+    setCurrentPage(event.selected + 1);
   };
 
   useEffect(() => {
@@ -142,11 +146,10 @@ const ClothingMale = () => {
   }, []);
 
   useEffect(() => {
-    // Nếu đang ở chế độ lọc giá và có giá trị lọc
     if (hiddenPrice && priceFitter > 0) {
       FilterPriceProduct(priceFitter);
     }
-  }, [currentPage]); // Phụ thuộc vào sự thay đổi của trang
+  }, [currentPage]);
 
   const FilterPriceProduct = async (value, categoryValue = valueCategory) => {
     setLoading(true);
@@ -175,6 +178,7 @@ const ClothingMale = () => {
           SetHiddenPrice(true);
           SetPriceProducts(filteredProducts);
           setProducts(res.data.data);
+          setFitter(true);
         }
       } catch (error) {
         console.error("Lỗi khi lọc sản phẩm:", error);
@@ -196,10 +200,44 @@ const ClothingMale = () => {
       setLoading(false);
       setFitter(false);
       setValueCategory("");
+      setPriceFitter(0);
+      setHiddentSort(false);
+      const newUrl = `${location.pathname}`;
+      Navigate(newUrl, { replace: true });
     } catch (error) {
       setLoading(false);
     }
   };
+
+  const handleBlockSort = () => {
+    setHiddentSort((prev) => !prev);
+  };
+
+  const sortPriceAsc = () => {
+    // Sắp xếp giá theo thứ tự tăng dần
+    setSort(true);
+    const sortedData = products
+      .slice()
+      .sort((a, b) => a.discountedPrice - b.discountedPrice);
+
+    setProducts(sortedData);
+    setFitter(true);
+    const newUrl = `${location.pathname}?show=priceAsc&page=${currentPage}`;
+    Navigate(newUrl, { replace: true });
+  };
+  const sortPriceDesc = () => {
+    // Sắp xếp giá theo thứ tự tăng dần
+    setSort(true);
+    const sortedData = products
+      .slice()
+      .sort((a, b) => b.discountedPrice - a.discountedPrice);
+
+    setProducts(sortedData);
+    setFitter(true);
+    const newUrl = `${location.pathname}?show=priceDesc&page=${currentPage}`;
+    Navigate(newUrl, { replace: true });
+  };
+
   return (
     <section>
       <div className="flex colletion">
@@ -480,34 +518,24 @@ const ClothingMale = () => {
                 </div>
               </div>
             </div>
-            {/* main menu nam nu */}
-            <div className="mt-3 ">
-              <div className="">
-                <ul className="flex items-center justify-between gap-3">
-                  <li className="male_clothing">
-                    <span>Áo khoác nam</span>
-                  </li>
-                  <li className="male_clothing">
-                    <span>Áo thun nam</span>
-                  </li>
-                  <li className="male_clothing">
-                    <span>Áo sơ mi nam</span>
-                  </li>
-                  <li className="male_clothing">
-                    <span>Quần jean nam</span>
-                  </li>
-                  <li className="male_clothing">
-                    <span>Quần ngắn nam</span>
-                  </li>
-                  <li className="male_clothing">
-                    <span>Quần dài nam </span>
-                  </li>
-                  <li className="male_clothing">
-                    <span>Quần Jogger nam</span>
-                  </li>
-                  <li className="male_clothing">
-                    <span>Giày nam</span>
-                  </li>
+            {/* lọc sản phẩm theo price , day*/}
+            <div className="ml-10 mt-5 ">
+              <div className="relative ">
+                <ul className="flex items-center gap-3">
+                  <div>
+                    <li className="male_clothing" onClick={handleBlockSort}>
+                      <span>SẮP XẾP THEO</span>
+                    </li>
+
+                    {hiddenSort && (
+                      <ul className="top-12 absolute z-40 sort_products">
+                        <li>Mới nhất</li>
+                        <li onClick={sortPriceAsc}>Giá : thấp - cao</li>
+                        <li onClick={sortPriceDesc}>Giá : cao - thấp</li>
+                      </ul>
+                    )}
+                  </div>
+
                   {Fitter && (
                     <li className="male_clothing" onClick={handleFitterProduct}>
                       <span>Xóa Lọc</span>
@@ -519,6 +547,7 @@ const ClothingMale = () => {
             {/* sản phẩm */}
             <div className="mt-3 male_left">
               <div className="flex flex-wrap gap-2">
+                {/* Hiện sản phẩm */}
                 {hiddenProducts
                   ? loading
                     ? [...Array(12)].map((_, index) => (

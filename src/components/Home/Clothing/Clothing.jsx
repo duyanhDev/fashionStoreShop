@@ -1,10 +1,12 @@
 import "./Clothing.css";
-import { Flex, Rate, Skeleton, Card } from "antd";
+import { Flex, Rate, Skeleton, Card, Button } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 
 export default function Clothing({ ListProducts }) {
+  console.log(ListProducts);
+
   const desc = ["terrible", "bad", "normal", "good", "wonderful"];
   const [loading, setLoading] = useState(true);
   const [ratings, setRatings] = useState({});

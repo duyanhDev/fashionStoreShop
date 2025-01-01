@@ -245,6 +245,11 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
     setKeywordSearch("");
   };
 
+  const unreadNotifications = DataNotifications.filter(
+    (item) =>
+      item.read === false && item.isCheck === false && item.isAdmin === false
+  );
+
   return (
     <div className="w-full flex justify-between items-center h-full m-auto">
       <div className="flex items-center doin_image">
@@ -297,9 +302,9 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
         <ul className="flex justify-end w-full">
           <li className="px-5 relative" onClick={handleShowNocations}>
             <IoNotificationsOutline size={30} />
-            {DataNotifications && DataNotifications.length > 0 ? (
+            {unreadNotifications && unreadNotifications.length > 0 ? (
               <span className="cart_items mr-1">
-                {DataNotifications.filter((item) => !item.read).length}
+                {unreadNotifications.filter((item) => !item.read).length}
               </span>
             ) : (
               <span className="cart_items mr-1">0</span>
@@ -456,24 +461,20 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
           >
             Reload
           </Button>
-          {DataNotifications &&
-            DataNotifications.length > 0 &&
-            DataNotifications.map((item) => {
-              return item.read === false ? (
-                <div
-                  className="border-b-2 p-1 cursor-pointer"
-                  onClick={() => handleBtnNocafition(item._id, item.orderId)}
-                  key={item._id}
-                >
-                  {item.message}
-                  <div className="mt-1">{formatTimeAgo(item.createdAt)}</div>
-                </div>
-              ) : (
-                <>
-                  <p>Hiện tại không có thông báo nào</p>
-                </>
-              );
-            })}
+          {unreadNotifications && unreadNotifications.length > 0 ? (
+            unreadNotifications.map((item) => (
+              <div
+                className="border-b-2 p-1 cursor-pointer"
+                onClick={() => handleBtnNocafition(item._id, item.orderId)}
+                key={item._id}
+              >
+                {item.message}
+                <div className="mt-1">{formatTimeAgo(item.createdAt)}</div>
+              </div>
+            ))
+          ) : (
+            <p>Hiện tại không có thông báo nào</p>
+          )}
         </Drawer>
       </div>
     </div>

@@ -321,8 +321,7 @@ const CartProducts = ({}) => {
         value,
         email,
         CartId,
-        productId,
-        user.isAdmin
+        productId
       );
 
       if (res && res.data.EC === 0) {
