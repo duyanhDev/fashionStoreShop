@@ -102,7 +102,7 @@ const getCartProduct = async (req, res) => {
 
     let cart = await Cart.findOne({ userId }).populate({
       path: "items.productId",
-      select: "name images",
+      select: "name variants.images",
     });
 
     if (!cart) {

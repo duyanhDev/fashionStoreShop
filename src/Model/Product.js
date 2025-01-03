@@ -4,11 +4,6 @@ const productSchema = new mongoose.Schema({
   normalizedName: {
     type: String,
   },
-  searchKeywords: [
-    {
-      type: String,
-    },
-  ],
   name: {
     type: String,
     required: true,
@@ -48,28 +43,65 @@ const productSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  size: [
-    {
-      type: String,
-    },
-  ],
-  color: [
-    {
-      type: String,
-    },
-  ],
-  images: [
+  sold: {
+    type: Number,
+    default: 0,
+  },
+  variants: [
     {
       color: {
         type: String,
         required: true,
       },
-      url: {
-        type: String,
-        required: true,
-      },
+      sizes: [
+        {
+          size: {
+            type: String,
+            required: true,
+          },
+          quantity: {
+            type: Number,
+            default: 0,
+            min: 0,
+          },
+          sold: {
+            type: Number,
+            default: 0,
+          },
+        },
+      ],
+      images: [
+        {
+          url: {
+            type: String,
+            required: true,
+          },
+        },
+      ],
     },
   ],
+  // size: [
+  //   {
+  //     type: String,
+  //   },
+  // ],
+  // color: [
+  //   {
+  //     type: String,
+  //   },
+  // ],
+  // images: [
+  //   {
+  //     color: {
+  //       type: String,
+  //       required: true,
+  //     },
+  //     url: {
+  //       type: String,
+  //       required: true,
+  //     },
+  //   },
+  // ],
   ratings: [
     {
       userId: {
@@ -147,25 +179,25 @@ const productSchema = new mongoose.Schema({
 // Middleware để tự động cập nhật `updatedAt` và tính `discountedPrice`
 productSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
-  this.discountedPrice = this.price * (1 - this.discount / 100);
+  this.discountedPrice = this.costPrice * (1 - this.discount / 100);
   this.normalizedName = this.name
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 
   // Tạo từ khóa tìm kiếm kết hợp nhiều thông tin
-  this.searchKeywords = [
-    this.name,
-    this.normalizedName,
-    this.brand,
-    ...this.name.split(" "),
-    ...this.normalizedName.split(" "),
-    this.gender,
-    // Thêm màu sắc vào từ khóa tìm kiếm
-    ...this.color,
-    // Thêm size vào từ khóa tìm kiếm
-    ...this.size,
-  ].filter(Boolean); // Loại bỏ các giá trị null/undefined/empty
+  // this.searchKeywords = [
+  //   this.name,
+  //   this.normalizedName,
+  //   this.brand,
+  //   ...this.name.split(" "),
+  //   ...this.normalizedName.split(" "),
+  //   this.gender,
+  //   // Thêm màu sắc vào từ khóa tìm kiếm
+  //   ...this.color,
+  //   // Thêm size vào từ khóa tìm kiếm
+  //   ...this.size,
+  // ].filter(Boolean); // Loại bỏ các giá trị null/undefined/empty
   next();
 });
 

@@ -24,7 +24,6 @@ const CreateOrder = async (req, res) => {
       productId,
     } = req.body;
 
-    // Validate input data
     if (!userId || !items || !paymentMethod || !shippingAddress) {
       return res
         .status(400)
@@ -69,7 +68,7 @@ const CreateOrder = async (req, res) => {
       // Add product details to the email content
       emailContent += `
         <li>
-          <img src="${product.images[0].url}" alt="${
+          <img src="${product.variants[0]?.images[0]?.url}" alt="${
         product.name
       }" width="100px" /> <br>
           <span>Tên sản phẩm:</span> ${product.name} <br>
@@ -148,9 +147,8 @@ const CreateOrder = async (req, res) => {
     const nameProduct = newOrder.items.map((item) => item.name);
     console.log(nameProduct);
 
-    const productIdItem = newOrder.items.map((item) => item.productId); // Assuming newOrder.items is an array of products with productId
+    const productIdItem = newOrder.items.map((item) => item.productId);
 
-    // Convert productId into the correct format for the products field
     const formattedProducts = productIdItem.map((id) => ({ productId: id }));
 
     // Notification for user
@@ -380,8 +378,21 @@ const UpDateOrder = async (req, res) => {
 
     for (const item of order.items) {
       const product = await Product.findById(item.productId);
+
       if (product) {
         product.stock = Math.max(product.stock - item.quantity, 0);
+        product.sold += item.quantity;
+
+        for (const variant of product.variants) {
+          for (const size of variant.sizes) {
+            if (size.size === item.size) {
+              size.quantity = Math.max(size.quantity - item.quantity, 0);
+              size.sold += item.quantity;
+            }
+          }
+        }
+
+        // Lưu sản phẩm sau khi cập nhật
         await product.save();
       } else {
         return res
@@ -420,7 +431,7 @@ const getTotalProductsSold = async (req, res) => {
   }
 };
 
-// lấy tổng số lương sản pjhaamr bán
+// lấy tổng số lương sản phẩm bán
 const getTotalProductsSoldByType = async (req, res) => {
   try {
     const orders = await Order.find();

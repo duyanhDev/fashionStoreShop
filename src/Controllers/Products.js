@@ -82,6 +82,92 @@ const Products = require("./../Model/Product");
 //       .json({ success: false, message: "Error adding product" });
 //   }
 // };
+
+// code fix
+// const AddProductsAPI = async (req, res) => {
+//   const {
+//     name,
+//     gender,
+//     description,
+//     category,
+//     brand,
+//     care,
+//     price,
+//     discount,
+//     stock,
+//     size,
+//     color,
+//     costPrice,
+//   } = req.body;
+
+//   // Parse sizes and colors into arrays
+//   const sizeArray = Array.isArray(size)
+//     ? size
+//     : size.split(",").map((item) => item.trim());
+//   const colorArray = Array.isArray(color)
+//     ? color
+//     : color.split(",").map((item) => item.trim());
+
+//   // Upload images and associate them with colors
+//   let images = [];
+//   if (req.files && req.files.images) {
+//     try {
+//       const files = Array.isArray(req.files.images)
+//         ? req.files.images
+//         : [req.files.images];
+
+//       // Ensure the number of colors matches the number of uploaded images
+//       if (files.length !== colorArray.length) {
+//         return res.status(400).json({
+//           success: false,
+//           message: "Number of images must match the number of colors",
+//         });
+//       }
+
+//       // Upload each image and associate it with the corresponding color
+//       for (let i = 0; i < files.length; i++) {
+//         const resultImage = await uploadFileToCloudinary(files[i]);
+//         images.push({ color: colorArray[i], url: resultImage.secure_url });
+//       }
+//     } catch (uploadError) {
+//       console.error("Error uploading images:", uploadError.message);
+//       return res
+//         .status(500)
+//         .json({ success: false, message: "Error uploading images" });
+//     }
+//   }
+
+//   const productData = {
+//     name,
+//     gender,
+//     description,
+//     category,
+//     brand,
+//     care,
+//     price,
+//     discount,
+//     stock,
+//     size: sizeArray,
+//     color: colorArray,
+//     images,
+//     costPrice,
+//   };
+
+//   try {
+//     const data = await AddProducts(productData);
+//     return res.status(200).json({
+//       EC: 0,
+//       data: data,
+//       message: "Product added successfully",
+//     });
+//   } catch (error) {
+//     console.error("Error adding product:", error.message);
+//     return res
+//       .status(500)
+//       .json({ success: false, message: "Error adding product" });
+//   }
+// };
+
 const AddProductsAPI = async (req, res) => {
   const {
     name,
@@ -97,7 +183,7 @@ const AddProductsAPI = async (req, res) => {
     color,
     costPrice,
   } = req.body;
-
+  const quantity = 100;
   // Parse sizes and colors into arrays
   const sizeArray = Array.isArray(size)
     ? size
@@ -107,7 +193,8 @@ const AddProductsAPI = async (req, res) => {
     : color.split(",").map((item) => item.trim());
 
   // Upload images and associate them with colors
-  let images = [];
+  let variants = [];
+
   if (req.files && req.files.images) {
     try {
       const files = Array.isArray(req.files.images)
@@ -122,10 +209,19 @@ const AddProductsAPI = async (req, res) => {
         });
       }
 
-      // Upload each image and associate it with the corresponding color
-      for (let i = 0; i < files.length; i++) {
+      // Process each color and its associated image
+      for (let i = 0; i < colorArray.length; i++) {
         const resultImage = await uploadFileToCloudinary(files[i]);
-        images.push({ color: colorArray[i], url: resultImage.secure_url });
+        const variant = {
+          color: colorArray[i],
+          sizes: sizeArray.map((size) => ({
+            size,
+            quantity: quantity,
+            sold: 0,
+          })),
+          images: [{ url: resultImage.secure_url }],
+        };
+        variants.push(variant);
       }
     } catch (uploadError) {
       console.error("Error uploading images:", uploadError.message);
@@ -145,9 +241,7 @@ const AddProductsAPI = async (req, res) => {
     price,
     discount,
     stock,
-    size: sizeArray,
-    color: colorArray,
-    images,
+    variants,
     costPrice,
   };
 
@@ -210,6 +304,7 @@ const UpdateProductsAPI = async (req, res) => {
       care,
       price,
       stock,
+      sold,
       size,
       color,
       costPrice,
@@ -285,6 +380,7 @@ const UpdateProductsAPI = async (req, res) => {
       care: care || existingProduct.care,
       price: price ? Number(price) : existingProduct.price,
       stock: stock ? Number(stock) : existingProduct.stock,
+      sold: sold ? Number(sold) : existingProduct.sold,
       size: sizeArray,
       color: colorArray,
       images: images,

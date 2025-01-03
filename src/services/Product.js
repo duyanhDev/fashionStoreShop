@@ -59,6 +59,7 @@ const UpdateProducts = async (productData) => {
         price: productData.price,
         discount: productData.discount,
         stock: productData.stock,
+        sold: productData.sold,
         size: productData.size,
         color: productData.color,
         images: productData.images,
@@ -185,10 +186,6 @@ const searchProductsByName = async (keyword, page) => {
       $or: [
         { name: { $regex: keyword, $options: "i" } },
         { normalizedName: { $regex: searchTerm, $options: "i" } },
-        { searchKeywords: { $regex: searchTerm, $options: "i" } },
-        { brand: { $regex: keyword, $options: "i" } },
-        { color: { $regex: keyword, $options: "i" } },
-        { size: { $regex: keyword, $options: "i" } },
       ],
     };
 
