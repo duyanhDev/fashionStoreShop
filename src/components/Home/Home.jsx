@@ -39,6 +39,10 @@ const Home = () => {
     navigate(`product/${id}`);
   };
 
+  const Image = ListProducts.map((item) => {
+    return item.variants.map((product) => product.images[0].url);
+  });
+
   return (
     <div className="m-auto mx-5">
       <div className="m-3">
@@ -87,14 +91,14 @@ const Home = () => {
                           <img
                             className="w-full h-64 object-cover"
                             alt="example"
-                            src={item.images[0].url}
+                            src={item.variants[0]?.images[0]?.url}
                           />
 
                           <div className="p-2 h-20 size g-2 hover">
                             <p className="font-bold text-[#000]">
                               Thêm vào giỏ hàng
                             </p>
-                            <div className="flex justify-center items-center mt-3">
+                            {/* <div className="flex justify-center items-center mt-3">
                               {item.size &&
                                 item.size.length > 0 &&
                                 item.size.map((item, index) => {
@@ -109,7 +113,7 @@ const Home = () => {
                                     </div>
                                   );
                                 })}
-                            </div>
+                            </div> */}
                           </div>
                         </div>
                       }

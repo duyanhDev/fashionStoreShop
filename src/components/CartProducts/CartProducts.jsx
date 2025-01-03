@@ -121,9 +121,9 @@ const CartProducts = ({}) => {
       return {
         key: index + 1,
         id: item.productId._id,
-        image: (
+        images: (
           <img
-            src={item.productId.images[0].url}
+            src={item.productId.variants[0]?.images[0]?.url}
             alt="Product"
             style={{ width: "50px", height: "50px" }}
           />
@@ -229,8 +229,8 @@ const CartProducts = ({}) => {
   const columns = [
     {
       title: "Hình Ảnh",
-      dataIndex: "image",
-      key: "image",
+      dataIndex: "images",
+      key: "images",
     },
     {
       title: "Tên Sản Phẩm",

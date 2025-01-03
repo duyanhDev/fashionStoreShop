@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css"; // Import styles for Quill
 import { useNavigate, useParams } from "react-router-dom";
-import { ListOneProductAPI, UpdateProductAPI } from "../../service/ApiProduct";
+import { ListOneProductAPI } from "../../service/ApiProduct";
 import { ListCategoryAPI } from "../../service/ApiCategory";
 
 const View = () => {
@@ -252,6 +252,7 @@ const View = () => {
             disabled
           />
         </div>
+
         <div className="ml-5 mt-2">
           <Typography.Title level={5}>Size</Typography.Title>
           <Space

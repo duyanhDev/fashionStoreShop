@@ -25,6 +25,7 @@ const UpLoad = () => {
   const [opitonCategory, setOptionCategory] = useState([]);
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
+  const [sold, setSold] = useState(0);
   const [size, setSize] = useState([]);
   const [color, setColor] = useState([]);
   const [image, setImageFiles] = useState([]);
@@ -86,6 +87,9 @@ const UpLoad = () => {
   const onChangeStock = (value) => {
     setStock(value);
   };
+  const onChangeSold = (value) => {
+    setSold(value);
+  };
 
   const handleChangeColor = (value) => {
     console.log(value);
@@ -102,6 +106,7 @@ const UpLoad = () => {
         const res = await ListOneProductAPI(param.id);
 
         if (res && res.data.EC === 0) {
+          console.log(res.data.data);
           setName(res.data.data.name || "");
           setGender(res.data.data.gender || "");
           setDescription(res.data.data.description || "");
@@ -110,6 +115,7 @@ const UpLoad = () => {
           setCategory([res.data.data.category.name] || []);
           setPrice(res.data.data.price || "");
           setStock(res.data.data.stock || "");
+          setSold(res.data.data.sold || 0);
           setSize(res.data.data.size || []);
           setColor(res.data.data.color || []);
           setCostPrice(res.data.data.costPrice || 0);
@@ -189,6 +195,7 @@ const UpLoad = () => {
         care,
         price,
         stock,
+        sold,
         size,
         color,
         image,
@@ -218,7 +225,7 @@ const UpLoad = () => {
       console.log(error);
     }
   };
-  console.log(costPrice);
+  console.log("check", color);
   return (
     <div className="w-full ml-6 flex ">
       {contextHolder}
@@ -337,6 +344,18 @@ const UpLoad = () => {
             max={10000}
             value={stock}
             onChange={onChangeStock}
+          />
+        </div>
+        <div className="ml-5 mt-2">
+          <Typography.Title level={5}>Sold</Typography.Title>
+          <InputNumber
+            style={{
+              width: "50%",
+            }}
+            min={1}
+            max={90000000}
+            value={sold}
+            onChange={onChangeSold}
           />
         </div>
         <div className="ml-5 mt-2">

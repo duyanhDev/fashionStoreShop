@@ -16,11 +16,13 @@ import { useEffect, useRef } from "react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { CartListProduct } from "./service/Cart";
+import Footer from "./components/Footer/Footer";
+import { UpOutlined } from "@ant-design/icons";
 function App() {
   const progressCircle = useRef(null);
   const progressContent = useRef(null);
   const { user } = useSelector((state) => state.auth);
-
+  const [isVisible, setIsVisible] = useState(false);
   const [ListProducts, setListProducts] = useState([]);
   const [ListCart, setListCard] = useState([]);
   const onAutoplayTimeLeft = (s, time, progress) => {
@@ -68,6 +70,29 @@ function App() {
     useEffect(() => {
       CartListProductsUser();
     }, [user._id]);
+
+  useEffect(() => {
+    const navHeader = document.querySelector(".nav_header");
+
+    const handleScroll = () => {
+      if (navHeader) {
+        const navHeight = navHeader.offsetHeight;
+        const scrolled = window.scrollY;
+
+        setIsVisible(scrolled > navHeight);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   return (
     <div className="container_nav">
@@ -422,6 +447,28 @@ function App() {
           context={{ ListProducts, CartListProductsUser, ListCart, user }}
         />
       </div>
+
+      <div className="fixed right-0 bottom-0 mb-24 chat_ai transition-opacity duration-300 z-10">
+        <button className="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center hover:bg-blue-800 transition-colors text-wrap">
+          ChatAi
+        </button>
+      </div>
+      <div
+        className={`fixed right-0 bottom-0 mb-7 transition-opacity duration-300 z-10 ${
+          isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+      >
+        <button
+          onClick={scrollToTop}
+          className="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center hover:bg-blue-800 transition-colors"
+        >
+          <UpOutlined className="text-[#fff]" />
+        </button>
+      </div>
+
+      <footer>
+        <Footer />
+      </footer>
     </div>
   );
 }

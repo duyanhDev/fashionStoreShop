@@ -238,6 +238,41 @@ const ClothingMale = () => {
     Navigate(newUrl, { replace: true });
   };
 
+  const SortDateProduct = () => {
+    setSort(true);
+    const sortedData = products.slice().sort((a, b) => {
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
+
+      return dateB - dateA;
+    });
+
+    setProducts(sortedData);
+    setFitter(true);
+    const newUrl = `${location.pathname}?show=CreateDate&page=${currentPage}`;
+    Navigate(newUrl, { replace: true });
+  };
+
+  const SortBestselling = () => {
+    if (!products || products.length === 0) {
+      console.warn("No products available to filter.");
+      return;
+    }
+
+    const sortedData = products.slice().sort((a, b) => b.sold - a.sold);
+
+    if (sortedData.length === 0) {
+      console.warn("No best-selling products found.");
+    }
+
+    setProducts(sortedData);
+    setFitter(true);
+
+    // Cập nhật URL để phản ánh việc hiển thị sản phẩm bán chạy
+    const newUrl = `${location.pathname}?show=Bestselling&page=${currentPage}`;
+    Navigate(newUrl, { replace: true });
+  };
+
   return (
     <section>
       <div className="flex colletion">
@@ -524,14 +559,20 @@ const ClothingMale = () => {
                 <ul className="flex items-center gap-3">
                   <div>
                     <li className="male_clothing" onClick={handleBlockSort}>
-                      <span>SẮP XẾP THEO</span>
+                      <button className="relative inline-flex h-12 overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-gray-50">
+                        <span className="absolute  inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#a2aeff_0%,#3749be_50%,#a2aeff_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
+                        <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full dark:bg-[#070e41] bg-[#ffffff] px-8 py-1 text-sm font-medium dark:text-gray-50 text-black backdrop-blur-3xl">
+                          SẮP XẾP THEO
+                        </span>
+                      </button>
                     </li>
 
                     {hiddenSort && (
                       <ul className="top-12 absolute z-40 sort_products">
-                        <li>Mới nhất</li>
+                        <li onClick={SortDateProduct}>Mới nhất</li>
                         <li onClick={sortPriceAsc}>Giá : thấp - cao</li>
                         <li onClick={sortPriceDesc}>Giá : cao - thấp</li>
+                        <li onClick={SortBestselling}>Bán chạy nhất</li>
                       </ul>
                     )}
                   </div>
@@ -569,7 +610,7 @@ const ClothingMale = () => {
                             </div>
                             <div>
                               <img
-                                src={product.images[0].url}
+                                src={product.variants[0]?.images[0]?.url}
                                 alt="ảnh"
                                 className="image_product_gender"
                               />
@@ -618,7 +659,7 @@ const ClothingMale = () => {
                           </div>
                           <div>
                             <img
-                              src={product.images[0].url}
+                              src={product.variants[0]?.images[0]?.url}
                               alt="ảnh"
                               className="image_product_gender"
                             />
@@ -671,7 +712,7 @@ const ClothingMale = () => {
                         </div>
                         <div>
                           <img
-                            src={product.images[0].url}
+                            src={product.variants[0]?.images[0]?.url}
                             alt="ảnh"
                             className="image_product_gender"
                           />
@@ -716,41 +757,47 @@ const ClothingMale = () => {
                       </>
                     )}
               </div>
-              <ReactPaginate
-                previousLabel={
-                  <svg
-                    viewBox="64 64 896 896"
-                    focusable="false"
-                    data-icon="left"
-                    width="1em"
-                    height="1em"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 000 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path>
-                  </svg>
-                }
-                nextLabel={
-                  <svg
-                    viewBox="64 64 896 896"
-                    focusable="false"
-                    data-icon="right"
-                    width="16px"
-                    height="16px"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path d="M765.7 486.8L314.9 134.7A7.97 7.97 0 00302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 000-50.4z"></path>
-                  </svg>
-                }
-                breakLabel={"..."}
-                pageCount={totalPages}
-                marginPagesDisplayed={2}
-                pageRangeDisplayed={5}
-                onPageChange={handlePageClick}
-                containerClassName={"pagination"}
-                activeClassName={"active"}
-              />
+              <div className="mt-10 flex justify-center items-center">
+                <ReactPaginate
+                  previousLabel={
+                    <svg
+                      viewBox="64 64 896 896"
+                      focusable="false"
+                      data-icon="left"
+                      width="1em"
+                      height="1em"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 000 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z" />
+                    </svg>
+                  }
+                  nextLabel={
+                    <svg
+                      viewBox="64 64 896 896"
+                      focusable="false"
+                      data-icon="right"
+                      width="16px"
+                      height="16px"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path d="M765.7 486.8L314.9 134.7A7.97 7.97 0 00302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 000-50.4z" />
+                    </svg>
+                  }
+                  breakLabel={null}
+                  pageCount={totalPages}
+                  marginPagesDisplayed={3}
+                  pageRangeDisplayed={3}
+                  onPageChange={handlePageClick}
+                  containerClassName="flex items-center gap-2"
+                  pageLinkClassName="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded"
+                  activeLinkClassName="bg-blue-500 text-white"
+                  previousClassName="p-2"
+                  nextClassName="p-2"
+                  disabledClassName="opacity-50"
+                />
+              </div>
             </div>
           </div>
         </div>

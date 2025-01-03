@@ -246,8 +246,6 @@
 
 li.male_clothing {
   padding: 10px 20px;
-  background: #ccc;
-  border-radius: 10px;
   cursor: pointer;
   text-wrap: nowrap;
 }

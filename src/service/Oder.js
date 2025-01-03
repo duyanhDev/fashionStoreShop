@@ -19,7 +19,6 @@ const createOrder = async (
   productId
 ) => {
   try {
-    // Ensure items are in the correct format (each item should have productId, quantity, and price)
     const formattedItems = items.map((item) => ({
       productId: item.productId, // productId must be provided
       name: item.name,

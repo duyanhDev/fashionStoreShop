@@ -370,6 +370,8 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
           </Button> */}
           {ListCart && ListCart.items && ListCart.items.length > 0 ? (
             ListCart.items.map((cart, index) => {
+              console.log(cart);
+
               return (
                 <div className="">
                   <div
@@ -378,7 +380,7 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
                   >
                     <div>
                       <img
-                        src={cart.productId.images[0].url}
+                        src={cart.productId.variants[0]?.images[0]?.url}
                         alt={cart.productId.name}
                         width={100}
                       />

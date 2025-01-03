@@ -7,7 +7,7 @@ import "swiper/css/navigation";
 import "swiper/css/thumbs";
 import { FreeMode, Navigation, Thumbs } from "swiper/modules";
 import { Rate, Button, Flex, notification, Image, Avatar, Input } from "antd";
-import { HeartOutlined, MinusOutlined, PlusOutlined } from "@ant-design/icons";
+import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { useOutletContext, useParams } from "react-router-dom";
 import {
   ListOneProductAPI,
@@ -16,7 +16,7 @@ import {
 } from "../../service/ApiProduct";
 import { AddCartAPI } from "../../service/Cart";
 import { useSelector } from "react-redux";
-import { fetchTotalProductsSoldAPI } from "../../service/totalProduct";
+
 import ReactPaginate from "react-paginate";
 const Details = () => {
   const [api, contextHolder] = notification.useNotification();
@@ -40,10 +40,11 @@ const Details = () => {
   const [SelectedSize, setSelectedSize] = useState("");
   const [CheckSelectedSize, setCheckSelectedSize] = useState(false);
   const [feedback, setFeedBack] = useState([]);
+  const [variants, setVariants] = useState([]);
   const ratings = 5;
   const [review, setReivew] = useState("");
   const { user } = useSelector((state) => state.auth);
-  const [sumProducts, setSumProducts] = useState([]);
+  const [sumProducts, setSumProducts] = useState(0);
 
   const itemsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(0);
@@ -79,17 +80,31 @@ const Details = () => {
       const res = await ListOneProductAPI(param.id);
 
       if (res && res.data && res.data.EC === 0) {
+        const ImagesUrl =
+          res.data.data.variants &&
+          res.data.data.variants.length > 0 &&
+          res.data.data.variants.map((item) => item.images);
+        const Color =
+          res.data.data.variants &&
+          res.data.data.variants.length > 0 &&
+          res.data.data.variants.map((item) => item.color);
+        const SizeMap =
+          res.data.data.variants &&
+          res.data.data.variants.length > 0 &&
+          res.data.data.variants.map((item) => item.sizes);
         setName(res.data.data.name || "");
         setDescription(res.data.data.description);
         setBrand(res.data.data.brand || "");
         setPrice(res.data.data.price || "");
         setDisscount(res.data.data.discount || "");
         setPricedisscount(res.data.data.discountedPrice || "");
-        setImage(res.data.data.images || []);
         setStock(res.data.data.stock || "");
-        setSize(res.data.data.size || []);
-        setColor(res.data.data.color || []);
         setFeedBack(res.data.data.ratings || []);
+        setSumProducts(res.data.data.sold || 0);
+        setVariants(res.data.data.variants || []);
+        setImage(ImagesUrl || []);
+        setColor(Color || []);
+        setSize(SizeMap || []);
       }
     } catch (error) {
       console.log(error);
@@ -115,6 +130,7 @@ const Details = () => {
   };
 
   const priceShift = discount ? pricediscount : price;
+  console.log(size);
 
   const handleAddProduct = async () => {
     if (!user) {
@@ -188,22 +204,6 @@ const Details = () => {
       console.error("Error adding product to cart:", error);
     }
   };
-  const fetchTotalProductsSold = async () => {
-    try {
-      const res = await fetchTotalProductsSoldAPI();
-      if (res && res.data) {
-        const data = res.data.productsSold.filter(
-          (product) => product.productId === param.id
-        );
-
-        setSumProducts(data);
-      }
-    } catch (error) {}
-  };
-
-  useEffect(() => {
-    fetchTotalProductsSold();
-  }, []);
 
   const handleFeedBack = async () => {
     try {
@@ -251,14 +251,18 @@ const Details = () => {
           >
             {image &&
               image.length > 0 &&
-              image.map((image, index) => {
+              image.map((images, index) => {
+                const url = images.map((image) => {
+                  return image.url;
+                });
+
                 return (
                   <>
                     <SwiperSlide key={index}>
                       <Image
-                        src={image.url}
+                        src={url}
                         preview={{
-                          src: image.url,
+                          src: url,
                         }}
                       />
                     </SwiperSlide>
@@ -278,11 +282,14 @@ const Details = () => {
           >
             {image &&
               image.length > 0 &&
-              image.map((image, index) => {
+              image.map((images, index) => {
+                const url = images.map((image) => {
+                  return image.url;
+                });
                 return (
                   <>
                     <SwiperSlide key={index}>
-                      <img src={image.url} />
+                      <img src={url} className="object-cover" />
                     </SwiperSlide>
                   </>
                 );
@@ -400,17 +407,17 @@ const Details = () => {
               <div className="flex items-center gap-1 m-3">
                 {size &&
                   size.length > 0 &&
-                  size.map((item, index) => (
+                  size[0].map((item, index) => (
                     <Button
                       key={index}
-                      onClick={() => handleSize(item)}
+                      onClick={() => handleSize(item.size)}
                       className={`${
-                        CheckSelectedSize && SelectedSize === item
+                        CheckSelectedSize && SelectedSize === item.size
                           ? "bg-black text-[#fff]"
                           : ""
                       }`}
                     >
-                      {item}
+                      {item.size}
                     </Button>
                   ))}
               </div>
@@ -433,16 +440,16 @@ const Details = () => {
                   {`${stock > 0 ? `${stock} sản phẩm có sẵn` : "Đã bán hết"} `}
                 </h4>
               </div>
-              {sumProducts && sumProducts.length > 0 && (
-                <div className="flex items-center gap-1">
-                  <h4
-                    className="text-[#b3b3b3] font-normal text-sm"
-                    onChange={(e) => setStock(e.target.value)}
-                  >
-                    {sumProducts[0].quantity} sản phẩm đã bán
-                  </h4>
-                </div>
-              )}
+
+              <div className="flex items-center gap-1">
+                <h4
+                  className="text-[#b3b3b3] font-normal text-sm"
+                  onChange={(e) => setStock(e.target.value)}
+                >
+                  {sumProducts} sản phẩm đã bán
+                </h4>
+              </div>
+
               <div className=" flex items-center gap-1">
                 <div className="flex items-center m-3 number-input-group ">
                   <Button

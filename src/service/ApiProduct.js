@@ -66,6 +66,7 @@ const UpdateProductAPI = async (
   care,
   price,
   stock,
+  sold,
   size,
   color,
   images = [],
@@ -80,6 +81,7 @@ const UpdateProductAPI = async (
   formData.append("care", care);
   formData.append("price", price);
   formData.append("stock", stock);
+  formData.append("sold", sold);
   formData.append("color", color);
   formData.append("size", size);
   images.forEach((file) => {
