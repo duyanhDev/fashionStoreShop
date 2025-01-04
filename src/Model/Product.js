@@ -31,14 +31,14 @@ const productSchema = new mongoose.Schema({
   price: {
     type: Number,
     required: true,
-  },
+  }, // giá nhập
   discount: {
     type: Number,
     default: 0,
   },
   discountedPrice: {
     type: Number,
-  },
+  }, // giá giảm
   stock: {
     type: Number,
     default: 0,
@@ -163,7 +163,7 @@ const productSchema = new mongoose.Schema({
     },
   ],
   costPrice: {
-    type: Number, // Giá nhập hàng cho một sản phẩm
+    type: Number, // giá bán hàng
     required: true,
   },
   createdAt: {
@@ -176,7 +176,6 @@ const productSchema = new mongoose.Schema({
   },
 });
 
-// Middleware để tự động cập nhật `updatedAt` và tính `discountedPrice`
 productSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
   this.discountedPrice = this.costPrice * (1 - this.discount / 100);
@@ -203,7 +202,7 @@ productSchema.pre("save", function (next) {
 
 // Virtual để tính số tiền nhập hàng (totalCost)
 productSchema.virtual("totalCost").get(function () {
-  return this.costPrice * this.stock;
+  return this.price * this.stock;
 });
 productSchema.set("toJSON", { virtuals: true });
 productSchema.set("toObject", { virtuals: true });

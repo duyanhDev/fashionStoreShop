@@ -23,6 +23,9 @@ const CreateOrder = async (req, res) => {
       CartId,
       productId,
     } = req.body;
+    console.log("check", items);
+    console.log("cart", CartId);
+    console.log("ff", productId);
 
     if (!userId || !items || !paymentMethod || !shippingAddress) {
       return res
@@ -383,11 +386,20 @@ const UpDateOrder = async (req, res) => {
         product.stock = Math.max(product.stock - item.quantity, 0);
         product.sold += item.quantity;
 
-        for (const variant of product.variants) {
-          for (const size of variant.sizes) {
-            if (size.size === item.size) {
-              size.quantity = Math.max(size.quantity - item.quantity, 0);
-              size.sold += item.quantity;
+        if (product) {
+          // Cập nhật tổng số lượng tồn kho và số lượng đã bán
+          product.stock = Math.max(product.stock - item.quantity, 0);
+          product.sold = (product.sold || 0) + item.quantity;
+
+          for (const variant of product.variants) {
+            //
+            if (variant.color === item.color) {
+              for (const size of variant.sizes) {
+                if (size.size === item.size) {
+                  size.quantity = Math.max(size.quantity - item.quantity, 0);
+                  size.sold = (size.sold || 0) + item.quantity;
+                }
+              }
             }
           }
         }
