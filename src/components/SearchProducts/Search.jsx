@@ -90,7 +90,7 @@ const Search = ({
                     return (
                       <div className="product-header-search" key={index}>
                         <img
-                          src={product.images[0].url}
+                          src={product.variants[0]?.images[0]?.url}
                           alt="ảnh"
                           style={{
                             width: "100%", // Điều chỉnh lại width để phù hợp
@@ -108,7 +108,7 @@ const Search = ({
                             {product.discount}%
                           </span>
                           <span className="line-through text-[#c4c4c4]">
-                            {formatPrice(product.price)}
+                            {formatPrice(product.costPrice)}
                           </span>
                         </div>
                       </div>

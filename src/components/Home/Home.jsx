@@ -132,7 +132,7 @@ const Home = () => {
                         </div>
                         <span className="line-through text-[#222] opacity-60 p-1">
                           {item.discount ? (
-                            <span>{formatPrice(item.price)}</span>
+                            <span>{formatPrice(item.costPrice)}</span>
                           ) : (
                             ""
                           )}
@@ -140,7 +140,7 @@ const Home = () => {
                         <span className="px-3">
                           {item.discountedPrice
                             ? formatPrice(item.discountedPrice)
-                            : formatPrice(item.price)}
+                            : formatPrice(item.costPrice)}
                         </span>
                       </div>
                     </Card>

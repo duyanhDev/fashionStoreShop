@@ -370,8 +370,6 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
           </Button> */}
           {ListCart && ListCart.items && ListCart.items.length > 0 ? (
             ListCart.items.map((cart, index) => {
-              console.log(cart);
-
               return (
                 <div className="">
                   <div

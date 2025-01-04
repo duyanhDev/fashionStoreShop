@@ -72,34 +72,42 @@ const Products = () => {
             product.stock && product.stock > 0 ? product.stock : "Đã hết hàng",
           size: (
             <div className="flex flex-wrap items-center gap-1 w-52">
-              {product.size.slice(0, 10).map((item, index) => (
-                <Tag key={index} color={getRandomColor()}>
-                  {item}
-                </Tag>
-              ))}
+              {product.variants.slice(0, 10).map((variant, variantIndex) => {
+                return variant.sizes.map((sizeItem, sizeIndex) => {
+                  return (
+                    <Tag
+                      key={`${variantIndex}-${sizeIndex}-${sizeItem.size}`}
+                      color={getRandomColor()}
+                    >
+                      {sizeItem.size}
+                    </Tag>
+                  );
+                });
+              })}
             </div>
           ),
+
           color: (
             <div className="flex gap-3 items-center">
-              {product.color.map((color) => {
-                if (color === "đen") {
+              {product.variants.map((color) => {
+                if (color.color === "đen") {
                   return (
                     <div
                       key={color}
                       className="w-5 h-5 bg-black rounded-full"
                     ></div>
                   );
-                } else if (color === "vàng") {
+                } else if (color.color === "vàng") {
                   return (
                     <div
                       key={color}
                       className="w-5 h-5 bg-yellow-500 rounded-full "
                     ></div>
                   );
-                } else if (color === "trắng") {
+                } else if (color.color === "trắng") {
                   return (
                     <div
-                      key={color}
+                      key={color.color}
                       className="w-5 h-5 bg-white border border-black-300 rounded-full "
                     ></div>
                   );
@@ -111,25 +119,29 @@ const Products = () => {
           ),
           image: (
             <div className="flex">
-              {product.images
-                .filter((image) => image !== null) // Filter out null values
-                .map((image, index) => (
-                  <Image
-                    key={index} // Use index as key (consider using a unique ID if available)
-                    src={image.url}
-                    alt={`${product.name} image ${index + 1}`} // More descriptive alt text
-                    width={50}
-                    height={50}
-                    style={{
-                      objectFit: "cover",
-                      borderRadius: "5px",
-                    }}
-                    onError={(e) => {
-                      e.target.onerror = null; // Prevent infinite loop
-                      e.target.src = "path/to/placeholder/image.jpg"; // Use a placeholder image on error
-                    }}
-                  />
-                ))}
+              {product.variants
+                .filter((item) => item.images !== null)
+                .map((value, index) => {
+                  return value.images.map((img) => {
+                    return (
+                      <Image
+                        key={index}
+                        src={img.url}
+                        alt={`${product.name} image ${index + 1}`}
+                        width={50}
+                        height={50}
+                        style={{
+                          objectFit: "cover",
+                          borderRadius: "5px",
+                        }}
+                        onError={(e) => {
+                          e.target.onerror = null; // Prevent infinite loop
+                          e.target.src = "path/to/placeholder/image.jpg";
+                        }}
+                      />
+                    );
+                  });
+                })}
             </div>
           ),
 

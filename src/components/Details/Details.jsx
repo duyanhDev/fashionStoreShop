@@ -36,7 +36,7 @@ const Details = () => {
   const { CartListProductsUser } = useOutletContext();
   const [checked, setChecked] = useState(false);
   const param = useParams();
-  const [SelectedColor, setSelectedColor] = useState("");
+  const [SelectedColor, setSelectedColor] = useState("đen");
   const [SelectedSize, setSelectedSize] = useState("");
   const [CheckSelectedSize, setCheckSelectedSize] = useState(false);
   const [feedback, setFeedBack] = useState([]);
@@ -45,6 +45,7 @@ const Details = () => {
   const [review, setReivew] = useState("");
   const { user } = useSelector((state) => state.auth);
   const [sumProducts, setSumProducts] = useState(0);
+  const [quantityProduct, SetquantityProduct] = useState([]);
 
   const itemsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(0);
@@ -95,7 +96,7 @@ const Details = () => {
         setName(res.data.data.name || "");
         setDescription(res.data.data.description);
         setBrand(res.data.data.brand || "");
-        setPrice(res.data.data.price || "");
+        setPrice(res.data.data.costPrice || "");
         setDisscount(res.data.data.discount || "");
         setPricedisscount(res.data.data.discountedPrice || "");
         setStock(res.data.data.stock || "");
@@ -130,7 +131,6 @@ const Details = () => {
   };
 
   const priceShift = discount ? pricediscount : price;
-  console.log(size);
 
   const handleAddProduct = async () => {
     if (!user) {
@@ -188,7 +188,11 @@ const Details = () => {
           message: "Đã thêm vào giỏ hàng",
           description: (
             <div className="flex gap-2 p-2 ">
-              <img src={image[0].url} className="img_cart" alt="lỗi" />
+              <img
+                src={variants[0]?.images[0]?.url}
+                className="img_cart"
+                alt="lỗi"
+              />
               <div>
                 <h1 className="whitespace-nowrap">{name}</h1>
                 <h1>{`${colorCart} / ${sizeCart}`}</h1>
@@ -232,6 +236,9 @@ const Details = () => {
       console.log(error);
     }
   };
+  const TotalStock = variants
+    .map((item) => item.sizes.reduce((acc, size) => acc + size.quantity, 0))
+    .reduce((acc, total) => acc + total, 0);
 
   return (
     <div className="Details w-full">
@@ -404,22 +411,23 @@ const Details = () => {
                   {size.length}
                 </span>
               </div>
-              <div className="flex items-center gap-1 m-3">
-                {size &&
-                  size.length > 0 &&
-                  size[0].map((item, index) => (
-                    <Button
-                      key={index}
-                      onClick={() => handleSize(item.size)}
-                      className={`${
-                        CheckSelectedSize && SelectedSize === item.size
-                          ? "bg-black text-[#fff]"
-                          : ""
-                      }`}
-                    >
-                      {item.size}
-                    </Button>
-                  ))}
+              <div className="flex items-center gap-1 m-3 size-selector">
+                {SelectedColor &&
+                  variants
+                    .find((variant) => variant.color === SelectedColor)
+                    ?.sizes.map((item, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleSize(item.size)}
+                        disabled={item.quantity === 0} // Disable nếu số lượng bằng 0
+                        className={`size-button  ${
+                          sizeCart === item.size ? "bg-black text-white" : ""
+                        } ${item.quantity === 0 ? "disabled" : ""}`}
+                      >
+                        {item.size} (
+                        {item.quantity > 0 ? item.quantity : "Hết hàng"})
+                      </button>
+                    ))}
               </div>
             </div>
           </div>
@@ -437,7 +445,11 @@ const Details = () => {
                   className="text-[#b3b3b3] font-normal text-sm"
                   onChange={(e) => setStock(e.target.value)}
                 >
-                  {`${stock > 0 ? `${stock} sản phẩm có sẵn` : "Đã bán hết"} `}
+                  {`${
+                    TotalStock > 0
+                      ? `${TotalStock} sản phẩm có sẵn`
+                      : "Đã bán hết"
+                  } `}
                 </h4>
               </div>
 
@@ -450,7 +462,7 @@ const Details = () => {
                 </h4>
               </div>
 
-              <div className=" flex items-center gap-1">
+              <div className=" flex items-center gap-1 mt-6">
                 <div className="flex items-center m-3 number-input-group ">
                   <Button
                     className=" w-10 h-10  border-none outline-none"
@@ -515,7 +527,7 @@ const Details = () => {
           </div>
         </div>
         <div className="flex-1">
-          <div className="text-center font-bold text-xl">PHẢN HỒI</div>
+          <div className="text-center font-bold text-xl mt-16">PHẢN HỒI</div>
           {currentFeedback &&
             currentFeedback.map((item) => {
               return (

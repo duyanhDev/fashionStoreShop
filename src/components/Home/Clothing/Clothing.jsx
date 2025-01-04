@@ -2,7 +2,6 @@ import "./Clothing.css";
 import { Flex, Rate, Skeleton, Card, Button } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ReactPaginate from "react-paginate";
 
 export default function Clothing({ ListProducts }) {
   const desc = ["terrible", "bad", "normal", "good", "wonderful"];
@@ -10,12 +9,13 @@ export default function Clothing({ ListProducts }) {
   const [ratings, setRatings] = useState({});
   const navigate = useNavigate();
 
-  // Separate state for each category's pagination
-  const [currentPageAo, setCurrentPageAo] = useState(0);
-  const [currentPageQuan, setCurrentPageQuan] = useState(0);
-  const [currentPageGiay, setCurrentPageGiay] = useState(0);
+  // State for visible items count
+  const [visibleItems, setVisibleItems] = useState(10);
+  const [visibleAoItems, setVisibleAoItems] = useState(10);
+  const [visibleQuanItems, setVisibleQuanItems] = useState(10);
+  const [visibleGiayItems, setVisibleGiayItems] = useState(10);
 
-  const itemsPerPage = 10;
+  const itemsPerLoad = 10;
 
   const aoProducts = ListProducts.filter(
     (product) => product.category.name === "Áo"
@@ -26,38 +26,6 @@ export default function Clothing({ ListProducts }) {
   const giayProducts = ListProducts.filter(
     (product) => product.category.name === "Giày"
   );
-
-  const aoOffset = currentPageAo * itemsPerPage;
-  const quanOffset = currentPageQuan * itemsPerPage;
-  const giayOffset = currentPageGiay * itemsPerPage;
-
-  const currentAoProducts = aoProducts.slice(aoOffset, aoOffset + itemsPerPage);
-  const currentQuanProducts = quanProducts.slice(
-    quanOffset,
-    quanOffset + itemsPerPage
-  );
-  const currentGiayProducts = giayProducts.slice(
-    giayOffset,
-    giayOffset + itemsPerPage
-  );
-
-  // Page count calculations
-  const aoPageCount = Math.ceil(aoProducts.length / itemsPerPage);
-  const quanPageCount = Math.ceil(quanProducts.length / itemsPerPage);
-  const giayPageCount = Math.ceil(giayProducts.length / itemsPerPage);
-
-  // Separate page change handlers for each category
-  const handlePageClickAo = (event) => {
-    setCurrentPageAo(event.selected);
-  };
-
-  const handlePageClickQuan = (event) => {
-    setCurrentPageQuan(event.selected);
-  };
-
-  const handlePageClickGiay = (event) => {
-    setCurrentPageGiay(event.selected);
-  };
 
   const formatPrice = (price) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
@@ -93,18 +61,29 @@ export default function Clothing({ ListProducts }) {
     navigate(`product/${id}`);
   };
 
-  const renderProductSection = (
-    title,
-    products,
-    pageCount,
-    handlePageClick
-  ) => (
+  const handleLoadMore = () => {
+    setVisibleItems((prev) => prev + itemsPerLoad);
+  };
+
+  const handleLoadMoreAo = () => {
+    setVisibleAoItems((prev) => prev + itemsPerLoad);
+  };
+
+  const handleLoadMoreQuan = () => {
+    setVisibleQuanItems((prev) => prev + itemsPerLoad);
+  };
+
+  const handleLoadMoreGiay = () => {
+    setVisibleGiayItems((prev) => prev + itemsPerLoad);
+  };
+
+  const renderProductSection = (title, products, visibleCount, onLoadMore) => (
     <>
       <div className="ml-4 mt-3 text-xl font-bold">{title}</div>
       <div className="flex gap-7 flex-wrap mx-4">
         {loading
           ? [...Array(12)].map((_, index) => <SkeletonCard key={index} />)
-          : products.map((product) => (
+          : products.slice(0, visibleCount).map((product) => (
               <div
                 className="content_dosin"
                 key={product._id}
@@ -131,7 +110,7 @@ export default function Clothing({ ListProducts }) {
                 {product.discount ? (
                   <div className="item_content">
                     <span className="text_span line-through">
-                      {formatPrice(product.price)}
+                      {formatPrice(product.costPrice)}
                     </span>
                     <span className="ml-2 text_span text-red-600">
                       -{product.discount}%
@@ -163,48 +142,13 @@ export default function Clothing({ ListProducts }) {
               </div>
             ))}
       </div>
-      <div className="mt-10 flex justify-center items-center">
-        <ReactPaginate
-          previousLabel={
-            <svg
-              viewBox="64 64 896 896"
-              focusable="false"
-              data-icon="left"
-              width="1em"
-              height="1em"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 000 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path>
-            </svg>
-          }
-          nextLabel={
-            <svg
-              viewBox="64 64 896 896"
-              focusable="false"
-              data-icon="right"
-              width="16px"
-              height="16px"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path d="M765.7 486.8L314.9 134.7A7.97 7.97 0 00302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 000-50.4z"></path>
-            </svg>
-          }
-          breakLabel={"..."}
-          pageCount={pageCount}
-          marginPagesDisplayed={2}
-          pageRangeDisplayed={3}
-          onPageChange={handlePageClick}
-          activeClassName={"active"}
-          containerClassName="flex items-center gap-2"
-          pageLinkClassName="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded"
-          activeLinkClassName="bg-blue-500 text-white"
-          previousClassName="p-2"
-          nextClassName="p-2"
-          disabledClassName="opacity-50"
-        />
-      </div>
+      {visibleCount < products.length && (
+        <div className="flex justify-center mt-4 mb-8">
+          <Button onClick={onLoadMore} type="primary">
+            XEM THÊM
+          </Button>
+        </div>
+      )}
     </>
   );
 
@@ -214,7 +158,7 @@ export default function Clothing({ ListProducts }) {
       <div className="flex gap-7 flex-wrap mx-4">
         {loading
           ? [...Array(15)].map((_, index) => <SkeletonCard key={index} />)
-          : ListProducts.map((product) => (
+          : ListProducts.slice(0, visibleItems).map((product) => (
               <div
                 className="content_dosin"
                 key={product._id}
@@ -241,7 +185,7 @@ export default function Clothing({ ListProducts }) {
                 {product.discount ? (
                   <div className="item_content">
                     <span className="text_span line-through">
-                      {formatPrice(product.price)}
+                      {formatPrice(product.costPrice)}
                     </span>
                     <span className="ml-2 text_span text-red-600">
                       -{product.discount}%
@@ -257,7 +201,7 @@ export default function Clothing({ ListProducts }) {
                     </span>
                   ) : (
                     <span className="text_span">
-                      {formatPrice(product.price)}
+                      {formatPrice(product.costPrice)}
                     </span>
                   )}
                 </div>
@@ -273,25 +217,27 @@ export default function Clothing({ ListProducts }) {
               </div>
             ))}
       </div>
-
-      {/* Các section sản phẩm theo danh mục với phân trang riêng */}
-      {renderProductSection(
-        "ÁO",
-        currentAoProducts,
-        aoPageCount,
-        handlePageClickAo
+      {visibleItems < ListProducts.length && (
+        <div className="flex justify-center mt-4 mb-8">
+          <Button onClick={handleLoadMore} type="primary">
+            XEM THÊM
+          </Button>
+        </div>
       )}
+
+      {/* Các section sản phẩm theo danh mục */}
+      {renderProductSection("ÁO", aoProducts, visibleAoItems, handleLoadMoreAo)}
       {renderProductSection(
         "QUẦN",
-        currentQuanProducts,
-        quanPageCount,
-        handlePageClickQuan
+        quanProducts,
+        visibleQuanItems,
+        handleLoadMoreQuan
       )}
       {renderProductSection(
         "GIÀY",
-        currentGiayProducts,
-        giayPageCount,
-        handlePageClickGiay
+        giayProducts,
+        visibleGiayItems,
+        handleLoadMoreGiay
       )}
     </div>
   );

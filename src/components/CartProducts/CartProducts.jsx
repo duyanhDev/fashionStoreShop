@@ -10,7 +10,6 @@ import ClipLoader from "react-spinners/ClipLoader";
 
 const CartProducts = ({}) => {
   const { ListCart, user, CartListProductsUser } = useOutletContext();
-  console.log(user);
 
   const [loadingSpin, setLoadingSpin] = useState(false);
   const [api, contextHolder] = notification.useNotification();
@@ -114,30 +113,220 @@ const CartProducts = ({}) => {
   };
 
   const data =
-    ListCart &&
-    ListCart.items &&
-    ListCart.items.length > 0 &&
-    ListCart.items.map((item, index) => {
-      return {
-        key: index + 1,
-        id: item.productId._id,
-        images: (
-          <img
-            src={item.productId.variants[0]?.images[0]?.url}
-            alt="Product"
-            style={{ width: "50px", height: "50px" }}
-          />
-        ),
-        name: item.productId.name,
-        color: item.color,
-        quantity: item.quantity,
-        size: item.size,
-        price: formatPrice(item.price),
-        totalItemPrice: item.totalItemPrice + "đ",
-      };
-    });
+    ListCart && ListCart.items && ListCart.items.length > 0
+      ? ListCart.items.map((item, index) => {
+          return {
+            key: index + 1,
+            id: item.productId._id,
+            images: (
+              <img
+                src={item.productId.variants[0]?.images[0]?.url}
+                alt="Product"
+                style={{ width: "50px", height: "50px" }}
+              />
+            ),
+            name: item.productId.name,
+            color: item.color,
+            quantity: item.quantity,
+            size: item.size,
+            price: formatPrice(item.price),
+            totalItemPrice: item.totalItemPrice + "đ",
+          };
+        })
+      : [];
 
   const [checkedItems, setCheckedItems] = useState([]);
+
+  // const handleCheck = (
+  //   id,
+  //   name,
+  //   size,
+  //   quantity,
+  //   color,
+  //   price,
+  //   itemID,
+  //   productId
+  // ) => {
+  //   // Chuyển đổi giá trị price từ chuỗi (nếu cần) thành số
+  //   setProductId((prev) => {
+  //     if (prev.includes(productId)) {
+  //       return prev.filter((item) => item !== productId);
+  //     } else {
+  //       return [...prev, productId];
+  //     }
+  //   });
+  //   const numericPrice =
+  //     typeof price === "string"
+  //       ? parseFloat(price.replace(/[^\d,.-]/g, "").replace(",", "."))
+  //       : price;
+
+  //   setCartId(itemID);
+
+  //   // Cập nhật state cho id của sản phẩm được chọn
+  //   setProducts((prevState) => {
+  //     if (!Array.isArray(prevState)) {
+  //       prevState = [];
+  //     }
+
+  //     const existingProductIndex = prevState.findIndex(
+  //       (product) => product.id === id
+  //     );
+
+  //     if (existingProductIndex !== -1) {
+  //       return prevState.map((product, index) =>
+  //         index === existingProductIndex
+  //           ? {
+  //               ...product,
+  //               name,
+  //               size,
+  //               quantity,
+  //               color,
+  //               price: numericPrice, // Cập nhật giá trị numericPrice
+  //             }
+  //           : product
+  //       );
+  //     }
+
+  //     return [
+  //       ...prevState,
+  //       {
+  //         id,
+  //         name,
+  //         quantity,
+  //         size,
+  //         color,
+  //         price: numericPrice, // Cập nhật giá trị numericPrice
+  //       },
+  //     ];
+  //   });
+
+  //   // Cập nhật giá trị totalItemPrice cho các sản phẩm đã chọn
+  //   setPriceObj((prevPriceObj) => {
+  //     const newPriceObj = { ...prevPriceObj };
+  //     if (newPriceObj[id]) {
+  //       delete newPriceObj[id];
+  //     } else {
+  //       newPriceObj[id] = numericPrice;
+  //     }
+  //     return newPriceObj;
+  //   });
+
+  //   setCheckedItems((prevCheckedItems) => {
+  //     if (prevCheckedItems.includes(id)) {
+  //       return prevCheckedItems.filter((itemId) => itemId !== id);
+  //     } else {
+  //       return [...prevCheckedItems, id];
+  //     }
+  //   });
+  // };
+
+  const handleSelectAll = () => {
+    // Kiểm tra xem tất cả các sản phẩm đã được chọn chưa
+    const allSelected =
+      Array.isArray(checkedItems) && checkedItems.length === data?.length;
+    if (allSelected) {
+      // Nếu tất cả đã được chọn, bỏ chọn tất cả
+      setCheckedItems([]);
+      setPriceObj({});
+      setProductId([]);
+      setCartId("");
+    } else {
+      // Nếu chưa chọn tất cả, chọn tất cả
+      data.map((product) => {
+        console.log(product);
+
+        const allProductIds = []; // Mảng để lưu tất cả productId
+        const { id, name, size, quantity, color, totalItemPrice } = product;
+
+        // Lưu productId vào allProductIds
+        allProductIds.push(id);
+
+        setCartId(ListCart._id);
+
+        // Chuyển đổi giá trị price thành số nếu cần
+        const numericPrice =
+          typeof totalItemPrice === "string"
+            ? parseFloat(
+                totalItemPrice
+                  .replace(/[^\d,.-]/g, "") // Loại bỏ ký tự không phải số
+                  .replace(",", ".") // Thay dấu phẩy thành dấu chấm
+              )
+            : totalItemPrice;
+
+        // Tạo key duy nhất cho sản phẩm
+        const uniqueKey = `${id}-${size}-${color}`;
+
+        // Cập nhật danh sách productId (chọn tất cả productId)
+        setProductId((prev) => {
+          if (prev.includes(allProductIds)) {
+            return prev.filter((item) => item !== id);
+          } else {
+            return [...prev, id];
+          }
+        });
+
+        // Cập nhật danh sách sản phẩm
+        setProducts((prevState) => {
+          if (!Array.isArray(prevState)) {
+            prevState = [];
+          }
+
+          // Kiểm tra sản phẩm dựa trên key duy nhất
+          const existingProductIndex = prevState.findIndex(
+            (product) =>
+              product.id === id &&
+              product.size === size &&
+              product.color === color
+          );
+
+          if (existingProductIndex !== -1) {
+            // Nếu sản phẩm đã tồn tại, cập nhật thông tin
+            return prevState.map((product, index) =>
+              index === existingProductIndex
+                ? {
+                    ...product,
+                    name,
+                    size,
+                    quantity,
+                    color,
+                    price: numericPrice, // Cập nhật giá
+                  }
+                : product
+            );
+          }
+
+          // Nếu sản phẩm chưa tồn tại, thêm mới
+          return [
+            ...prevState,
+            {
+              id,
+              name,
+              quantity,
+              size,
+              color,
+              price: numericPrice,
+            },
+          ];
+        });
+
+        // Cập nhật giá trị priceObj
+        setPriceObj((prevPriceObj) => {
+          const newPriceObj = { ...prevPriceObj };
+          newPriceObj[uniqueKey] = numericPrice; // Lưu giá trị giá sản phẩm
+          return newPriceObj;
+        });
+
+        // Cập nhật danh sách sản phẩm đã chọn
+        setCheckedItems((prevCheckedItems) => {
+          if (prevCheckedItems.includes(uniqueKey)) {
+            return prevCheckedItems;
+          } else {
+            return [...prevCheckedItems, uniqueKey];
+          }
+        });
+      });
+    }
+  };
 
   const handleCheck = (
     id,
@@ -149,7 +338,18 @@ const CartProducts = ({}) => {
     itemID,
     productId
   ) => {
-    // Chuyển đổi giá trị price từ chuỗi (nếu cần) thành số
+    console.log(price);
+
+    // Chuyển đổi giá trị price thành số nếu cần
+    const numericPrice =
+      typeof price === "string"
+        ? parseFloat(price.replace(/[^\d,.-]/g, "").replace(",", "."))
+        : price;
+
+    // Tạo một key duy nhất cho sản phẩm dựa trên id, size và color
+    const uniqueKey = `${id}-${size}-${color}`;
+
+    // Cập nhật danh sách productId (chọn hoặc bỏ chọn productId)
     setProductId((prev) => {
       if (prev.includes(productId)) {
         return prev.filter((item) => item !== productId);
@@ -157,24 +357,23 @@ const CartProducts = ({}) => {
         return [...prev, productId];
       }
     });
-    const numericPrice =
-      typeof price === "string"
-        ? parseFloat(price.replace(/[^\d,.-]/g, "").replace(",", "."))
-        : price;
 
     setCartId(itemID);
 
-    // Cập nhật state cho id của sản phẩm được chọn
+    // Cập nhật danh sách sản phẩm
     setProducts((prevState) => {
       if (!Array.isArray(prevState)) {
         prevState = [];
       }
 
+      // Kiểm tra sản phẩm dựa trên key duy nhất
       const existingProductIndex = prevState.findIndex(
-        (product) => product.id === id
+        (product) =>
+          product.id === id && product.size === size && product.color === color
       );
 
       if (existingProductIndex !== -1) {
+        // Nếu sản phẩm đã tồn tại, cập nhật thông tin
         return prevState.map((product, index) =>
           index === existingProductIndex
             ? {
@@ -183,12 +382,13 @@ const CartProducts = ({}) => {
                 size,
                 quantity,
                 color,
-                price: numericPrice, // Cập nhật giá trị numericPrice
+                price: numericPrice,
               }
             : product
         );
       }
 
+      // Nếu sản phẩm chưa tồn tại, thêm mới
       return [
         ...prevState,
         {
@@ -197,27 +397,30 @@ const CartProducts = ({}) => {
           quantity,
           size,
           color,
-          price: numericPrice, // Cập nhật giá trị numericPrice
+          price: numericPrice,
         },
       ];
     });
 
-    // Cập nhật giá trị totalItemPrice cho các sản phẩm đã chọn
+    // Cập nhật giá trị totalItemPrice
     setPriceObj((prevPriceObj) => {
       const newPriceObj = { ...prevPriceObj };
-      if (newPriceObj[id]) {
-        delete newPriceObj[id];
+      if (newPriceObj[uniqueKey]) {
+        delete newPriceObj[uniqueKey];
       } else {
-        newPriceObj[id] = numericPrice;
+        newPriceObj[uniqueKey] = numericPrice;
       }
       return newPriceObj;
     });
 
+    // Cập nhật danh sách sản phẩm đã chọn
     setCheckedItems((prevCheckedItems) => {
-      if (prevCheckedItems.includes(id)) {
-        return prevCheckedItems.filter((itemId) => itemId !== id);
+      if (prevCheckedItems.includes(uniqueKey)) {
+        // Nếu sản phẩm đã chọn, bỏ chọn
+        return prevCheckedItems.filter((itemKey) => itemKey !== uniqueKey);
       } else {
-        return [...prevCheckedItems, id];
+        // Nếu sản phẩm chưa chọn, thêm vào
+        return [...prevCheckedItems, uniqueKey];
       }
     });
   };
@@ -263,12 +466,26 @@ const CartProducts = ({}) => {
       key: "totalItemPrice",
     },
     {
-      title: "Chọn sản phẩm",
+      title: (
+        <input
+          type="checkbox"
+          checked={
+            data.length > 0 &&
+            data.every((item) =>
+              checkedItems.includes(`${item.id}-${item.size}-${item.color}`)
+            )
+          }
+          onChange={handleSelectAll}
+        />
+      ),
       dataIndex: "id",
       key: "id",
       render: (_, record) => (
         <input
           type="checkbox"
+          checked={checkedItems.includes(
+            `${record.id}-${record.size}-${record.color}`
+          )}
           onChange={() =>
             handleCheck(
               record.id,
@@ -372,6 +589,7 @@ const CartProducts = ({}) => {
               <label className="text-sm">Số điện thoại</label>
               <Input
                 placeholder="Nhập số điện thoại"
+                type="number"
                 onChange={(e) => setNumber(e.target.value)}
                 value={number}
                 status={!number && "error"}
@@ -468,6 +686,7 @@ const CartProducts = ({}) => {
               </div>
             </div>
           </div>
+
           <div className="mt-5">
             <h1 className="text-3xl font-semibold">Hình thức thanh toán</h1>
             <div className="mt-3">
@@ -551,7 +770,18 @@ const CartProducts = ({}) => {
           </div>
         )}
         <div className="w-1/2 h-full">
-          <Table columns={columns} dataSource={data} size="middle" />
+          <Table
+            columns={columns}
+            dataSource={data}
+            size="middle"
+            pagination={{
+              total: data.length,
+              pageSize: 5,
+              showSizeChanger: false,
+              showTotal: (total) => `Tổng ${total} sản phẩm`,
+              className: "pagination-custom",
+            }}
+          />
         </div>
       </div>
       <div className="footer w-full flex">

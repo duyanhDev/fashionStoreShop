@@ -49,8 +49,8 @@ const ViewSearch = ({}) => {
               <div className="product-header-search-1 " key={product.id}>
                 <img
                   src={
-                    product.images && product.images.length > 0
-                      ? product.images[0].url
+                    product.variants && product.variants.length > 0
+                      ? product.variants[0]?.images[0]?.url
                       : "fallback-image-url.jpg"
                   }
                   alt={product.name || "Sản phẩm"}
@@ -70,7 +70,7 @@ const ViewSearch = ({}) => {
                     {product.discount}%
                   </span>
                   <span className="line-through text-[#c4c4c4]">
-                    {formatPrice(product.price)}
+                    {formatPrice(product.costPrice)}
                   </span>
                 </div>
               </div>

@@ -71,6 +71,8 @@ function App() {
       CartListProductsUser();
     }, [user._id]);
 
+  console.log(ListCart);
+
   useEffect(() => {
     const navHeader = document.querySelector(".nav_header");
 

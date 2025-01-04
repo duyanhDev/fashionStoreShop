@@ -176,18 +176,18 @@ const Create = () => {
             duration: 2,
           });
         }, 1000);
-        setName("");
-        setBrand("");
-        setCare("");
-        setDescription("");
-        setCategory("");
-        setStock("");
-        setColor([]);
-        setSize([]);
-        setDisscount("");
-        setPrice("");
-        setImageFiles("");
-        setCostPrice("");
+        // setName("");
+        // setBrand("");
+        // setCare("");
+        // setDescription("");
+        // setCategory("");
+        // setStock("");
+        // setColor([]);
+        // setSize([]);
+        // setDisscount("");
+        // setPrice("");
+        // setImageFiles("");
+        // setCostPrice("");
       }
     } catch (error) {}
   };

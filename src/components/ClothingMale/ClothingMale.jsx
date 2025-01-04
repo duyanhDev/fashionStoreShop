@@ -82,6 +82,28 @@ const ClothingMale = () => {
       setSelectedValues((prev) => prev.filter((item) => item !== value));
     }
   };
+  useEffect(() => {
+    // Lấy tham số từ query string trong URL
+    const urlParams = new URLSearchParams(location.search);
+    const categoryParam = urlParams.get("category");
+    const priceParam = urlParams.get("price");
+
+    // Kiểm tra và áp dụng bộ lọc theo danh mục nếu có
+    if (categoryParam) {
+      setValueCategory(categoryParam);
+      setFitter(true);
+    }
+
+    // Kiểm tra và áp dụng bộ lọc theo giá nếu có
+    if (priceParam) {
+      setPriceFitter(priceParam);
+      FilterPriceProduct(priceParam); // Áp dụng lọc theo giá
+    }
+
+    // Các logic khác cho việc tải dữ liệu
+    // Đảm bảo rằng fetchProducts sử dụng cả category và price nếu có
+    fetchProducts(categoryParam, priceParam);
+  }, [location.search, param.gender, currentPage]);
 
   const handleOnClickColor = (value) => {
     setColor(value);
@@ -97,29 +119,38 @@ const ClothingMale = () => {
     </Card>
   );
   const fetchProducts = async () => {
-    setLoading(true); // Set loading state first
+    setLoading(true);
 
     try {
-      const res = valueCategory
-        ? await CategoryGenderFitterAPI(
-            param.gender,
-            valueCategory,
-            currentPage
-          )
-        : await CategoryProductsGender(param.gender, currentPage);
+      let res;
 
-      await new Promise((resolve) => setTimeout(resolve, 3000)); // Wait for 3 seconds
+      if (valueCategory) {
+        res = await CategoryGenderFitterAPI(
+          param.gender,
+          valueCategory,
+          currentPage
+        );
+      } else {
+        res = await CategoryProductsGender(param.gender, currentPage);
+      }
 
+      // Mô phỏng thời gian tải (nếu cần)
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
+      // Nếu API trả về thành công
       if (res?.data?.EC === 0) {
-        setProducts(res.data.data);
-        setTotalPages(res.data.totalPages);
+        let filteredProducts = res.data.data;
 
+        // Lọc sản phẩm theo giá nếu có bộ lọc giá
         if (hiddenPrice && priceFitter > 0) {
-          const filteredProducts = res.data.data.filter(
+          filteredProducts = filteredProducts.filter(
             (product) => Number(product.discountedPrice) >= priceFitter
           );
-          SetPriceProducts(filteredProducts);
         }
+
+        // Cập nhật danh sách sản phẩm và tổng số trang
+        setProducts(filteredProducts);
+        setTotalPages(res.data.totalPages);
       }
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -154,8 +185,11 @@ const ClothingMale = () => {
   const FilterPriceProduct = async (value, categoryValue = valueCategory) => {
     setLoading(true);
     setPriceFitter(value);
+
+    // Cập nhật URL với tham số giá
     const newUrl = `${location.pathname}?price=${value}`;
     Navigate(newUrl, { replace: true });
+
     setTimeout(async () => {
       try {
         let res;
@@ -169,12 +203,10 @@ const ClothingMale = () => {
           res = await CategoryProductsGender(param.gender, currentPage);
         }
 
-        if (res && res.data && res.data.EC === 0) {
-          const filteredProducts = res.data.data.filter((product) => {
-            const price = Number(product.discountedPrice);
-            return price >= value;
-          });
-
+        if (res?.data?.EC === 0) {
+          const filteredProducts = res.data.data.filter(
+            (product) => Number(product.discountedPrice) >= value
+          );
           SetHiddenPrice(true);
           SetPriceProducts(filteredProducts);
           setProducts(res.data.data);
