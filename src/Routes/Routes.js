@@ -62,7 +62,7 @@ RouterAPI.post("/like", toggleLikeRatingAPI);
 
 // gender products
 
-RouterAPI.get("/categoryProducts/:gender/:page", CategoryGenderAPI);
+RouterAPI.get("/categoryProductsFilter", CategoryGenderAPI);
 RouterAPI.get(
   "/categoryfilter/:gender/:category/:page",
   CategoryGenderFitterAPI

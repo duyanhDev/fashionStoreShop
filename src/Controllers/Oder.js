@@ -89,7 +89,12 @@ const CreateOrder = async (req, res) => {
     emailContent += `</ul>`;
     emailContent += `<h4><span>Tổng giá tiền thanh toán:</span> ${formatPrice(
       totalAmount
-    )} VND</h4>`;
+    )}(${
+      paymentMethod === "vnpay" || paymentMethod === "momo"
+        ? "Đã thanh toán"
+        : "Chưa Thanh Toán"
+    }
+  )VND</h4>`;
 
     // Create new order
     const newOrder = new Order({
@@ -115,7 +120,7 @@ const CreateOrder = async (req, res) => {
     const mailOptions = {
       from: "dangtrinhduyanh100202@gmail.com",
       to: email,
-      subject: "Your Order Confirmation",
+      subject: "BẠN ĐÃ ĐẶT ĐƠN HÀNG THÀNH CÔNG TRÊN DOSIIN ",
       html: emailContent, // Send HTML content
     };
 

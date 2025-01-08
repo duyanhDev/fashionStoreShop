@@ -130,28 +130,74 @@ const toggleLikeRating = async (productId, ratingId, userId) => {
   };
 };
 
-const CategoryGender = async (gender, page) => {
+const ProductFilter = async ({
+  gender,
+  category,
+  minPrice,
+  maxPrice,
+  sortName,
+  sortPrice,
+  sortDate,
+  page = 1,
+}) => {
   try {
-    const perPage = 10;
+    const perPage = 20;
     const skip = (page - 1) * perPage;
 
+    // Tạo bộ lọc
+    const filter = {};
+    if (gender) filter.gender = gender;
+    if (category) filter.category = category;
+    if (minPrice)
+      filter.discountedPrice = {
+        ...filter.discountedPrice,
+        $gte: Number(minPrice),
+      }; // Giá >= minPrice
+    if (maxPrice)
+      filter.discountedPrice = {
+        ...filter.discountedPrice,
+        $lte: Number(maxPrice),
+      }; // Giá <= maxPrice
+
+    // Tạo tiêu chí sắp xếp
+    const sortCriteria = {};
+    if (sortName === "az") {
+      sortCriteria.name = 1; // Tên A-Z
+    } else if (sortName === "za") {
+      sortCriteria.name = -1; // Tên Z-A
+    }
+
+    if (sortPrice === "asc") {
+      sortCriteria.discountedPrice = 1; // Giá từ thấp đến cao
+    } else if (sortPrice === "desc") {
+      sortCriteria.discountedPrice = -1; // Giá từ cao đến thấp
+    }
+
+    if (sortDate === "newest") {
+      sortCriteria.createdAt = -1; // Ngày mới nhất
+    } else if (sortDate === "oldest") {
+      sortCriteria.createdAt = 1; // Ngày cũ nhất
+    }
+
+    // Truy vấn và đếm dữ liệu
     const [products, count] = await Promise.all([
-      Products.find({ gender }).skip(skip).limit(perPage),
-      Products.countDocuments({ gender }),
+      Products.find(filter).sort(sortCriteria).skip(skip).limit(perPage),
+      Products.countDocuments(filter),
     ]);
 
+    // Tính tổng số trang
     const totalPages = Math.ceil(count / perPage);
 
     return { products, totalPages, currentPage: page };
   } catch (error) {
-    console.error("Error fetching products by gender:", error);
+    console.error("Error fetching products with filters:", error);
     throw new Error("Error fetching products");
   }
 };
 
 const CategoryGenderFitter = async (gender, category, page) => {
   try {
-    const perPage = 10;
+    const perPage = 20;
     const skip = (page - 1) * perPage;
 
     const [products, count] = await Promise.all([
@@ -260,7 +306,7 @@ module.exports = {
   ListOneProducts,
   UpdateProducts,
   PutFeedbackProduct,
-  CategoryGender,
+  ProductFilter,
   CategoryGenderFitter,
   toggleLikeRating,
   searchProductsByName,
