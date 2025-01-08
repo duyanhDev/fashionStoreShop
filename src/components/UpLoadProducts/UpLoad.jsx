@@ -26,6 +26,7 @@ const UpLoad = () => {
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
   const [sold, setSold] = useState(0);
+  const [discount, setDisscount] = useState(0);
   const [size, setSize] = useState([]);
   const [color, setColor] = useState([]);
   const [image, setImageFiles] = useState([]);
@@ -49,6 +50,8 @@ const UpLoad = () => {
   };
 
   const onPreview = async (file) => {
+    console.log(file);
+
     // You can handle image preview here if needed
     // Example: display modal with the selected image
     const src = file.url || (await getBase64(file.originFileObj));
@@ -114,16 +117,22 @@ const UpLoad = () => {
           setCare(res.data.data.care || "");
           setCategory([res.data.data.category.name] || []);
           setPrice(res.data.data.price || "");
+          setDisscount(res.data.data.discount || 0);
           setStock(res.data.data.stock || "");
           setSold(res.data.data.sold || 0);
           setSize(res.data.data.size || []);
           setColor(res.data.data.color || []);
           setCostPrice(res.data.data.costPrice || 0);
           setFileList(
-            res.data.data.images.map((image) => ({
-              url: image.url,
-              name: image.url || "Image",
-            })) || []
+            res.data.data.variants.flatMap((item) => {
+              return item.images.map((image) => {
+                console.log(image); // Log từng ảnh
+                return {
+                  url: image.url,
+                  name: image.url || "Image",
+                };
+              });
+            })
           );
         }
       } catch (error) {
@@ -132,6 +141,8 @@ const UpLoad = () => {
     };
     CallApiListProduct();
   }, [param.id]);
+
+  console.log(setFileList);
 
   useEffect(() => {
     const FetchCategory = async () => {
@@ -194,6 +205,7 @@ const UpLoad = () => {
         brand,
         care,
         price,
+        discount,
         stock,
         sold,
         size,
@@ -225,7 +237,11 @@ const UpLoad = () => {
       console.log(error);
     }
   };
-  console.log("check", color);
+
+  const onChangeDiscount = (value) => {
+    setDisscount(value);
+  };
+
   return (
     <div className="w-full ml-6 flex ">
       {contextHolder}
@@ -334,6 +350,18 @@ const UpLoad = () => {
           />
         </div>
 
+        <div className="ml-5 mt-2">
+          <Typography.Title level={5}>discount</Typography.Title>
+          <InputNumber
+            style={{
+              width: "50%",
+            }}
+            min={0}
+            max={90000000}
+            value={discount}
+            onChange={onChangeDiscount}
+          />
+        </div>
         <div className="ml-5 mt-2">
           <Typography.Title level={5}>Stock</Typography.Title>
           <InputNumber

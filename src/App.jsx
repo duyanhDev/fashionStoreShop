@@ -25,6 +25,7 @@ function App() {
   const [isVisible, setIsVisible] = useState(false);
   const [ListProducts, setListProducts] = useState([]);
   const [ListCart, setListCard] = useState([]);
+  const Navigate = useNavigate();
   const onAutoplayTimeLeft = (s, time, progress) => {
     progressCircle.current.style.setProperty("--progress", 1 - progress);
     progressContent.current.textContent = `${Math.ceil(time / 1000)}s`;
@@ -451,7 +452,10 @@ function App() {
       </div>
 
       <div className="fixed right-0 bottom-0 mb-24 chat_ai transition-opacity duration-300 z-10">
-        <button className="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center hover:bg-blue-800 transition-colors text-wrap">
+        <button
+          className="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center hover:bg-blue-800 transition-colors text-wrap"
+          onClick={() => Navigate("/ChatAi")}
+        >
           ChatAi
         </button>
       </div>

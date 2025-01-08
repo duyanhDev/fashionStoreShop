@@ -2,108 +2,160 @@ import { useEffect, useState } from "react";
 import "./ClothingMale.css";
 import { Radio, Space, Slider, Button, Card, Skeleton } from "antd";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import {
-  CategoryGenderFitterAPI,
-  CategoryProductsGender,
-  ListCategoryAPI,
-} from "../../service/ApiCategory";
+import { useDispatch, useSelector } from "react-redux";
+import { ListCategoryAPI } from "../../service/ApiCategory";
 import ReactPaginate from "react-paginate";
+import { fetchProducts } from "../../redux/actions/filterAction";
 
 const ClothingMale = () => {
-  const [priceFitter, setPriceFitter] = useState(0);
-  const [hiddenPrice, SetHiddenPrice] = useState(false);
-  const [Category, setCategory] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [priceProducts, SetPriceProducts] = useState([]);
   const param = useParams();
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [value, setValue] = useState(1);
-  const [valueCategory, setValueCategory] = useState("");
-  const [selectedValues, setSelectedValues] = useState([]);
-  const [color, setColor] = useState("");
-  const [hiddenProducts, setHiddenProducts] = useState(false);
-  const [Fitter, setFitter] = useState(false);
+
   const location = useLocation();
   const Navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [hidden, setHidden] = useState(false);
+  const [checkFiltter, setCheckFilter] = useState(false);
+  const [ListCategory, setListCategory] = useState([]);
+  const [valueId, setValueId] = useState("");
+  const [categoryName, setCategoryName] = useState("");
+  const {
+    products,
+    loading,
+    totalPages,
+    category,
+    selectedSize,
+    selectedColor,
+    sortPrice,
+  } = useSelector((state) => state.filter);
 
-  /// sort
+  const queryParams = new URLSearchParams(location.search);
+  const savedSortPrice = queryParams.get("sortPrice") || "";
+  const saveCateogry = queryParams.get("Category");
+  const savedCurrentPage = parseInt(queryParams.get("currentPage")) || 1; // Default to page 1
 
-  const [hiddenSort, setHiddentSort] = useState(false);
-  const [sort, setSort] = useState(false);
+  const currentPage = useSelector((state) => state.filter.currentPage);
+
+  useEffect(() => {
+    const params = {
+      gender: param.gender,
+      category:
+        valueId ||
+        (saveCateogry
+          ? ListCategory.find((cat) => cat.name === saveCateogry)?._id
+          : ""),
+      sortPrice: savedSortPrice,
+      currentPage: savedCurrentPage,
+    };
+
+    dispatch(fetchProducts(params));
+  }, [
+    // dispatch,
+    valueId,
+    param.gender,
+    savedSortPrice,
+    savedCurrentPage,
+    saveCateogry,
+    ListCategory,
+  ]);
+
+  useEffect(() => {
+    const FetchListCategoryAndInitialize = async () => {
+      try {
+        const res = await ListCategoryAPI();
+        if (res && res.data) {
+          const categories = res.data.data;
+          setListCategory(categories);
+
+          // Xử lý giá trị ban đầu từ URL
+          const categoryFromURL = queryParams.get("Category");
+          if (categoryFromURL) {
+            const foundCategory = categories.find(
+              (cat) => cat.name === categoryFromURL
+            );
+            if (foundCategory) {
+              setValueId(foundCategory._id);
+            }
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    FetchListCategoryAndInitialize();
+  }, []);
+
+  useEffect(() => {
+    if (ListCategory.length > 0) {
+      const params = {
+        gender: param.gender,
+        category:
+          valueId ||
+          (saveCateogry
+            ? ListCategory.find((cat) => cat.name === saveCateogry)?._id
+            : ""),
+        sortPrice: savedSortPrice,
+        currentPage: savedCurrentPage,
+      };
+
+      dispatch(fetchProducts(params));
+    }
+  }, [valueId, param.gender, savedSortPrice, savedCurrentPage]);
+
+  const handlePageClick = (page) => {
+    const pageNumber = page.selected + 1;
+
+    const queryParams = new URLSearchParams(location.search);
+    queryParams.set("currentPage", pageNumber);
+    Navigate(`${location.pathname}?${queryParams.toString()}`);
+
+    dispatch(
+      fetchProducts({
+        gender: param.gender,
+        category: valueId,
+        sortPrice: savedSortPrice,
+        currentPage: pageNumber,
+      })
+    );
+  };
 
   const formatPrice = (price) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
   };
   const marks = {
     0: <span>0VND</span>,
-    100: <span className="increase">{priceFitter}VND</span>,
+    // 100: <span className="increase">{priceFitter}VND</span>,
   };
+
+  // lấy danh sách sản phẩm category
 
   const onChange = async (e) => {
-    setLoading(true);
-    setValueCategory(e.target.value);
-    setHiddenProducts(true);
-    setCurrentPage(1); // Reset to first page when changing category
-    setFitter(true);
-    const newUrl = `${location.pathname}?category=${e.target.value}`;
-    Navigate(newUrl, { replace: true });
-    try {
-      const res = await CategoryGenderFitterAPI(
-        param.gender,
-        e.target.value,
-        1
-      );
-      await new Promise((resolve) => setTimeout(resolve, 3000)); // Wait for 3 seconds
-      if (res?.data?.EC === 0) {
-        setProducts(res.data.data);
-        setTotalPages(res.data.totalPages);
+    const selectedValue = e.target.value;
+    setValueId(selectedValue);
 
-        if (hiddenPrice && priceFitter > 0) {
-          const filteredProducts = res.data.data.filter(
-            (product) => Number(product.discountedPrice) >= priceFitter
-          );
-          SetPriceProducts(filteredProducts);
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching category products:", error);
-    } finally {
-      setLoading(false);
+    // Tìm danh mục tương ứng với giá trị đã chọn
+    const selectedCategory = ListCategory.find(
+      (category) => category._id === selectedValue
+    );
+
+    if (selectedCategory) {
+      setCategoryName(selectedCategory.name);
     }
+    setHidden(true);
+    const queryParams = new URLSearchParams(location.search);
+    queryParams.set("Category", selectedCategory.name);
+    Navigate(`${location.pathname}?${queryParams.toString()}`);
+    dispatch(
+      fetchProducts({
+        gender: param.gender,
+        category: selectedValue,
+        sortPrice: savedSortPrice,
+        currentPage: 1,
+      })
+    );
   };
 
-  const handleCheckboxChange = (e) => {
-    const value = e.target.value;
-    if (e.target.checked) {
-      setSelectedValues((prev) => [...prev, value]);
-    } else {
-      setSelectedValues((prev) => prev.filter((item) => item !== value));
-    }
-  };
-  useEffect(() => {
-    // Lấy tham số từ query string trong URL
-    const urlParams = new URLSearchParams(location.search);
-    const categoryParam = urlParams.get("category");
-    const priceParam = urlParams.get("price");
-
-    // Kiểm tra và áp dụng bộ lọc theo danh mục nếu có
-    if (categoryParam) {
-      setValueCategory(categoryParam);
-      setFitter(true);
-    }
-
-    // Kiểm tra và áp dụng bộ lọc theo giá nếu có
-    if (priceParam) {
-      setPriceFitter(priceParam);
-      FilterPriceProduct(priceParam); // Áp dụng lọc theo giá
-    }
-
-    // Các logic khác cho việc tải dữ liệu
-    // Đảm bảo rằng fetchProducts sử dụng cả category và price nếu có
-    fetchProducts(categoryParam, priceParam);
-  }, [location.search, param.gender, currentPage]);
+  const handleCheckboxChange = (e) => {};
 
   const handleOnClickColor = (value) => {
     setColor(value);
@@ -118,192 +170,46 @@ const ClothingMale = () => {
       <Skeleton active={true} paragraph={{ rows: 3 }} />
     </Card>
   );
-  const fetchProducts = async () => {
-    setLoading(true);
 
-    try {
-      let res;
+  const handleSortDesAndAsc = (value) => {
+    const queryParams = new URLSearchParams(location.search);
+    queryParams.set("sortPrice", value);
+    queryParams.set("currentPage", 1);
 
-      if (valueCategory) {
-        res = await CategoryGenderFitterAPI(
-          param.gender,
-          valueCategory,
-          currentPage
-        );
-      } else {
-        res = await CategoryProductsGender(param.gender, currentPage);
-      }
+    Navigate(`${location.pathname}?${queryParams.toString()}`); // Update URL
 
-      // Mô phỏng thời gian tải (nếu cần)
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-
-      // Nếu API trả về thành công
-      if (res?.data?.EC === 0) {
-        let filteredProducts = res.data.data;
-
-        // Lọc sản phẩm theo giá nếu có bộ lọc giá
-        if (hiddenPrice && priceFitter > 0) {
-          filteredProducts = filteredProducts.filter(
-            (product) => Number(product.discountedPrice) >= priceFitter
-          );
-        }
-
-        // Cập nhật danh sách sản phẩm và tổng số trang
-        setProducts(filteredProducts);
-        setTotalPages(res.data.totalPages);
-      }
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    } finally {
-      setLoading(false);
-    }
+    // Gọi API sau khi URL đã thay đổi
+    const params = {
+      gender: param.gender,
+      category: valueId,
+      sortPrice: value,
+      currentPage: 1,
+    };
+    setCheckFilter(true);
+    dispatch(fetchProducts(params));
   };
-
-  useEffect(() => {
-    fetchProducts();
-  }, [param.gender, currentPage, valueCategory]);
-  const handlePageClick = (event) => {
-    setCurrentPage(event.selected + 1);
-  };
-
-  useEffect(() => {
-    ListCategoryAPI()
-      .then((res) => {
-        if (res?.data?.EC === 0) {
-          setCategory(res.data.data);
-        }
-      })
-      .catch(console.error);
-  }, []);
-
-  useEffect(() => {
-    if (hiddenPrice && priceFitter > 0) {
-      FilterPriceProduct(priceFitter);
-    }
-  }, [currentPage]);
-
-  const FilterPriceProduct = async (value, categoryValue = valueCategory) => {
-    setLoading(true);
-    setPriceFitter(value);
-
-    // Cập nhật URL với tham số giá
-    const newUrl = `${location.pathname}?price=${value}`;
-    Navigate(newUrl, { replace: true });
-
-    setTimeout(async () => {
-      try {
-        let res;
-        if (categoryValue) {
-          res = await CategoryGenderFitterAPI(
-            param.gender,
-            categoryValue,
-            currentPage
-          );
-        } else {
-          res = await CategoryProductsGender(param.gender, currentPage);
-        }
-
-        if (res?.data?.EC === 0) {
-          const filteredProducts = res.data.data.filter(
-            (product) => Number(product.discountedPrice) >= value
-          );
-          SetHiddenPrice(true);
-          SetPriceProducts(filteredProducts);
-          setProducts(res.data.data);
-          setFitter(true);
-        }
-      } catch (error) {
-        console.error("Lỗi khi lọc sản phẩm:", error);
-      } finally {
-        setLoading(false);
-      }
-    }, 3000);
-  };
-
-  useEffect(() => {
-    setPriceFitter(0);
-    setCurrentPage(1);
-    SetHiddenPrice(false);
-  }, [location.pathname]);
 
   const handleFitterProduct = async () => {
-    setLoading(true);
     try {
-      setLoading(false);
-      setFitter(false);
-      setValueCategory("");
-      setPriceFitter(0);
-      setHiddentSort(false);
+      setValueId("");
+      const params = {
+        gender: param.gender,
+        category: "",
+        sortPrice: "",
+      };
+      dispatch(fetchProducts(params));
+      setHidden(false);
       const newUrl = `${location.pathname}`;
       Navigate(newUrl, { replace: true });
     } catch (error) {
-      setLoading(false);
+      console.log(error);
     }
+    setCheckFilter(false);
   };
 
-  const handleBlockSort = () => {
-    setHiddentSort((prev) => !prev);
-  };
+  const SortDateProduct = () => {};
 
-  const sortPriceAsc = () => {
-    // Sắp xếp giá theo thứ tự tăng dần
-    setSort(true);
-    const sortedData = products
-      .slice()
-      .sort((a, b) => a.discountedPrice - b.discountedPrice);
-
-    setProducts(sortedData);
-    setFitter(true);
-    const newUrl = `${location.pathname}?show=priceAsc&page=${currentPage}`;
-    Navigate(newUrl, { replace: true });
-  };
-  const sortPriceDesc = () => {
-    // Sắp xếp giá theo thứ tự tăng dần
-    setSort(true);
-    const sortedData = products
-      .slice()
-      .sort((a, b) => b.discountedPrice - a.discountedPrice);
-
-    setProducts(sortedData);
-    setFitter(true);
-    const newUrl = `${location.pathname}?show=priceDesc&page=${currentPage}`;
-    Navigate(newUrl, { replace: true });
-  };
-
-  const SortDateProduct = () => {
-    setSort(true);
-    const sortedData = products.slice().sort((a, b) => {
-      const dateA = new Date(a.createdAt);
-      const dateB = new Date(b.createdAt);
-
-      return dateB - dateA;
-    });
-
-    setProducts(sortedData);
-    setFitter(true);
-    const newUrl = `${location.pathname}?show=CreateDate&page=${currentPage}`;
-    Navigate(newUrl, { replace: true });
-  };
-
-  const SortBestselling = () => {
-    if (!products || products.length === 0) {
-      console.warn("No products available to filter.");
-      return;
-    }
-
-    const sortedData = products.slice().sort((a, b) => b.sold - a.sold);
-
-    if (sortedData.length === 0) {
-      console.warn("No best-selling products found.");
-    }
-
-    setProducts(sortedData);
-    setFitter(true);
-
-    // Cập nhật URL để phản ánh việc hiển thị sản phẩm bán chạy
-    const newUrl = `${location.pathname}?show=Bestselling&page=${currentPage}`;
-    Navigate(newUrl, { replace: true });
-  };
+  const SortBestselling = () => {};
 
   return (
     <section>
@@ -311,15 +217,11 @@ const ClothingMale = () => {
         <div className="colletion_left">
           <div>
             <h1>Loại sản phẩm</h1>
-            <Radio.Group
-              className="mr-5"
-              onChange={onChange}
-              value={valueCategory}
-            >
+            <Radio.Group className="mr-5" onChange={onChange} value={valueId}>
               <Space direction="vertical">
-                {Category &&
-                  Category.length > 0 &&
-                  Category.map((Category) => {
+                {ListCategory &&
+                  ListCategory.length > 0 &&
+                  ListCategory.map((Category) => {
                     return (
                       <Radio value={Category._id} key={Category._id}>
                         {Category.name}
@@ -331,7 +233,7 @@ const ClothingMale = () => {
           </div>
           <div>
             <h1 className="mt-2">Bộ sưu tập</h1>
-            <Radio.Group className="mr-5" onChange={onChange} value={value}>
+            <Radio.Group className="mr-5" onChange={onChange} value={1}>
               <Space direction="vertical">
                 <Radio value={1}>Áo sơ mi</Radio>
                 <Radio value={2}>Áo thun</Radio>
@@ -454,7 +356,7 @@ const ClothingMale = () => {
               <Slider
                 className="w-full"
                 marks={marks}
-                value={priceFitter} // Đồng bộ giá trị
+                value={1} // Đồng bộ giá trị
                 min={0}
                 max={1000000}
                 step={50000}
@@ -590,7 +492,10 @@ const ClothingMale = () => {
               <div className="relative ">
                 <ul className="flex items-center gap-3">
                   <div>
-                    <li className="male_clothing" onClick={handleBlockSort}>
+                    <li
+                      className="male_clothing"
+                      onClick={() => setCheckFilter((prev) => !prev)}
+                    >
                       <button className="relative inline-flex h-12 overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-gray-50">
                         <span className="absolute  inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#a2aeff_0%,#3749be_50%,#a2aeff_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
                         <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full dark:bg-[#070e41] bg-[#ffffff] px-8 py-1 text-sm font-medium dark:text-gray-50 text-black backdrop-blur-3xl">
@@ -599,17 +504,21 @@ const ClothingMale = () => {
                       </button>
                     </li>
 
-                    {hiddenSort && (
+                    {checkFiltter && (
                       <ul className="top-12 absolute z-40 sort_products">
                         <li onClick={SortDateProduct}>Mới nhất</li>
-                        <li onClick={sortPriceAsc}>Giá : thấp - cao</li>
-                        <li onClick={sortPriceDesc}>Giá : cao - thấp</li>
+                        <li onClick={() => handleSortDesAndAsc("asc")}>
+                          Giá : thấp - cao
+                        </li>
+                        <li onClick={() => handleSortDesAndAsc("desc")}>
+                          Giá : cao - thấp
+                        </li>
                         <li onClick={SortBestselling}>Bán chạy nhất</li>
                       </ul>
                     )}
                   </div>
 
-                  {Fitter && (
+                  {hidden && (
                     <li className="male_clothing" onClick={handleFitterProduct}>
                       <span>Xóa Lọc</span>
                     </li>
@@ -620,65 +529,11 @@ const ClothingMale = () => {
             {/* sản phẩm */}
             <div className="mt-3 male_left">
               <div className="flex flex-wrap gap-2">
-                {/* Hiện sản phẩm */}
-                {hiddenProducts
-                  ? loading
-                    ? [...Array(12)].map((_, index) => (
-                        <SkeletonCard key={index} />
-                      ))
-                    : products &&
-                      !hiddenPrice &&
-                      products.length > 0 &&
-                      products.map((product, index) => {
-                        return (
-                          <div
-                            className="main_product_male cursor-pointer mt-5"
-                            key={index + 1}
-                          >
-                            <div className="w-10 h-10 absolute right-0">
-                              <span className="percent">
-                                {product.discount}%
-                              </span>
-                            </div>
-                            <div>
-                              <img
-                                src={product.variants[0]?.images[0]?.url}
-                                alt="ảnh"
-                                className="image_product_gender"
-                              />
-                            </div>
-                            <div className="mt-2">
-                              <h1 className=" main_product_male_h1">
-                                {product.name}
-                              </h1>
-                              <div className="flex gap-5 items-center justify-center">
-                                <span className="line-through text-red-500">
-                                  {formatPrice(product.price)}
-                                </span>
-                                <span>
-                                  {formatPrice(product.discountedPrice)}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="text-center m-2">
-                              <Button
-                                className=""
-                                onClick={() =>
-                                  Navigate(`/product/${product._id}`)
-                                }
-                              >
-                                Xem chi tiết sản phẩm
-                              </Button>
-                            </div>
-                          </div>
-                        );
-                      })
-                  : loading
+                {loading
                   ? [...Array(12)].map((_, index) => (
                       <SkeletonCard key={index} />
                     ))
                   : products &&
-                    !hiddenPrice &&
                     products.length > 0 &&
                     products.map((product, index) => {
                       return (
@@ -722,72 +577,6 @@ const ClothingMale = () => {
                         </div>
                       );
                     })}
-                {/* /// */}
-                {loading
-                  ? [...Array(12)].map((_, index) => (
-                      <SkeletonCard key={index} />
-                    ))
-                  : // Kiểm tra và hiển thị sản phẩm lọc giá hoặc sản phẩm gốc
-                  (hiddenPrice && priceFitter > 0 ? priceProducts : products) &&
-                    hiddenPrice &&
-                    (priceFitter > 0 ? priceProducts : products).length > 0
-                  ? (hiddenPrice && priceFitter > 0
-                      ? priceProducts
-                      : products
-                    ).map((product, index) => (
-                      <div
-                        className="main_product_male cursor-pointer mt-5"
-                        key={index + 1}
-                      >
-                        <div className="w-10 h-10 absolute right-0">
-                          <span className="percent">{product.discount}%</span>
-                        </div>
-                        <div>
-                          <img
-                            src={product.variants[0]?.images[0]?.url}
-                            alt="ảnh"
-                            className="image_product_gender"
-                          />
-                        </div>
-                        <div className="mt-2">
-                          <h1 className=" main_product_male_h1">
-                            {product.name}
-                          </h1>
-                          <div className="flex gap-5 items-center justify-center">
-                            <span className="line-through text-red-500">
-                              {formatPrice(product.price)}
-                            </span>
-                            <span>{formatPrice(product.discountedPrice)}</span>
-                          </div>
-                        </div>
-                        <div className="text-center m-2">
-                          <Button
-                            className=""
-                            onClick={() => Navigate(`/product/${product._id}`)}
-                          >
-                            Xem chi tiết sản phẩm
-                          </Button>
-                        </div>
-                      </div>
-                    ))
-                  : // Chỉ hiển thị khi có giá trị lọc mà không có sản phẩm
-                    hiddenPrice &&
-                    priceFitter > 0 &&
-                    priceProducts.length === 0 && (
-                      <>
-                        <div className="flex justify-center w-full items-center mt-6">
-                          <img
-                            src="https://cdn2.cellphones.com.vn/insecure/rs:fill:150:0/q:90/plain/https://cellphones.com.vn/media/wysiwyg/Review-empty.png"
-                            alt="loi"
-                          />
-                        </div>
-                        <div className="flex justify-center items-center w-full mt-8">
-                          <p className="font-semibold text-xl">
-                            Hiện tại shop chưa tìm được sản phẩm?
-                          </p>
-                        </div>
-                      </>
-                    )}
               </div>
               <div className="mt-10 flex justify-center items-center">
                 <ReactPaginate

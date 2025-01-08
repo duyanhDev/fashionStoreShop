@@ -5,8 +5,6 @@ const initialState = {
 };
 
 const searchReducer = (state = initialState, action) => {
-  console.log(action.payload);
-
   switch (action.type) {
     case SEARCH:
       return {

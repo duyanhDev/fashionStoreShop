@@ -65,6 +65,7 @@ const UpdateProductAPI = async (
   brand,
   care,
   price,
+  discount,
   stock,
   sold,
   size,
@@ -80,6 +81,7 @@ const UpdateProductAPI = async (
   formData.append("brand", brand);
   formData.append("care", care);
   formData.append("price", price);
+  formData.append("discount", discount);
   formData.append("stock", stock);
   formData.append("sold", sold);
   formData.append("color", color);

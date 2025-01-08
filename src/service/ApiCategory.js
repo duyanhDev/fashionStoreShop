@@ -25,11 +25,28 @@ const UpdateOneCatogryAPI = async (id, name, description) => {
 const DeleteOneCategoryAPI = async (id) => {
   return await axios.delete(`http://localhost:9000/api/v1/category/${id}`);
 };
-
-const CategoryProductsGender = async (gender, page) => {
-  return axios.get(
-    `http://localhost:9000/api/v1/categoryProducts/${gender}/${page}`
-  );
+const CategoryProductsGender = async (
+  gender,
+  category,
+  minPrice,
+  maxPrice,
+  sortName,
+  sortPrice,
+  sortDate,
+  page
+) => {
+  return axios.get(`http://localhost:9000/api/v1/categoryProductsFilter`, {
+    params: {
+      gender,
+      category,
+      minPrice,
+      maxPrice,
+      sortName,
+      sortPrice,
+      sortDate,
+      page,
+    },
+  });
 };
 
 const CategoryGenderFitterAPI = async (gender, category, page) => {
