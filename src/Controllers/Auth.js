@@ -2,6 +2,9 @@ const { uploadFileToCloudinary } = require("./../services/Cloudinary");
 const { RegisterUser, LoginUser } = require("./../services/Auth");
 const Users = require("./../Model/User");
 const bcrypt = require("bcrypt"); // Thay vì "bcryptjs"
+const nodemailer = require("nodemailer");
+require("dotenv").config;
+
 const RegisterUserAPI = async (req, res) => {
   try {
     const { name, email, password, isAdmin } = req.body;
@@ -87,7 +90,6 @@ const UpDateProfileUserAPI = async (req, res) => {
     const {
       id,
       name,
-      password,
       city,
       district,
       ward,
@@ -97,20 +99,6 @@ const UpDateProfileUserAPI = async (req, res) => {
       height,
       weight,
     } = req.body;
-
-    console.log(
-      id,
-      name,
-      password,
-      city,
-      district,
-      ward,
-      phone,
-      gender,
-      dateOfBirth,
-      height,
-      weight
-    );
 
     const avatar = req.files?.avatar;
 
@@ -124,7 +112,6 @@ const UpDateProfileUserAPI = async (req, res) => {
     // Cập nhật dữ liệu
     const updatedData = {
       name: name || UpdateUser.name,
-      password: password || UpdateUser.password,
       "address.city": city || UpdateUser.address.city,
       "address.district": district || UpdateUser.address.district,
       "address.ward": ward || UpdateUser.address.ward,
@@ -134,11 +121,6 @@ const UpDateProfileUserAPI = async (req, res) => {
       height: height || UpdateUser.height,
       weight: weight || UpdateUser.weight,
     };
-
-    if (password) {
-      const salt = await bcrypt.genSalt(10);
-      updatedData.password = await bcrypt.hash(password, salt);
-    }
 
     // Nếu có avatar mới
     if (avatar) {
@@ -164,10 +146,93 @@ const UpDateProfileUserAPI = async (req, res) => {
   }
 };
 
+// cập nhật mật khẩu
+const ChanglePasswordAPI = async (req, res) => {
+  try {
+    const { id, currentPassword, newPassword } = req.body;
+
+    if (!id || !currentPassword || !newPassword) {
+      return res.status(400).json({ error: "Thiếu thông tin cần thiết" });
+    }
+
+    const user = await Users.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ error: "Người dùng không tồn tại" });
+    }
+
+    // so sánh mật khẩu cũ
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: "Mật khẩu hiện tại không đúng" });
+    }
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Cập nhật mật khẩu
+    user.password = hashedPassword;
+    await user.save();
+    return res.status(200).json({ message: "Đổi mật khẩu thành công" });
+  } catch (error) {}
+};
+
+const Forgotpassword = async (req, res) => {
+  try {
+    let { email } = req.body;
+
+    console.log(email);
+
+    // Tìm người dùng theo email
+    const user = await Users.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ error: "Email không tồn tại" });
+    }
+
+    // Thiết lập transporter để gửi email
+    let transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    // Tạo mật khẩu mới
+    const newPassword = "dosin1234"; // Mật khẩu bạn tạo
+
+    // Thiết lập thông tin email
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: user.email,
+      subject: "Mật khẩu mới của bạn",
+      html: `<p>Mật khẩu mới của bạn là: <strong>${newPassword}</strong></p>`, // Gửi mật khẩu gốc cho người dùng qua email
+    };
+
+    // Gửi email
+    await transporter.sendMail(mailOptions);
+
+    // Cập nhật mật khẩu đã mã hóa vào cơ sở dữ liệu
+    user.password = newPassword;
+    await user.save();
+
+    return res
+      .status(200)
+      .json({ message: "Mật khẩu mới đã được gửi tới email của bạn" });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ error: "Đã xảy ra lỗi, vui lòng thử lại sau" });
+  }
+};
+
 module.exports = {
   RegisterUserAPI,
   LoginUserAPI,
   ListUserAPI,
   ListOneUserAPI,
   UpDateProfileUserAPI,
+  ChanglePasswordAPI,
+  Forgotpassword,
 };

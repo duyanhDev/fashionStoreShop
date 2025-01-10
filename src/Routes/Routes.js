@@ -24,6 +24,7 @@ const {
   ListUserAPI,
   ListOneUserAPI,
   UpDateProfileUserAPI,
+  Forgotpassword,
 } = require("./../Controllers/Auth");
 const {
   addToCart,
@@ -89,6 +90,7 @@ RouterAPI.post("/login", LoginUserAPI);
 RouterAPI.get("/users", ListUserAPI);
 RouterAPI.get("/profile-users", ListOneUserAPI);
 RouterAPI.put("/updateProfile", UpDateProfileUserAPI);
+RouterAPI.post("/forgetpassword", Forgotpassword);
 
 // Cart
 RouterAPI.post("/cart", addToCart);
