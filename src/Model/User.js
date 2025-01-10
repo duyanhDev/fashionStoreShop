@@ -8,13 +8,16 @@ const UserSchema = new mongoose.Schema(
     password: { type: String, required: true },
     avatar: { type: String },
     address: {
-      street: { type: String },
-      city: { type: String },
-      state: { type: String },
-      zip: { type: String },
-      country: { type: String },
+      city: { type: String }, // Thành phố
+      district: { type: String }, // Quận/Huyện
+      ward: { type: String }, // Phường/Xã
     },
     phone: { type: String },
+    gender: { type: String, enum: ["Nam", "Nữ"], default: "Nam" },
+    dateOfBirth: { type: Date },
+    height: { type: Number },
+    weight: { type: Number },
+    totalPrice: { type: Number },
     isAdmin: { type: Boolean, default: false },
     cart: [{ type: mongoose.Schema.Types.ObjectId, ref: "Cart" }],
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],

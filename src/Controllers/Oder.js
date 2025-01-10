@@ -45,7 +45,13 @@ const CreateOrder = async (req, res) => {
     }
 
     let totalAmount = 0;
-    let emailContent = `<div>THÔNG TIN ĐƠN HÀNG - DÀNH CHO NGƯỜI MUA:</div><ul>`;
+    let emailContent = `
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+      <div style="font-size: 18px; font-weight: bold; padding: 15px; background-color: #f5f5f5; border-radius: 8px; margin-bottom: 20px;">
+        THÔNG TIN ĐƠN HÀNG - DÀNH CHO NGƯỜI MUA:
+      </div>
+      <ul style="list-style: none; padding: 0; margin: 0;">
+    `;
 
     const formatPrice = (price) => {
       if (price === undefined || price === null) {
@@ -70,31 +76,59 @@ const CreateOrder = async (req, res) => {
 
       // Add product details to the email content
       emailContent += `
-        <li>
-          <img src="${product.variants[0]?.images[0]?.url}" alt="${
-        product.name
-      }" width="100px" /> <br>
-          <span>Tên sản phẩm:</span> ${product.name} <br>
-          <span>Số lượng:</span> ${item.quantity} <br>
-          <span>Size:</span> ${item.size} <br>
-          <span>Màu sắc:</span> ${item.color} <br>
-          <span>Giá :</span> ${formatPrice(item.price)} VND <br>
-        
-  
-
-        </li>
-      `;
+      <li style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #ffffff;">
+        <img src="${product.variants[0]?.images[0]?.url}" 
+             alt="${product.name}" 
+             style="width: 100px; height: auto; border-radius: 4px; margin-bottom: 10px;" />
+        <br>
+        <div style="line-height: 1.6;">
+          <div style="margin-bottom: 8px;">
+            <span style="font-weight: bold; color: #555; display: inline-block; width: 100px;">Tên sản phẩm:</span> 
+            <span style="color: #333;">${product.name}</span>
+          </div>
+          <div style="margin-bottom: 8px;">
+            <span style="font-weight: bold; color: #555; display: inline-block; width: 100px;">Số lượng:</span>
+            <span style="color: #333;">${item.quantity}</span>
+          </div>
+          <div style="margin-bottom: 8px;">
+            <span style="font-weight: bold; color: #555; display: inline-block; width: 100px;">Size:</span>
+            <span style="color: #333;">${item.size}</span>
+          </div>
+          <div style="margin-bottom: 8px;">
+            <span style="font-weight: bold; color: #555; display: inline-block; width: 100px;">Màu sắc:</span>
+            <span style="color: #333;">${item.color}</span>
+          </div>
+          <div style="margin-bottom: 8px;">
+            <span style="font-weight: bold; color: #555; display: inline-block; width: 100px;">Giá:</span>
+            <span style="color: #333;">${formatPrice(item.price)} VND</span>
+          </div>
+        </div>
+      </li>
+  `;
     }
 
     emailContent += `</ul>`;
-    emailContent += `<h4><span>Tổng giá tiền thanh toán:</span> ${formatPrice(
-      totalAmount
-    )}(${
-      paymentMethod === "vnpay" || paymentMethod === "momo"
-        ? "Đã thanh toán"
-        : "Chưa Thanh Toán"
-    }
-  )VND</h4>`;
+    emailContent += `
+    <h4 style="margin-top: 20px; padding: 15px; background-color: #f5f5f5; border-radius: 8px; font-size: 16px;">
+      <span style="color: #555; font-weight: bold;">Tổng giá tiền thanh toán:</span> 
+      <span style="color: #333; font-weight: bold;">${formatPrice(
+        totalAmount
+      )}</span>
+      <span style="display: inline-block; padding: 4px 8px; border-radius: 4px; margin-left: 8px; font-size: 14px;
+        ${
+          paymentMethod === "vnpay" || paymentMethod === "momo"
+            ? "background-color: #e8f5e9; color: #2e7d32;"
+            : "background-color: #fff3e0; color: #ef6c00;"
+        }">
+        (${
+          paymentMethod === "vnpay" || paymentMethod === "momo"
+            ? "Đã thanh toán"
+            : "Chưa Thanh Toán"
+        })
+      </span>
+      VND
+    </h4>
+  </div>`;
 
     // Create new order
     const newOrder = new Order({
@@ -370,6 +404,7 @@ const listOderUserId = async (req, res) => {
 const UpDateOrder = async (req, res) => {
   try {
     const { id } = req.params;
+    const { totalPrice } = req.body;
 
     const order = await Order.findOneAndUpdate(
       { _id: id },
@@ -380,6 +415,16 @@ const UpDateOrder = async (req, res) => {
       { new: true } // Chỉ định trả về đối tượng đã cập nhật
     );
 
+    const user = await Users.findOneAndUpdate(
+      { _id: order.userId },
+      {
+        $inc: { totalPrice: totalPrice }, // Sử dụng $inc để cộng dồn giá trị
+      },
+      { new: true }
+    );
+    if (!user) {
+      return res.status(404).json({ message: "Order not found" });
+    }
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }

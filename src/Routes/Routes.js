@@ -22,6 +22,8 @@ const {
   RegisterUserAPI,
   LoginUserAPI,
   ListUserAPI,
+  ListOneUserAPI,
+  UpDateProfileUserAPI,
 } = require("./../Controllers/Auth");
 const {
   addToCart,
@@ -85,6 +87,8 @@ RouterAPI.delete("/category/:id", DeleteOneCategoryAPI);
 RouterAPI.post("/register", RegisterUserAPI);
 RouterAPI.post("/login", LoginUserAPI);
 RouterAPI.get("/users", ListUserAPI);
+RouterAPI.get("/profile-users", ListOneUserAPI);
+RouterAPI.put("/updateProfile", UpDateProfileUserAPI);
 
 // Cart
 RouterAPI.post("/cart", addToCart);
