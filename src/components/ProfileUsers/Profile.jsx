@@ -102,10 +102,7 @@ const Profile = () => {
   const bachkim = 10000000;
 
   const inputDate = moment(dateBrith); // Ngày gốc
-
-  const correctedDate = inputDate.date(10).month(1).year(2002); // Sửa ngày, tháng, năm (tháng tính từ 0)
-
-  const formattedDate = correctedDate.format("DD-MM-YYYY"); // Chuyển định dạng
+  const formattedDate = moment(dateBrith).format("DD-MM-YYYY");
 
   const [selectedDate, setSelectedDate] = useState(formattedDate);
 
@@ -436,7 +433,6 @@ const Profile = () => {
       const res = await update_profileUser(
         id,
         name,
-        password,
         city,
         district,
         ward,
@@ -467,32 +463,32 @@ const Profile = () => {
               <img
                 src={palatium}
                 alt="lên hạng"
-                className="icon_users mt-3"
-                style={{ height: "26px" }}
+                className="icon_users mt-4 w-52"
+                style={{ height: "50px" }}
               />
             ) : points >= vang ? (
               <img
                 src={gold}
                 alt="lên hạng"
-                className="w-16"
-                style={{ height: "26px" }}
+                className="w-32"
+                style={{ height: "50px" }}
               />
             ) : points >= bac ? (
               <img
                 src={silver} // Use a placeholder for the lowest rank
                 alt="lên hạng"
-                className="w-16"
-                style={{ height: "26px" }}
+                className="w-32 mt-4"
+                style={{ height: "50px" }}
               />
             ) : (
               <img
                 src={logo_user} // Use a placeholder for the lowest rank
                 alt="lên hạng"
-                className="w-16"
-                style={{ height: "26px" }}
+                className="w-32 mt-4"
+                style={{ height: "50px" }}
               />
             )}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mt-5">
               <p className="account-line__description flex items-center gap-1">
                 Chi tiêu thêm
                 <b className="text-blue-500 font-bold">
@@ -545,7 +541,6 @@ const Profile = () => {
               </p>
               ;
             </div>
-
             <div className="mt-2">
               <span
                 className={`account-line_value ${
@@ -593,7 +588,7 @@ const Profile = () => {
           <div className="">
             <p className="text-xl text-[#00000099]">Tổng chi tiêu </p>
             <p className="text-center text-2xl font-bold text-[#000000]">
-              {formatPrice(points)}
+              {formatPrice(points || 0)}
             </p>
           </div>
         </div>
@@ -677,7 +672,7 @@ const Profile = () => {
               </div>
               <div className="mt-4 flex justify-between gap-3 ">
                 <span className="text-gray-600 font-medium">Cân nặng</span>
-                <span className="text-gray-950 font-bold">{weight}cm</span>
+                <span className="text-gray-950 font-bold">{weight}kg</span>
               </div>
               <div className="mt-4 flex justify-between gap-3 ">
                 <span className="text-gray-600 font-medium">Email</span>

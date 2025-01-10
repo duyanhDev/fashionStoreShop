@@ -19,7 +19,6 @@ const get_profile_user = async (id) => {
 const update_profileUser = async (
   id,
   name,
-  password,
   city,
   district,
   ward,
@@ -35,7 +34,6 @@ const update_profileUser = async (
   // Appending fields to the FormData object
   data.append("id", id);
   data.append("name", name);
-  data.append("password", password);
   data.append("city", city);
   data.append("district", district);
   data.append("ward", ward);

@@ -571,7 +571,7 @@ const CartProducts = ({}) => {
   };
 
   return (
-    <div className="h-screen w-full">
+    <div className="h-screen w-full mt-28">
       <div className="cart flex justify-between">
         <div className="w-1/2">
           <h1 className="text-3xl font-semibold">Thông tin đặt hàng</h1>

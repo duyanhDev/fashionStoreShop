@@ -278,7 +278,7 @@ const Create = () => {
         </div>
 
         <div className="ml-5 mt-2">
-          <Typography.Title level={5}>costPrice</Typography.Title>
+          <Typography.Title level={5}>Giá bán</Typography.Title>
           <Input
             type="number"
             style={{ width: "50%" }}
@@ -288,7 +288,7 @@ const Create = () => {
           />
         </div>
         <div className="ml-5 mt-2">
-          <Typography.Title level={5}>Price</Typography.Title>
+          <Typography.Title level={5}>Giá nhập</Typography.Title>
           <InputNumber
             style={{
               width: "50%",

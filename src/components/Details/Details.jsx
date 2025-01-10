@@ -438,7 +438,7 @@ const Details = () => {
               </div>
             </div>
           </div>
-          <div className="border border-b-2">
+          <div className="">
             <div className="p-4">
               <div className="flex items-center gap-1">
                 <h4
@@ -462,7 +462,7 @@ const Details = () => {
                 </h4>
               </div>
 
-              <div className=" flex items-center gap-1 mt-6">
+              <div className=" flex items-center gap-1 -mt-2">
                 <div className="flex items-center m-3 number-input-group ">
                   <Button
                     className=" w-10 h-10  border-none outline-none"

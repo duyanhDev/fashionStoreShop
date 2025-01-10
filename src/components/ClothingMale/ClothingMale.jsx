@@ -558,7 +558,7 @@ const ClothingMale = () => {
                             </h1>
                             <div className="flex gap-5 items-center justify-center">
                               <span className="line-through text-red-500">
-                                {formatPrice(product.price)}
+                                {formatPrice(product.costPrice)}
                               </span>
                               <span>
                                 {formatPrice(product.discountedPrice)}
