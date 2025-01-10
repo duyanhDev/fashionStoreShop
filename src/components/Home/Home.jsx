@@ -7,6 +7,7 @@ import { Pagination } from "swiper/modules";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import Clothing from "./Clothing/Clothing";
 import { useState, useEffect } from "react";
+import SliderComponent from "../Slider/Slider";
 
 const Home = () => {
   const { ListProducts } = useOutletContext();
@@ -44,10 +45,12 @@ const Home = () => {
   });
 
   return (
-    <div className="m-auto mx-5">
-      <div className="m-3">
-        <h1 className=" text-xl font-bold h1_main">SẢN PHẨM NỔI BẬT</h1>
-        {/* <div className="">
+    <>
+      <SliderComponent />
+      <div className="m-auto mx-5">
+        <div className="m-3">
+          <h1 className=" text-xl font-bold h1_main">SẢN PHẨM NỔI BẬT</h1>
+          {/* <div className="">
           <ul className="flex items-center gap-4">
             <li>ÁO</li>
             <li>QUẦN</li>
@@ -56,49 +59,49 @@ const Home = () => {
             <li>DÉP</li>
           </ul>
         </div> */}
-      </div>
-      <div className="flex gap-5 mx-4 category_main ">
-        <Swiper
-          slidesPerView={5}
-          spaceBetween={30}
-          pagination={{
-            clickable: true,
-          }}
-          modules={[Pagination]}
-          className="mySwiper"
-        >
-          {loading
-            ? [...Array(5)].map((_, index) => (
-                <SwiperSlide key={`skeleton-${index}`}>
-                  <SkeletonCard />
-                </SwiperSlide>
-              ))
-            : ListProducts &&
-              ListProducts.length > 0 &&
-              ListProducts.map((item, index) => {
-                return (
-                  <SwiperSlide
-                    key={item._id}
-                    onClick={() => handleDetails(item._id)}
-                    className="w-full"
-                  >
-                    <Card
-                      hoverable
-                      style={{}}
+        </div>
+        <div className="flex gap-5 mx-4 category_main ">
+          <Swiper
+            slidesPerView={5}
+            spaceBetween={30}
+            pagination={{
+              clickable: true,
+            }}
+            modules={[Pagination]}
+            className="mySwiper"
+          >
+            {loading
+              ? [...Array(5)].map((_, index) => (
+                  <SwiperSlide key={`skeleton-${index}`}>
+                    <SkeletonCard />
+                  </SwiperSlide>
+                ))
+              : ListProducts &&
+                ListProducts.length > 0 &&
+                ListProducts.map((item, index) => {
+                  return (
+                    <SwiperSlide
+                      key={item._id}
+                      onClick={() => handleDetails(item._id)}
                       className="w-full"
-                      cover={
-                        <div className="hover_children">
-                          <img
-                            className="w-full h-64 object-cover"
-                            alt="example"
-                            src={item.variants[0]?.images[0]?.url}
-                          />
+                    >
+                      <Card
+                        hoverable
+                        style={{}}
+                        className="w-full"
+                        cover={
+                          <div className="hover_children">
+                            <img
+                              className="w-full h-64 object-cover"
+                              alt="example"
+                              src={item.variants[0]?.images[0]?.url}
+                            />
 
-                          <div className="p-2 h-20 size g-2 hover">
-                            <p className="font-bold text-[#000]">
-                              Thêm vào giỏ hàng
-                            </p>
-                            {/* <div className="flex justify-center items-center mt-3">
+                            <div className="p-2 h-20 size g-2 hover">
+                              <p className="font-bold text-[#000]">
+                                Thêm vào giỏ hàng
+                              </p>
+                              {/* <div className="flex justify-center items-center mt-3">
                               {item.size &&
                                 item.size.length > 0 &&
                                 item.size.map((item, index) => {
@@ -114,46 +117,47 @@ const Home = () => {
                                   );
                                 })}
                             </div> */}
+                            </div>
                           </div>
-                        </div>
-                      }
-                    >
-                      <div className="discount ">
-                        <p className="text-[#111] font-semibold p-1">
-                          {item.brand}
-                        </p>
-                        <div
-                          className="item_content"
-                          style={{ maxWidth: "200px" }}
-                        >
-                          <span className="whitespace-nowrap overflow-hidden text-ellipsis block">
-                            {item.name}
+                        }
+                      >
+                        <div className="discount ">
+                          <p className="text-[#111] font-semibold p-1">
+                            {item.brand}
+                          </p>
+                          <div
+                            className="item_content"
+                            style={{ maxWidth: "200px" }}
+                          >
+                            <span className="whitespace-nowrap overflow-hidden text-ellipsis block">
+                              {item.name}
+                            </span>
+                          </div>
+                          <span className="line-through text-[#222] opacity-60 p-1">
+                            {item.discount ? (
+                              <span>{formatPrice(item.costPrice)}</span>
+                            ) : (
+                              ""
+                            )}
+                          </span>
+                          <span className="px-3">
+                            {item.discountedPrice
+                              ? formatPrice(item.discountedPrice)
+                              : formatPrice(item.costPrice)}
                           </span>
                         </div>
-                        <span className="line-through text-[#222] opacity-60 p-1">
-                          {item.discount ? (
-                            <span>{formatPrice(item.costPrice)}</span>
-                          ) : (
-                            ""
-                          )}
-                        </span>
-                        <span className="px-3">
-                          {item.discountedPrice
-                            ? formatPrice(item.discountedPrice)
-                            : formatPrice(item.costPrice)}
-                        </span>
-                      </div>
-                    </Card>
-                  </SwiperSlide>
-                );
-              })}
-        </Swiper>
+                      </Card>
+                    </SwiperSlide>
+                  );
+                })}
+          </Swiper>
+        </div>
+        <div className=" mt-4">
+          <h1 className="ml-4 mt-3 text-xl font-bold">TẤT CẢ SẢN PHẨM</h1>
+          <Clothing ListProducts={ListProducts} />
+        </div>
       </div>
-      <div className=" mt-4">
-        <h1 className="ml-4 mt-3 text-xl font-bold">TẤT CẢ SẢN PHẨM</h1>
-        <Clothing ListProducts={ListProducts} />
-      </div>
-    </div>
+    </>
   );
 };
 

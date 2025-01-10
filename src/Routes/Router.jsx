@@ -13,6 +13,7 @@ import OrderAdmin from "../components/OderAdmin/OrderAdmin";
 import OderStatus from "../components/OderStatus/OderStatus";
 import Order from "../components/Orders/Order";
 import Products from "../components/Products/Product";
+import Profile from "../components/ProfileUsers/Profile";
 import ViewSearch from "../components/Sumsearch/ViewSearch";
 import UpLoad from "../components/UpLoadProducts/UpLoad";
 import UserStatsCard from "../components/UserChar/UserChart";
@@ -60,6 +61,10 @@ export const RouterLayout = [
   {
     path: "/search",
     element: <ViewSearch />,
+  },
+  {
+    path: "/profile/:username",
+    element: <Profile />,
   },
 ];
 

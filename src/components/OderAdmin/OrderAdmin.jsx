@@ -8,8 +8,10 @@ import { ListOderProductsAll, UpDateOrderProductAPI } from "../../service/Oder";
 import { useEffect, useState } from "react";
 import moment from "moment";
 import "./OrderAdmin.css";
+import { useSelector } from "react-redux";
 const OrderAdmin = () => {
   const [api, contextHolder] = notification.useNotification();
+  const { user } = useSelector((state) => state.auth);
   const columns = [
     {
       title: "STT",
@@ -148,7 +150,7 @@ const OrderAdmin = () => {
                 {item.orderStatus === "Processing" && (
                   <CheckSquareOutlined
                     className="icon-square check"
-                    onClick={() => handleCheckOrder(item._id)}
+                    onClick={() => handleCheckOrder(item._id, item.totalAmount)}
                   />
                 )}
                 <DeleteOutlined className="icon-square delete" />
@@ -198,10 +200,11 @@ const OrderAdmin = () => {
       setData([]);
     }
   };
+  console.log(data);
 
-  const handleCheckOrder = async (id) => {
+  const handleCheckOrder = async (id, totalPrice) => {
     try {
-      let res = await UpDateOrderProductAPI(id);
+      let res = await UpDateOrderProductAPI(id, totalPrice);
       if (res) {
         api.open({
           message: "Đơn hàng đã được duyệt",

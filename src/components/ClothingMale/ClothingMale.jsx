@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ListCategoryAPI } from "../../service/ApiCategory";
 import ReactPaginate from "react-paginate";
 import { fetchProducts } from "../../redux/actions/filterAction";
-
+import SliderComponent from "../Slider/Slider";
 const ClothingMale = () => {
   const param = useParams();
 
@@ -213,6 +213,7 @@ const ClothingMale = () => {
 
   return (
     <section>
+      <SliderComponent />
       <div className="flex colletion">
         <div className="colletion_left">
           <div>

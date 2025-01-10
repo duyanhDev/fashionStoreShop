@@ -68,8 +68,10 @@ const ListOderProductsAll = async () => {
   return await axios.get("http://localhost:9000/api/v1/get-order-all");
 };
 
-const UpDateOrderProductAPI = async (id) => {
-  return await axios.put(`http://localhost:9000/api/v1/order/${id}`);
+const UpDateOrderProductAPI = async (id, totalPrice) => {
+  return await axios.put(`http://localhost:9000/api/v1/order/${id}`, {
+    totalPrice,
+  });
 };
 
 const OrderStatusOneProduct = async (id) => {

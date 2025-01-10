@@ -67,6 +67,9 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
       key: "2",
       label: "Profile",
       extra: "⌘P",
+      onClick: () => {
+        navigate(`/profile/${user.name}`);
+      },
     },
     {
       key: "3",
