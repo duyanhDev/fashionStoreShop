@@ -154,25 +154,25 @@ const Details = () => {
       });
       return;
     }
-    if (stock <= 0) {
-      api.open({
-        message: "Sản phẩm đã bán hết",
-        description:
-          "Vui lòng khách hàng đợi shop nhập thêm hoặc mua sản phẩm mới",
-        duration: 3,
-        type: "warning",
-      });
-      return;
-    }
-    if (count > stock) {
-      api.open({
-        message: `Sản phẩm  hiện giờ chỉ còn ${stock} sản phẩm`,
-        description: `Khách hàng chỉnh số lượng cho phù hợp với số lượng sản phẩm`,
-        duration: 3,
-        type: "warning",
-      });
-      return;
-    }
+    // if (stock <= 0) {
+    //   api.open({
+    //     message: "Sản phẩm đã bán hết",
+    //     description:
+    //       "Vui lòng khách hàng đợi shop nhập thêm hoặc mua sản phẩm mới",
+    //     duration: 3,
+    //     type: "warning",
+    //   });
+    //   return;
+    // }
+    // if (count > stock) {
+    //   api.open({
+    //     message: `Sản phẩm  hiện giờ chỉ còn ${stock} sản phẩm`,
+    //     description: `Khách hàng chỉnh số lượng cho phù hợp với số lượng sản phẩm`,
+    //     duration: 3,
+    //     type: "warning",
+    //   });
+    //   return;
+    // }
     try {
       const res = await AddCartAPI(
         user._id,

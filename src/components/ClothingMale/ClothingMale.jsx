@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "./ClothingMale.css";
 import { Radio, Space, Slider, Button, Card, Skeleton } from "antd";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
@@ -7,6 +7,7 @@ import { ListCategoryAPI } from "../../service/ApiCategory";
 import ReactPaginate from "react-paginate";
 import { fetchProducts } from "../../redux/actions/filterAction";
 import SliderComponent from "../Slider/Slider";
+
 const ClothingMale = () => {
   const param = useParams();
 
@@ -17,26 +18,35 @@ const ClothingMale = () => {
   const [checkFiltter, setCheckFilter] = useState(false);
   const [ListCategory, setListCategory] = useState([]);
   const [valueId, setValueId] = useState("");
-  const [categoryName, setCategoryName] = useState("");
-  const {
-    products,
-    loading,
-    totalPages,
-    category,
-    selectedSize,
-    selectedColor,
-    sortPrice,
-  } = useSelector((state) => state.filter);
+
+  const menuRef = useRef(null);
+  // xử khi click bên ngoài
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setCheckFilter(false); // Ẩn menu khi click bên ngoài
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const { products, loading, totalPages } = useSelector(
+    (state) => state.filter
+  );
 
   const queryParams = new URLSearchParams(location.search);
   const savedSortPrice = queryParams.get("sortPrice") || "";
   const saveCateogry = queryParams.get("Category");
-  const savedCurrentPage = parseInt(queryParams.get("currentPage")) || 1; // Default to page 1
-
+  const savedCurrentPage = parseInt(queryParams.get("currentPage")) || 1;
+  const savedSortDate = queryParams.get("sortDate") || "";
   const currentPage = useSelector((state) => state.filter.currentPage);
 
-  useEffect(() => {
-    const params = {
+  const getFetchParams = useCallback(() => {
+    return {
       gender: param.gender,
       category:
         valueId ||
@@ -44,18 +54,17 @@ const ClothingMale = () => {
           ? ListCategory.find((cat) => cat.name === saveCateogry)?._id
           : ""),
       sortPrice: savedSortPrice,
+      sortDate: savedSortDate,
       currentPage: savedCurrentPage,
     };
-
-    dispatch(fetchProducts(params));
   }, [
-    // dispatch,
-    valueId,
     param.gender,
-    savedSortPrice,
-    savedCurrentPage,
+    valueId,
     saveCateogry,
     ListCategory,
+    savedSortPrice,
+    savedSortDate,
+    savedCurrentPage,
   ]);
 
   useEffect(() => {
@@ -87,36 +96,25 @@ const ClothingMale = () => {
 
   useEffect(() => {
     if (ListCategory.length > 0) {
-      const params = {
-        gender: param.gender,
-        category:
-          valueId ||
-          (saveCateogry
-            ? ListCategory.find((cat) => cat.name === saveCateogry)?._id
-            : ""),
-        sortPrice: savedSortPrice,
-        currentPage: savedCurrentPage,
-      };
-
+      const params = getFetchParams();
       dispatch(fetchProducts(params));
     }
-  }, [valueId, param.gender, savedSortPrice, savedCurrentPage]);
+  }, [dispatch, getFetchParams, ListCategory.length]);
 
   const handlePageClick = (page) => {
+    console.log(page);
+
     const pageNumber = page.selected + 1;
+    const newParams = new URLSearchParams(location.search);
+    newParams.set("currentPage", pageNumber);
 
-    const queryParams = new URLSearchParams(location.search);
-    queryParams.set("currentPage", pageNumber);
-    Navigate(`${location.pathname}?${queryParams.toString()}`);
+    Navigate(`${location.pathname}?${newParams.toString()}`);
 
-    dispatch(
-      fetchProducts({
-        gender: param.gender,
-        category: valueId,
-        sortPrice: savedSortPrice,
-        currentPage: pageNumber,
-      })
-    );
+    const fetchParams = {
+      ...getFetchParams(),
+      currentPage: pageNumber,
+    };
+    dispatch(fetchProducts(fetchParams));
   };
 
   const formatPrice = (price) => {
@@ -131,28 +129,27 @@ const ClothingMale = () => {
 
   const onChange = async (e) => {
     const selectedValue = e.target.value;
-    setValueId(selectedValue);
-
-    // Tìm danh mục tương ứng với giá trị đã chọn
     const selectedCategory = ListCategory.find(
       (category) => category._id === selectedValue
     );
 
     if (selectedCategory) {
-      setCategoryName(selectedCategory.name);
+      setValueId(selectedValue);
+      setHidden(true);
+
+      const newParams = new URLSearchParams(location.search);
+      newParams.set("Category", selectedCategory.name);
+      newParams.set("currentPage", "1");
+      Navigate(`${location.pathname}?${newParams.toString()}`);
+
+      dispatch(
+        fetchProducts({
+          ...getFetchParams(),
+          category: selectedValue,
+          currentPage: 1,
+        })
+      );
     }
-    setHidden(true);
-    const queryParams = new URLSearchParams(location.search);
-    queryParams.set("Category", selectedCategory.name);
-    Navigate(`${location.pathname}?${queryParams.toString()}`);
-    dispatch(
-      fetchProducts({
-        gender: param.gender,
-        category: selectedValue,
-        sortPrice: savedSortPrice,
-        currentPage: 1,
-      })
-    );
   };
 
   const handleCheckboxChange = (e) => {};
@@ -185,7 +182,8 @@ const ClothingMale = () => {
       sortPrice: value,
       currentPage: 1,
     };
-    setCheckFilter(true);
+    setHidden(true);
+    setCheckFilter(false);
     dispatch(fetchProducts(params));
   };
 
@@ -196,6 +194,7 @@ const ClothingMale = () => {
         gender: param.gender,
         category: "",
         sortPrice: "",
+        sortDate: "",
       };
       dispatch(fetchProducts(params));
       setHidden(false);
@@ -205,6 +204,25 @@ const ClothingMale = () => {
       console.log(error);
     }
     setCheckFilter(false);
+  };
+
+  const handleSortDate = (value) => {
+    const queryParams = new URLSearchParams(location.search);
+    queryParams.set("sortDate", value);
+    queryParams.set("currentPage", 1);
+
+    Navigate(`${location.pathname}?${queryParams.toString()}`); // Update URL
+
+    // Gọi API sau khi URL đã thay đổi
+    const params = {
+      gender: param.gender,
+      category: valueId,
+      sortDate: value,
+      currentPage: 1,
+    };
+    setCheckFilter(false);
+    setHidden(true);
+    dispatch(fetchProducts(params));
   };
 
   const SortDateProduct = () => {};
@@ -492,22 +510,21 @@ const ClothingMale = () => {
             <div className="ml-10 mt-5 ">
               <div className="relative ">
                 <ul className="flex items-center gap-3">
-                  <div>
+                  <div ref={menuRef}>
                     <li
                       className="male_clothing"
                       onClick={() => setCheckFilter((prev) => !prev)}
                     >
-                      <button className="relative inline-flex h-12 overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-gray-50">
-                        <span className="absolute  inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#a2aeff_0%,#3749be_50%,#a2aeff_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
-                        <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full dark:bg-[#070e41] bg-[#ffffff] px-8 py-1 text-sm font-medium dark:text-gray-50 text-black backdrop-blur-3xl">
-                          SẮP XẾP THEO
-                        </span>
-                      </button>
+                      <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full dark:bg-[#070e41] bg-[#ffffff] px-8 py-1 text-sm font-medium dark:text-gray-50 text-black backdrop-blur-3xl">
+                        SẮP XẾP THEO
+                      </span>
                     </li>
 
                     {checkFiltter && (
                       <ul className="top-12 absolute z-40 sort_products">
-                        <li onClick={SortDateProduct}>Mới nhất</li>
+                        <li onClick={() => handleSortDate("newest")}>
+                          Mới nhất
+                        </li>
                         <li onClick={() => handleSortDesAndAsc("asc")}>
                           Giá : thấp - cao
                         </li>
@@ -521,7 +538,9 @@ const ClothingMale = () => {
 
                   {hidden && (
                     <li className="male_clothing" onClick={handleFitterProduct}>
-                      <span>Xóa Lọc</span>
+                      <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full dark:bg-[#070e41] bg-[#ffffff] px-8 py-1 text-sm font-medium dark:text-gray-50 text-black backdrop-blur-3xl">
+                        XÓA LỌC
+                      </span>
                     </li>
                   )}
                 </ul>
@@ -607,6 +626,7 @@ const ClothingMale = () => {
                       <path d="M765.7 486.8L314.9 134.7A7.97 7.97 0 00302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 000-50.4z" />
                     </svg>
                   }
+                  initialPage={savedCurrentPage - 1}
                   breakLabel={null}
                   pageCount={totalPages}
                   marginPagesDisplayed={3}

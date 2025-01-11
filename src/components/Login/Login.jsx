@@ -1,6 +1,6 @@
 import { FcGoogle } from "react-icons/fc";
 import { FaCheckSquare } from "react-icons/fa";
-import { Button } from "antd";
+import { Button, notification } from "antd";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
 import { LoginAuth } from "../../service/Auth";
@@ -8,33 +8,77 @@ import { login } from "../../redux/actions/Auth";
 import { useNavigate } from "react-router-dom";
 const LoginForm = () => {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState();
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({ email: "", password: "" });
   const dispatch = useDispatch();
-
+  const [api, contextHolder] = notification.useNotification();
   const navigate = useNavigate();
 
+  // Validate email format
+  const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = { email: "", password: "" };
+
+    // Validate email
+    if (!email) {
+      newErrors.email = "Vui lòng nhập email";
+      isValid = false;
+    } else if (!isValidEmail(email)) {
+      newErrors.email = "Email không đúng định dạng";
+      isValid = false;
+    }
+
+    // Validate password
+    if (!password) {
+      newErrors.password = "Vui lòng nhập mật khẩu";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleLogin = async () => {
+    if (!validateForm()) {
+      api["error"]({
+        message: "Lỗi đăng nhập",
+        description: "Vui lòng kiểm tra lại thông tin đăng nhập",
+      });
+      return;
+    }
+
     try {
-      // Gọi hàm LoginAuth để thực hiện đăng nhập
       let res = await LoginAuth(email, password);
 
       if (res && res.data.EC === 0) {
         dispatch(login(res.data.data.token, res.data.data.user));
-
+        api["success"]({
+          message: "Đăng nhập thành công",
+          description: "Chào mừng bạn đã quay trở lại",
+        });
         navigate("/");
       } else {
-        // Nếu EC không phải là 0, hiển thị thông báo lỗi
-        console.log("Login failed:", res.data.message);
-        // Bạn có thể hiển thị thông báo lỗi cho người dùng tại đây
+        api["error"]({
+          message: "Lỗi đăng nhập",
+          description: res.data.message || "Đăng nhập không thành công",
+        });
       }
     } catch (error) {
-      // Xử lý lỗi nếu có trong quá trình đăng nhập
+      api["error"]({
+        message: "Lỗi đăng nhập",
+        description: "Đã có lỗi xảy ra, vui lòng thử lại sau",
+      });
       console.error("Login error:", error);
-      // Bạn có thể thông báo lỗi cho người dùng tại đây
     }
   };
+
   return (
     <div className="min-h-screen flex">
+      {contextHolder}
       {/* Left side - Image */}
       <div className="w-8/12">
         <img
@@ -66,6 +110,7 @@ const LoginForm = () => {
               <hr className="h-0 border-b border-solid border-grey-500 grow" />
             </div>
 
+            {/* Email Input */}
             <label
               htmlFor="email"
               className="mb-2 text-sm text-start text-grey-900"
@@ -77,13 +122,24 @@ const LoginForm = () => {
               type="email"
               placeholder="mail@example.com"
               value={email}
-              className="flex items-center w-full h-9  px-5 py-4 mr-2 text-sm font-medium outline-none focus:bg-grey-400 mb-6 placeholder:text-grey-700 bg-grey-200 text-dark-grey-900 rounded-2xl border border-solid border-[#ccc]"
-              onChange={(e) => setEmail(e.target.value)}
+              className={`flex items-center w-full h-9 px-5 py-4 mr-2 text-sm font-medium outline-none focus:bg-grey-400 mb-1 placeholder:text-grey-700 bg-grey-200 text-dark-grey-900 rounded-2xl border border-solid ${
+                errors.email ? "border-red-500" : "border-[#ccc]"
+              }`}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (errors.email) setErrors({ ...errors, email: "" });
+              }}
             />
+            {errors.email && (
+              <span className="text-red-500 text-xs mb-4 text-left">
+                {errors.email}
+              </span>
+            )}
 
+            {/* Password Input */}
             <label
               htmlFor="password"
-              className="mb-2 text-sm text-start text-grey-900"
+              className="mb-2 mt-4 text-sm text-start text-grey-900"
             >
               Password*
             </label>
@@ -91,10 +147,20 @@ const LoginForm = () => {
               id="password"
               type="password"
               placeholder="Enter a password"
-              onChange={(e) => setPassword(e.target.value)}
               value={password}
-              className="flex items-center w-full h-9 px-5 py-4 mb-5 mr-2 text-sm font-medium outline-none focus:bg-grey-400 placeholder:text-grey-700 bg-grey-200 text-dark-grey-900 rounded-2xl border border-solid border-[#ccc]"
+              className={`flex items-center w-full h-9 px-5 py-4 mb-1 mr-2 text-sm font-medium outline-none focus:bg-grey-400 placeholder:text-grey-700 bg-grey-200 text-dark-grey-900 rounded-2xl border border-solid ${
+                errors.password ? "border-red-500" : "border-[#ccc]"
+              }`}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (errors.password) setErrors({ ...errors, password: "" });
+              }}
             />
+            {errors.password && (
+              <span className="text-red-500 text-xs mb-4 text-left">
+                {errors.password}
+              </span>
+            )}
 
             <Button onClick={handleLogin}>Đăng Nhập</Button>
 

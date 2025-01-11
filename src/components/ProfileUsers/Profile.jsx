@@ -11,38 +11,121 @@ import img5 from "./../../assets/Image/mceclip6_34.png";
 import img6 from "./../../assets/Image/mceclip1_37.png";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { get_profile_user, update_profileUser } from "../../service/Auth";
-import { Button, DatePicker, Form, Input, message, Modal, Tabs } from "antd";
+import {
+  ChanglePasswordAPI,
+  get_profile_user,
+  update_profileUser,
+} from "../../service/Auth";
+import {
+  Button,
+  DatePicker,
+  Form,
+  Input,
+  message,
+  Modal,
+  notification,
+  Tabs,
+} from "antd";
 import moment from "moment";
 
-const PersonalInfoForm = () => {
+const PersonalInfoForm = ({ id }) => {
+  console.log(id);
+
   const [form] = Form.useForm();
+
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassWord, setNewPassword] = useState("");
+  const [confirmPassWord, setConfirmPassword] = useState("");
+
+  const [api, contextHolder] = notification.useNotification();
+
   const onFinish = (values) => {
     console.log("Received values of form: ", values);
   };
+
+  const handleUpdatePassWord = async () => {
+    try {
+      // Validate form fields
+      await form.validateFields();
+
+      const values = form.getFieldsValue();
+      if (!values.passworded || !values.password || !values.confirm) {
+        api["error"]({
+          message: "Thông báo",
+          description: "Vui lòng nhập đầy đủ thông tin",
+        });
+        return;
+      }
+
+      // Call API
+      const res = await ChanglePasswordAPI(id, currentPassword, newPassWord);
+      if (res && res.data.data.success === true) {
+        api["success"]({
+          message: "Cập nhật mật khẩu thành công",
+          description: "Bạn đã cập nhật thành công mật khẩu mới",
+        });
+      }
+    } catch (error) {
+      if (error.errorFields) {
+        // Form validation error
+        api["error"]({
+          message: "Thông báo",
+          description: "Vui lòng nhập đầy đủ thông tin",
+        });
+      } else if (error.response) {
+        // Error from API
+        api["error"]({
+          message: "Thông báo lỗi",
+          description: error.response.data.message || "Có lỗi xảy ra",
+        });
+      } else {
+        // Other errors
+        api["error"]({
+          message: "Lỗi",
+          description: "Có lỗi xảy ra, vui lòng thử lại sau",
+        });
+      }
+      console.error("Error:", error);
+    }
+  };
+
   return (
     <>
+      {contextHolder}
       <Form form={form} onFinish={onFinish}>
         <Form.Item
           name="passworded"
           label="Mật khẩu cũ"
+          value={currentPassword}
+          onChange={(e) => setCurrentPassword(e.target.value)}
           rules={[
             {
               required: true,
-              message: "Please input your password!",
+              message: "Vui lòng nhập mật khẩu cũ!",
+            },
+            {
+              min: 6,
+              message: "Mật khẩu phải có ít nhất 6 ký tự!",
             },
           ]}
           hasFeedback
         >
           <Input.Password />
         </Form.Item>
+
         <Form.Item
           name="password"
           label="Mật khẩu mới"
+          value={newPassWord}
+          onChange={(e) => setNewPassword(e.target.value)}
           rules={[
             {
               required: true,
-              message: "Please input your password!",
+              message: "Vui lòng nhập mật khẩu mới!",
+            },
+            {
+              min: 6,
+              message: "Mật khẩu mới phải có ít nhất 6 ký tự!",
             },
           ]}
           hasFeedback
@@ -54,11 +137,13 @@ const PersonalInfoForm = () => {
           name="confirm"
           label="Nhập lại mật khẩu mới"
           dependencies={["password"]}
+          value={confirmPassWord}
+          onChange={(e) => setConfirmPassword(e.target.value)}
           hasFeedback
           rules={[
             {
               required: true,
-              message: "Please confirm your password!",
+              message: "Vui lòng xác nhận lại mật khẩu mới!",
             },
             ({ getFieldValue }) => ({
               validator(_, value) {
@@ -66,13 +151,22 @@ const PersonalInfoForm = () => {
                   return Promise.resolve();
                 }
                 return Promise.reject(
-                  new Error("The new password that you entered do not match!")
+                  new Error("Mật khẩu xác nhận không khớp với mật khẩu mới!")
                 );
               },
             }),
           ]}
         >
           <Input.Password />
+        </Form.Item>
+        <Form.Item>
+          <Button
+            className="w-full h-10"
+            htmlType="submit"
+            onClick={() => handleUpdatePassWord()}
+          >
+            Cập nhật
+          </Button>
         </Form.Item>
       </Form>
     </>
@@ -424,7 +518,7 @@ const Profile = () => {
     {
       key: "2",
       label: "Cập nhật mật khẩu",
-      children: <PersonalInfoForm />, // Replace with actual content
+      children: <PersonalInfoForm id={id} />, // Replace with actual content
     },
   ];
 
@@ -699,7 +793,6 @@ const Profile = () => {
           title="Thông tin tài khoản"
           centered
           open={openResponsive}
-          onOk={() => setOpenResponsive(false)}
           onCancel={() => setOpenResponsive(false)}
           width={{
             with: "1000px",

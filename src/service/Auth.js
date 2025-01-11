@@ -68,4 +68,17 @@ const update_profileUser = async (
   }
 };
 
-export { LoginAuth, UserAuth, get_profile_user, update_profileUser };
+const ChanglePasswordAPI = async (id, currentPassword, newPassword) => {
+  return await axios.put("http://localhost:9000/api/v1/changel-passsword", {
+    id,
+    currentPassword,
+    newPassword,
+  });
+};
+export {
+  LoginAuth,
+  UserAuth,
+  get_profile_user,
+  update_profileUser,
+  ChanglePasswordAPI,
+};

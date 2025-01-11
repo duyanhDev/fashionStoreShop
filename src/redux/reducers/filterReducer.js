@@ -36,6 +36,12 @@ export const filterReducer = (state = initialState, action) => {
         sortPrice: action.payload,
         currentPage: 1,
       };
+    case FILTER_TYPES.SET_DATE:
+      return {
+        ...state,
+        sortDate: action.payload,
+        currentPage: 1,
+      };
 
     case FILTER_TYPES.SET_CATEGORY:
       return {
