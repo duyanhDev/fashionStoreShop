@@ -13,7 +13,7 @@ import ImgCrop from "antd-img-crop";
 import { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css"; // Import styles for Quill
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ListOneProductAPI, UpdateProductAPI } from "../../service/ApiProduct";
 import { ListCategoryAPI } from "../../service/ApiCategory";
 
@@ -37,6 +37,7 @@ const UpLoad = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [costPrice, setCostPrice] = useState("");
 
+  const Navigate = useNavigate();
   // xử lí ảnh
   const [fileList, setFileList] = useState([{}]);
   console.log(param);
@@ -299,7 +300,7 @@ const UpLoad = () => {
       </div>
       <div className="w-2/5 ">
         <Flex gap="small" wrap className="mt-8 ml-5 ">
-          <Button>Cancel</Button>
+          <Button onClick={() => Navigate("/admin/products")}>Cancel</Button>
           <Button type="primary" onClick={hanldeUpdateProducts}>
             Update
           </Button>
@@ -376,14 +377,12 @@ const UpLoad = () => {
         </div>
         <div className="ml-5 mt-2">
           <Typography.Title level={5}>Sold</Typography.Title>
-          <InputNumber
-            style={{
-              width: "50%",
-            }}
+          <Input
+            type="number"
+            style={{ width: "50%" }}
             min={1}
-            max={90000000}
             value={sold}
-            onChange={onChangeSold}
+            onChange={(e) => setSold(e.target.value)}
           />
         </div>
         <div className="ml-5 mt-2">

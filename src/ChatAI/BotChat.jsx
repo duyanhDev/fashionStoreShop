@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { PostChatBotAI } from "../service/ChatBot";
 import { useOutletContext } from "react-router-dom";
-
+import chatbotData from "./../chatbot-data.json";
 const BotChatAI = () => {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "Xin chào! Tôi là trợ lý ảo. một số gợi ý để biết thông tin về trang web hoặc sản phẩm : người viết ra trang web này là ai ? : gợi ý sản phẩm",
+      text: chatbotData.initial_message.text,
       sender: "bot",
     },
   ]);
@@ -229,63 +229,125 @@ const BotChatAI = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
-      {/* Message list */}
-      <div className="flex-grow overflow-y-auto p-4 space-y-4">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex items-start space-x-2 ${
-              msg.sender === "user" ? "justify-end" : "justify-start"
-            }`}
-          >
-            {msg.sender === "bot" && <BotIcon />}
-            <div
-              className={`px-4 py-2 rounded-lg max-w-[70%] ${
-                msg.sender === "user"
-                  ? "bg-blue-500 text-white"
-                  : "bg-white text-gray-800 border"
-              }`}
-            >
-              {/* Render content conditionally */}
-              {msg.sender === "bot" ? (
-                <ul
-                  dangerouslySetInnerHTML={{
-                    __html: `<ul>${msg.text}</ul>`,
-                  }}
-                />
-              ) : (
-                msg.text
-              )}
-            </div>
-            {msg.sender === "user" && (
-              <div className="flex items-center space-x-2">
-                <UserIcon />
-                <p className="text-sm text-gray-600">
-                  {user?.name || "Người dùng"}
-                </p>
-              </div>
-            )}
-          </div>
-        ))}
+    <div className="flex flex-col h-screen bg-slate-200 mt-28">
+      {/* Header - ChatGPT style */}
+      <div className="bg-gray-900 border-b border-gray-800 p-4">
+        <h1 className="text-xl text-white text-center font-semibold">
+          Tôi có thể giúp gì cho bạn?
+        </h1>
       </div>
 
-      {/* Input box */}
-      <div className="p-4 bg-white border-t flex items-center space-x-2">
-        <input
-          type="text"
-          value={inputMessage}
-          onChange={(e) => setInputMessage(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-          placeholder="Nhập tin nhắn..."
-          className="flex-grow px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <button
-          onClick={handleSendMessage}
-          className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition"
-        >
-          <SendIcon />
-        </button>
+      {/* Message list */}
+      <div className="flex-grow overflow-y-auto bg-gray-900">
+        <div className="max-w-3xl mx-auto">
+          {messages.map((msg) => (
+            <div
+              key={msg.id}
+              className={`flex items-start space-x-2 p-4 ${
+                msg.sender === "user" ? "bg-gray-900" : "bg-gray-800"
+              }`}
+            >
+              {msg.sender === "bot" && <BotIcon />}
+              <div
+                className={`px-4 py-2 rounded-lg max-w-[80%] ${
+                  msg.sender === "user"
+                    ? "bg-gray-700 text-white"
+                    : "bg-gray-800 text-gray-100"
+                }`}
+              >
+                {msg.sender === "bot" ? (
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: msg.text,
+                    }}
+                    className="prose prose-invert"
+                  />
+                ) : (
+                  msg.text
+                )}
+              </div>
+              {msg.sender === "user" && (
+                <div className="flex items-center space-x-2">
+                  <UserIcon />
+                  <p className="text-sm text-gray-400">
+                    {user?.name || "Người dùng"}
+                  </p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Input box - ChatGPT style */}
+      <div className="border-t border-gray-800 bg-gray-900 p-4">
+        <div className="max-w-3xl mx-auto relative">
+          <textarea
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            onKeyDown={(e) =>
+              e.key === "Enter" && !e.shiftKey && handleSendMessage()
+            }
+            placeholder="Nhập tin nhắn..."
+            className="w-full bg-gray-700 text-white rounded-lg pl-4 pr-10 py-3 focus:outline-none focus:ring-1 focus:ring-gray-600 resize-none"
+            rows={1}
+          />
+          <button
+            onClick={handleSendMessage}
+            className="absolute right-2 bottom-2.5 p-1.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-gray-600"
+          >
+            <SendIcon />
+          </button>
+        </div>
+
+        {/* Bottom toolbar */}
+        <div className="max-w-3xl mx-auto mt-2 flex items-center space-x-2 text-gray-400">
+          <button className="p-2 hover:bg-gray-800 rounded">
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+              />
+            </svg>
+          </button>
+          <button className="p-2 hover:bg-gray-800 rounded">
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+          </button>
+          <button className="p-2 hover:bg-gray-800 rounded">
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -13,10 +13,9 @@ const CartProducts = ({}) => {
 
   const [loadingSpin, setLoadingSpin] = useState(false);
   const [api, contextHolder] = notification.useNotification();
-
+  const [value, setValue] = useState(1);
   const [provine, SetProvine] = useState([]);
   const [district, setDistrict] = useState([]);
-  const [value, setValue] = useState(1);
   const [warn, setWarn] = useState([]);
   const [id, SetId] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");

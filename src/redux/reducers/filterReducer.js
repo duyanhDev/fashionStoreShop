@@ -43,6 +43,13 @@ export const filterReducer = (state = initialState, action) => {
         currentPage: 1,
       };
 
+    case FILTER_TYPES.SET_HOT:
+      return {
+        ...state,
+        sortSold: action.payload,
+        currentPage: 1,
+      };
+
     case FILTER_TYPES.SET_CATEGORY:
       return {
         ...state,

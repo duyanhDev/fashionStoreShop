@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import "./ClothingMale.css";
-import { Radio, Space, Slider, Button, Card, Skeleton } from "antd";
+import { Radio, Space, Slider, Button, Card, Skeleton, Flex, Rate } from "antd";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { ListCategoryAPI } from "../../service/ApiCategory";
@@ -43,6 +43,7 @@ const ClothingMale = () => {
   const saveCateogry = queryParams.get("Category");
   const savedCurrentPage = parseInt(queryParams.get("currentPage")) || 1;
   const savedSortDate = queryParams.get("sortDate") || "";
+  const savedsortSold = queryParams.get("sortSold") || "";
   const currentPage = useSelector((state) => state.filter.currentPage);
 
   const getFetchParams = useCallback(() => {
@@ -55,6 +56,7 @@ const ClothingMale = () => {
           : ""),
       sortPrice: savedSortPrice,
       sortDate: savedSortDate,
+      sortSold: savedsortSold,
       currentPage: savedCurrentPage,
     };
   }, [
@@ -64,6 +66,7 @@ const ClothingMale = () => {
     ListCategory,
     savedSortPrice,
     savedSortDate,
+    savedsortSold,
     savedCurrentPage,
   ]);
 
@@ -187,25 +190,6 @@ const ClothingMale = () => {
     dispatch(fetchProducts(params));
   };
 
-  const handleFitterProduct = async () => {
-    try {
-      setValueId("");
-      const params = {
-        gender: param.gender,
-        category: "",
-        sortPrice: "",
-        sortDate: "",
-      };
-      dispatch(fetchProducts(params));
-      setHidden(false);
-      const newUrl = `${location.pathname}`;
-      Navigate(newUrl, { replace: true });
-    } catch (error) {
-      console.log(error);
-    }
-    setCheckFilter(false);
-  };
-
   const handleSortDate = (value) => {
     const queryParams = new URLSearchParams(location.search);
     queryParams.set("sortDate", value);
@@ -225,8 +209,44 @@ const ClothingMale = () => {
     dispatch(fetchProducts(params));
   };
 
-  const SortDateProduct = () => {};
+  const handleSortSold = (value) => {
+    const queryParams = new URLSearchParams(location.search);
+    queryParams.set("sortSold", value);
+    queryParams.set("currentPage", 1);
 
+    Navigate(`${location.pathname}?${queryParams.toString()}`); // Update URL
+
+    // Gọi API sau khi URL đã thay đổi
+    const params = {
+      gender: param.gender,
+      category: valueId,
+      sortSold: value,
+      currentPage: 1,
+    };
+    setHidden(true);
+    setCheckFilter(false);
+    dispatch(fetchProducts(params));
+  };
+
+  // reset Data
+  const handleFitterProduct = async () => {
+    try {
+      setValueId("");
+      const params = {
+        gender: param.gender,
+        category: "",
+        sortPrice: "",
+        sortDate: "",
+      };
+      dispatch(fetchProducts(params));
+      setHidden(false);
+      const newUrl = `${location.pathname}`;
+      Navigate(newUrl, { replace: true });
+    } catch (error) {
+      console.log(error);
+    }
+    setCheckFilter(false);
+  };
   const SortBestselling = () => {};
 
   return (
@@ -401,109 +421,34 @@ const ClothingMale = () => {
           </div>
           <div className="mt-5">
             <div className="">
-              <p className="text-4xl text-black font-bold">
+              <p className="text-xl text-black font-bold">
                 Một số sản phẩm bán chạy
               </p>
             </div>
 
             <div className="mt-5 flex gap-4 items-center flex-nowrap border-b border-gray-200 p-2 sm:flex-wrap lg:flex-nowrap ">
               <div className="flex gap-4 ml-6">
-                <div className="w-32">
-                  <div>
-                    <img
-                      className="img_male"
-                      src="https://media3.coolmate.me/cdn-cgi/image/width=672,height=990,quality=80,format=auto/uploads/September2024/24CMAW.AT009.13.jpg"
-                      alt="lỗi"
-                    />
-                  </div>
-                  <div className="text-center">
-                    <p>ÁO nam</p>
-                  </div>
-                </div>
-                <div className="w-32">
-                  <div>
-                    <img
-                      className="img_male"
-                      src="https://media3.coolmate.me/cdn-cgi/image/width=672,height=990,quality=80,format=auto/uploads/September2024/24CMAW.AT009.13.jpg"
-                      alt="lỗi"
-                    />
-                  </div>
-                  <div className="text-center">
-                    <p>ÁO nam</p>
-                  </div>
-                </div>
-                <div className="w-32">
-                  <div>
-                    <img
-                      className="img_male"
-                      src="https://media3.coolmate.me/cdn-cgi/image/width=672,height=990,quality=80,format=auto/uploads/September2024/24CMAW.AT009.13.jpg"
-                      alt="lỗi"
-                    />
-                  </div>
-                  <div className="text-center">
-                    <p>ÁO nam</p>
-                  </div>
-                </div>
-                <div className="w-32">
-                  <div>
-                    <img
-                      className="img_male"
-                      src="https://media3.coolmate.me/cdn-cgi/image/width=672,height=990,quality=80,format=auto/uploads/September2024/24CMAW.AT009.13.jpg"
-                      alt="lỗi"
-                    />
-                  </div>
-                  <div className="text-center">
-                    <p>ÁO nam</p>
-                  </div>
-                </div>
-                <div className="w-32">
-                  <div>
-                    <img
-                      className="img_male"
-                      src="https://media3.coolmate.me/cdn-cgi/image/width=672,height=990,quality=80,format=auto/uploads/September2024/24CMAW.AT009.13.jpg"
-                      alt="lỗi"
-                    />
-                  </div>
-                  <div className="text-center">
-                    <p>ÁO nam</p>
-                  </div>
-                </div>
-                <div className="w-32">
-                  <div>
-                    <img
-                      className="img_male"
-                      src="https://media3.coolmate.me/cdn-cgi/image/width=672,height=990,quality=80,format=auto/uploads/September2024/24CMAW.AT009.13.jpg"
-                      alt="lỗi"
-                    />
-                  </div>
-                  <div className="text-center">
-                    <p>ÁO nam</p>
-                  </div>
-                </div>
-                <div className="w-32">
-                  <div>
-                    <img
-                      className="img_male"
-                      src="https://media3.coolmate.me/cdn-cgi/image/width=672,height=990,quality=80,format=auto/uploads/September2024/24CMAW.AT009.13.jpg"
-                      alt="lỗi"
-                    />
-                  </div>
-                  <div className="text-center">
-                    <p>ÁO nam</p>
-                  </div>
-                </div>
-                <div className="w-32">
-                  <div>
-                    <img
-                      className="img_male"
-                      src="https://media3.coolmate.me/cdn-cgi/image/width=672,height=990,quality=80,format=auto/uploads/September2024/24CMAW.AT009.13.jpg"
-                      alt="lỗi"
-                    />
-                  </div>
-                  <div className="text-center">
-                    <p>ÁO nam</p>
-                  </div>
-                </div>
+                {products &&
+                  products.length > 0 &&
+                  products
+                    .slice(0, 8)
+                    .sort((a, b) => {
+                      return b.sold - a.sold;
+                    })
+                    .map((product) => (
+                      <div key={product.id} className="w-32">
+                        <div>
+                          <img
+                            className="img_male"
+                            src={product.variants[0]?.images[0]?.url}
+                            alt="lỗi"
+                          />
+                        </div>
+                        <div className="text-center">
+                          <p>{product.name}</p>
+                        </div>
+                      </div>
+                    ))}
               </div>
             </div>
             {/* lọc sản phẩm theo price , day*/}
@@ -531,7 +476,9 @@ const ClothingMale = () => {
                         <li onClick={() => handleSortDesAndAsc("desc")}>
                           Giá : cao - thấp
                         </li>
-                        <li onClick={SortBestselling}>Bán chạy nhất</li>
+                        <li onClick={() => handleSortSold("hot")}>
+                          Bán chạy nhất
+                        </li>
                       </ul>
                     )}
                   </div>
@@ -550,7 +497,7 @@ const ClothingMale = () => {
             <div className="mt-3 male_left">
               <div className="flex flex-wrap gap-2">
                 {loading
-                  ? [...Array(12)].map((_, index) => (
+                  ? [...Array(20)].map((_, index) => (
                       <SkeletonCard key={index} />
                     ))
                   : products &&
@@ -572,7 +519,7 @@ const ClothingMale = () => {
                             />
                           </div>
                           <div className="mt-2">
-                            <h1 className=" main_product_male_h1">
+                            <h1 className=" main_product_male_h1 text-center">
                               {product.name}
                             </h1>
                             <div className="flex gap-5 items-center justify-center">
@@ -583,7 +530,20 @@ const ClothingMale = () => {
                                 {formatPrice(product.discountedPrice)}
                               </span>
                             </div>
+                            <div className="flex gap-0 mx-4 items-center justify-between">
+                              <span className="line-through text-red-500 ">
+                                <Rate
+                                  disabled
+                                  defaultValue={5}
+                                  style={{ fontSize: "14px" }}
+                                />
+                              </span>
+                              <span style={{ fontSize: "14px" }}>
+                                Đã bán {product.sold}
+                              </span>
+                            </div>
                           </div>
+
                           <div className="text-center m-2">
                             <Button
                               className=""

@@ -395,10 +395,10 @@ function App() {
 
       <div className="fixed right-0 bottom-0 mb-24 chat_ai transition-opacity duration-300 z-10">
         <button
-          className="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center hover:bg-blue-800 transition-colors text-wrap"
+          className="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center text-white hover:bg-blue-800 transition-colors text-wrap"
           onClick={() => Navigate("/ChatAi")}
         >
-          ChatAi
+          AI
         </button>
       </div>
       <div

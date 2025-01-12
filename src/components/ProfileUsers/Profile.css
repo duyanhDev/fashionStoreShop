@@ -120,7 +120,7 @@ img.object-cover.palatium {
 .profile_username.relative.bottom-0 {
   width     : 1300px;
   margin-top: 20%;
-  height    : 500px;
+  min-height: 500px;
   left      : 50%;
   transform : translateX(-50%);
 }
@@ -135,7 +135,7 @@ img.object-cover.palatium {
 }
 
 .account-profile_check {
-  padding: 60px;
+  padding: 30px;
 }
 
 .ant-modal.css-dev-only-do-not-override-apn68 {

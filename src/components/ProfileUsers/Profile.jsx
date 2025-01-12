@@ -11,6 +11,8 @@ import img5 from "./../../assets/Image/mceclip6_34.png";
 import img6 from "./../../assets/Image/mceclip1_37.png";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import axios from "./../../untils/axios";
+
 import {
   ChanglePasswordAPI,
   get_profile_user,
@@ -24,6 +26,7 @@ import {
   message,
   Modal,
   notification,
+  Select,
   Tabs,
 } from "antd";
 import moment from "moment";
@@ -188,6 +191,10 @@ const Profile = () => {
   const [city, setCity] = useState("");
   const [district, setdistrict] = useState("");
   const [ward, setward] = useState("");
+  const [selectedImage, setSelectedImage] = useState("");
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [ImageUpLoad, SetImageUpLoad] = useState("");
 
   const [openResponsive, setOpenResponsive] = useState(false);
   const [password, setPassword] = useState("");
@@ -195,16 +202,19 @@ const Profile = () => {
   const vang = 3000000;
   const bachkim = 10000000;
 
-  const inputDate = moment(dateBrith); // Ngày gốc
+  const inputDate = moment(dateBrith);
   const formattedDate = moment(dateBrith).format("DD-MM-YYYY");
 
   const [selectedDate, setSelectedDate] = useState(formattedDate);
 
-  const [selectedImage, setSelectedImage] = useState("");
-  const [previewUrl, setPreviewUrl] = useState(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [ImageUpLoad, SetImageUpLoad] = useState("");
+  // tỉnh huyện xã
 
+  const [ProvineData, SetProvineData] = useState([]);
+  const [SeletectIdProvine, SetSeletectIdProvine] = useState("");
+  const [districtData, SetDistrictData] = useState([]);
+  const [SeletectIdDistrict, SetSeletectIdDistrict] = useState("");
+  const [WarmData, setWarmData] = useState([]);
+  const [SeletectIdWarm, SetSeletectIdWarm] = useState("");
   /// Check time
   useEffect(() => {
     if (inputDate.isValid()) {
@@ -272,9 +282,9 @@ const Profile = () => {
         setEmail(res.data.data.email || "");
         setPoints(res.data.data.totalPrice || "");
         setPassword(res.data.data.password || "");
-        setCity(res.data.data.city || "");
-        setdistrict(res.data.data.district || "");
-        setward(res.data.data.ward || "");
+        setCity(res.data.data.address.city || "");
+        setdistrict(res.data.data.address.district || "");
+        setward(res.data.data.address.ward || "");
         setGender(res.data.data.gender || "");
         setDateBrith(res.data.data.dateOfBirth || "");
         setHeight(res.data.data.height || "");
@@ -292,6 +302,69 @@ const Profile = () => {
   const onChange = (key) => {
     console.log(key);
   };
+
+  const FetchDataProvince = async () => {
+    let url = "https://esgoo.net/api-tinhthanh/1/0.htm";
+
+    let res = await axios.get(url);
+
+    if (res && res.data && res.data.data) {
+      let data = res.data.data;
+      SetProvineData(data);
+    }
+  };
+
+  const FeachDataDistrict = async () => {
+    let url = `https://esgoo.net/api-tinhthanh/2/${SeletectIdProvine}.htm`;
+
+    let res = await axios.get(url);
+
+    if (res && res.data && res.data.data) {
+      let data = res.data.data;
+      SetDistrictData(data);
+    }
+  };
+
+  const FeachDataWarn = async () => {
+    let url = `https://esgoo.net/api-tinhthanh/3/${SeletectIdDistrict}.htm`;
+    let res = await axios.get(url);
+
+    if (res && res.data && res.data.data) {
+      let data = res.data.data;
+      setWarmData(data);
+    }
+  };
+  useEffect(() => {
+    FetchDataProvince();
+  }, []);
+
+  console.log(WarmData);
+
+  useEffect(() => {
+    FeachDataDistrict();
+  }, [SeletectIdProvine]);
+
+  useEffect(() => {
+    FeachDataWarn();
+  }, [SeletectIdDistrict]);
+
+  const handleOnChangeProvine = (value, name) => {
+    SetSeletectIdProvine(value);
+    setCity(name.label);
+  };
+
+  const handleOnChangeDistrict = (value, name) => {
+    SetSeletectIdDistrict(value);
+    setdistrict(name.label);
+  };
+  const handleOnChangeWarm = (value, name) => {
+    console.log(name);
+
+    SetSeletectIdWarm(value);
+    setward(name.label);
+  };
+
+  console.log(ward);
 
   const items = [
     {
@@ -382,6 +455,113 @@ const Profile = () => {
                 onChange={(e) => setWeight(e.target.value)}
                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
               />
+            </div>
+            <div className="flex justify-between items-center gap-4">
+              <div>
+                <p>Tỉnh/Thành Phố</p>
+                <Select
+                  showSearch
+                  style={{
+                    width: 200,
+                  }}
+                  placeholder="Tỉnh hoặc thành phố"
+                  optionFilterProp="label"
+                  filterSort={(optionA, optionB) =>
+                    (optionA?.label ?? "")
+                      .toLowerCase()
+                      .localeCompare((optionB?.label ?? "").toLowerCase())
+                  }
+                  value={SeletectIdProvine}
+                  onChange={(value, option) =>
+                    handleOnChangeProvine(value, option)
+                  }
+                  options={
+                    ProvineData && ProvineData.length > 0
+                      ? [
+                          {
+                            value: "",
+                            label: "Chọn Tỉnh/Phố",
+                            disabled: true,
+                          },
+                          ...ProvineData.map((provine) => ({
+                            value: provine.id,
+                            label: provine.name,
+                          })),
+                        ]
+                      : []
+                  }
+                />
+              </div>
+              <div>
+                <p>Quận/Huyện</p>
+                <Select
+                  showSearch
+                  style={{
+                    width: 200,
+                  }}
+                  placeholder="Quận/Huyện"
+                  optionFilterProp="label"
+                  filterSort={(optionA, optionB) =>
+                    (optionA?.label ?? "")
+                      .toLowerCase()
+                      .localeCompare((optionB?.label ?? "").toLowerCase())
+                  }
+                  value={SeletectIdDistrict}
+                  onChange={(value, option) =>
+                    handleOnChangeDistrict(value, option)
+                  }
+                  options={
+                    districtData && districtData.length > 0
+                      ? [
+                          {
+                            value: "",
+                            label: "Chọn Quận/Huyện",
+                            disabled: true,
+                          },
+                          ...districtData.map((district) => ({
+                            value: district.id,
+                            label: district.full_name,
+                          })),
+                        ]
+                      : []
+                  }
+                />
+              </div>
+              <div>
+                <p>Phường/Xã</p>
+                <Select
+                  showSearch
+                  style={{
+                    width: 200,
+                  }}
+                  placeholder="Phường/Xã"
+                  optionFilterProp="label"
+                  filterSort={(optionA, optionB) =>
+                    (optionA?.label ?? "")
+                      .toLowerCase()
+                      .localeCompare((optionB?.label ?? "").toLowerCase())
+                  }
+                  value={SeletectIdWarm}
+                  onChange={(value, option) =>
+                    handleOnChangeWarm(value, option)
+                  }
+                  options={
+                    WarmData && WarmData.length > 0
+                      ? [
+                          {
+                            value: "",
+                            label: "Chọn Phường/Xã",
+                            disabled: true,
+                          },
+                          ...WarmData.map((warm) => ({
+                            value: warm.id,
+                            label: warm.full_name,
+                          })),
+                        ]
+                      : []
+                  }
+                />
+              </div>
             </div>
 
             <div>
@@ -767,6 +947,20 @@ const Profile = () => {
               <div className="mt-4 flex justify-between gap-3 ">
                 <span className="text-gray-600 font-medium">Cân nặng</span>
                 <span className="text-gray-950 font-bold">{weight}kg</span>
+              </div>
+              <div className="mt-4 flex justify-between gap-3 ">
+                <span className="text-gray-600 font-medium">
+                  Tỉnh/Thành Phố
+                </span>
+                <span className="text-gray-950 font-bold">{city}</span>
+              </div>
+              <div className="mt-4 flex justify-between gap-3 ">
+                <span className="text-gray-600 font-medium">Quận/Huyện</span>
+                <span className="text-gray-950 font-bold">{district}</span>
+              </div>
+              <div className="mt-4 flex justify-between gap-3 ">
+                <span className="text-gray-600 font-medium">Phường/Xã</span>
+                <span className="text-gray-950 font-bold">{ward}</span>
               </div>
               <div className="mt-4 flex justify-between gap-3 ">
                 <span className="text-gray-600 font-medium">Email</span>
