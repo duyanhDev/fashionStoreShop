@@ -138,6 +138,7 @@ const ProductFilter = async ({
   sortName,
   sortPrice,
   sortDate,
+  sortSold,
   page = 1,
 }) => {
   try {
@@ -177,6 +178,10 @@ const ProductFilter = async ({
       sortCriteria.createdAt = -1; // Ngày mới nhất
     } else if (sortDate === "oldest") {
       sortCriteria.createdAt = 1; // Ngày cũ nhất
+    }
+
+    if (sortSold === "hot") {
+      sortCriteria.sold = -1;
     }
 
     // Truy vấn và đếm dữ liệu

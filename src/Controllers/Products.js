@@ -264,6 +264,7 @@ const UpdateProductsAPI = async (req, res) => {
       price,
       discount,
       stock,
+      sold,
       size,
       color,
       costPrice,
@@ -364,6 +365,7 @@ const UpdateProductsAPI = async (req, res) => {
       price: price ? Number(price) : existingProduct.price,
       discount: discount || existingProduct.discount,
       stock: stock ? Number(stock) : existingProduct.stock,
+      sold: sold ? Number(sold) : existingProduct.sold,
       costPrice: costPrice || existingProduct.costPrice,
       discountedPrice: discountedPrice || existingProduct.discountedPrice,
       variants, // Cập nhật variants
@@ -409,6 +411,7 @@ const CategoryGenderAPI = async (req, res) => {
     sortName,
     sortPrice,
     sortDate,
+    sortSold,
   } = req.query;
 
   try {
@@ -420,18 +423,9 @@ const CategoryGenderAPI = async (req, res) => {
       sortName,
       sortPrice,
       sortDate,
+      sortSold,
       page,
     });
-    console.log(
-      gender,
-      category,
-      minPrice,
-      maxPrice,
-      sortName,
-      sortPrice,
-      sortDate,
-      page
-    );
 
     return res.status(200).json({
       EC: 0,

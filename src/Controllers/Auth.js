@@ -150,6 +150,7 @@ const UpDateProfileUserAPI = async (req, res) => {
 const ChanglePasswordAPI = async (req, res) => {
   try {
     const { id, currentPassword, newPassword } = req.body;
+    console.log(id, currentPassword, newPassword);
 
     if (!id || !currentPassword || !newPassword) {
       return res.status(400).json({ error: "Thiếu thông tin cần thiết" });
@@ -163,25 +164,28 @@ const ChanglePasswordAPI = async (req, res) => {
 
     // so sánh mật khẩu cũ
 
-    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    const isMatch = await user.comparePassword(currentPassword);
+    console.log(isMatch);
+
     if (!isMatch) {
-      return res.status(400).json({ error: "Mật khẩu hiện tại không đúng" });
+      return res.status(400).json({
+        success: false,
+        message: "Mật khẩu cũ không chính xác",
+      });
     }
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
 
     // Cập nhật mật khẩu
-    user.password = hashedPassword;
+    user.password = newPassword;
     await user.save();
-    return res.status(200).json({ message: "Đổi mật khẩu thành công" });
+    return res
+      .status(200)
+      .json({ success: true, message: "Đổi mật khẩu thành công" });
   } catch (error) {}
 };
 
 const Forgotpassword = async (req, res) => {
   try {
     let { email } = req.body;
-
-    console.log(email);
 
     // Tìm người dùng theo email
     const user = await Users.findOne({ email });
