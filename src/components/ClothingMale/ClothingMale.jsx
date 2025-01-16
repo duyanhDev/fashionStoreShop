@@ -19,6 +19,8 @@ const ClothingMale = () => {
   const [ListCategory, setListCategory] = useState([]);
   const [valueId, setValueId] = useState("");
 
+  const [priceRange, setPriceRange] = useState([0, 1000000]);
+
   const menuRef = useRef(null);
   // xử khi click bên ngoài
   useEffect(() => {
@@ -44,7 +46,9 @@ const ClothingMale = () => {
   const savedCurrentPage = parseInt(queryParams.get("currentPage")) || 1;
   const savedSortDate = queryParams.get("sortDate") || "";
   const savedsortSold = queryParams.get("sortSold") || "";
-  const currentPage = useSelector((state) => state.filter.currentPage);
+  const UrlMinPrice = Number(queryParams.get("minPrice")) || undefined;
+  const UrlMaxPrice = Number(queryParams.get("maxPrice")) || undefined;
+  // const currentPage = useSelector((state) => state.filter.currentPage);
 
   const getFetchParams = useCallback(() => {
     return {
@@ -57,6 +61,8 @@ const ClothingMale = () => {
       sortPrice: savedSortPrice,
       sortDate: savedSortDate,
       sortSold: savedsortSold,
+      minPrice: UrlMinPrice,
+      maxPrice: UrlMaxPrice,
       currentPage: savedCurrentPage,
     };
   }, [
@@ -66,6 +72,8 @@ const ClothingMale = () => {
     ListCategory,
     savedSortPrice,
     savedSortDate,
+    UrlMinPrice,
+    UrlMaxPrice,
     savedsortSold,
     savedCurrentPage,
   ]);
@@ -124,8 +132,9 @@ const ClothingMale = () => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
   };
   const marks = {
-    0: <span>0VND</span>,
-    // 100: <span className="increase">{priceFitter}VND</span>,
+    0: "0",
+    500000: "500K",
+    1000000: "1M",
   };
 
   // lấy danh sách sản phẩm category
@@ -237,18 +246,55 @@ const ClothingMale = () => {
         category: "",
         sortPrice: "",
         sortDate: "",
+        minPrice: undefined,
+        maxPrice: undefined,
       };
-      dispatch(fetchProducts(params));
       setHidden(false);
+      dispatch(fetchProducts(params));
+
       const newUrl = `${location.pathname}`;
+
       Navigate(newUrl, { replace: true });
     } catch (error) {
       console.log(error);
     }
-    setCheckFilter(false);
   };
-  const SortBestselling = () => {};
 
+  const handleRangeChange = (value) => {
+    setPriceRange(value);
+    const [min, max] = value;
+
+    const queryParams = new URLSearchParams(location.search);
+    queryParams.set("minPrice", min);
+    queryParams.set("maxPrice", max);
+    queryParams.set("currentPage", 1);
+
+    Navigate(`${location.pathname}?${queryParams.toString()}`); // Update URL
+
+    // Gọi API sau khi URL đã thay đổi
+    const params = {
+      gender: param.gender,
+      category: valueId,
+      minPrice: min,
+      maxPrice: max,
+      sortSold: value,
+      currentPage: 1,
+      saveCateogry: "",
+    };
+    setHidden(true);
+    setCheckFilter(false);
+    dispatch(fetchProducts(params));
+  };
+
+  useEffect(() => {
+    // Khi URL thay đổi, đồng bộ lại giá trị thanh trượt
+    const minPrice = Number(queryParams.get("minPrice")) || 0;
+    const maxPrice = Number(queryParams.get("maxPrice")) || 1000000;
+    setPriceRange([minPrice, maxPrice]);
+  }, [queryParams]);
+  useEffect(() => {
+    setHidden(true);
+  }, [savedSortPrice, savedSortDate, UrlMinPrice, UrlMaxPrice, savedsortSold]);
   return (
     <section>
       <SliderComponent />
@@ -394,15 +440,13 @@ const ClothingMale = () => {
               </div>
               <Slider
                 className="w-full"
+                range
                 marks={marks}
-                value={1} // Đồng bộ giá trị
+                value={priceRange}
                 min={0}
                 max={1000000}
                 step={50000}
-                onChange={(value) => {
-                  setPriceFitter(value); // Cập nhật giá trị khi kéo thanh trượt
-                  FilterPriceProduct(value); // Gọi hàm lọc sản phẩm
-                }}
+                onChange={handleRangeChange}
               />
             </div>
           </div>

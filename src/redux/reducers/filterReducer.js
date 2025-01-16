@@ -61,7 +61,7 @@ export const filterReducer = (state = initialState, action) => {
       return {
         ...state,
         priceRange: action.payload,
-        minPrice: action.payload > 0 ? 0 : "",
+        minPrice: action.payload,
         maxPrice: action.payload,
         currentPage: 1,
       };

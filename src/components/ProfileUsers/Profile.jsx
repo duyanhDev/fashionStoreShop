@@ -62,7 +62,9 @@ const PersonalInfoForm = ({ id }) => {
 
       // Call API
       const res = await ChanglePasswordAPI(id, currentPassword, newPassWord);
-      if (res && res.data.data.success === true) {
+      console.log(res);
+
+      if (res && res.data.success === true) {
         api["success"]({
           message: "Cập nhật mật khẩu thành công",
           description: "Bạn đã cập nhật thành công mật khẩu mới",
