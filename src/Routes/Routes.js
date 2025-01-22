@@ -50,6 +50,14 @@ const {
   updateReadNocatifionsAPI,
 } = require("../Controllers/Notifications");
 
+/// mess
+
+const {
+  sendMessageCutomerAPI,
+  getMessages,
+  sendMessageToAdminAPI,
+} = require("./../Controllers/MessageChat");
+
 //product
 
 RouterAPI.get("/products", ListProductsAPI);
@@ -118,5 +126,11 @@ RouterAPI.post("/notification/:id", updateReadNocatifionsAPI);
 // search
 
 RouterAPI.get("/search/:page", searchProductsByNameAPI);
+
+/// chat
+
+RouterAPI.post("/customer/send", sendMessageCutomerAPI);
+RouterAPI.post("/admin/send", sendMessageToAdminAPI);
+RouterAPI.get("/message", getMessages);
 
 module.exports = RouterAPI;

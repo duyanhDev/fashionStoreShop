@@ -141,6 +141,8 @@ const ProductFilter = async ({
   sortSold,
   page = 1,
 }) => {
+  console.log(minPrice, maxPrice);
+
   try {
     const perPage = 20;
     const skip = (page - 1) * perPage;
@@ -149,16 +151,11 @@ const ProductFilter = async ({
     const filter = {};
     if (gender) filter.gender = gender;
     if (category) filter.category = category;
-    if (minPrice)
-      filter.discountedPrice = {
-        ...filter.discountedPrice,
-        $gte: Number(minPrice),
-      }; // Giá >= minPrice
-    if (maxPrice)
-      filter.discountedPrice = {
-        ...filter.discountedPrice,
-        $lte: Number(maxPrice),
-      }; // Giá <= maxPrice
+    if (minPrice || maxPrice) {
+      filter.discountedPrice = {};
+      if (minPrice) filter.discountedPrice.$gte = Number(minPrice);
+      if (maxPrice) filter.discountedPrice.$lte = Number(maxPrice);
+    }
 
     // Tạo tiêu chí sắp xếp
     const sortCriteria = {};

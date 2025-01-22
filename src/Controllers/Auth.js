@@ -1,7 +1,6 @@
 const { uploadFileToCloudinary } = require("./../services/Cloudinary");
 const { RegisterUser, LoginUser } = require("./../services/Auth");
 const Users = require("./../Model/User");
-const bcrypt = require("bcrypt"); // Thay vì "bcryptjs"
 const nodemailer = require("nodemailer");
 require("dotenv").config;
 
