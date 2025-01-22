@@ -11,11 +11,13 @@ import { useSelector } from "react-redux";
 import { CartListProduct } from "./service/Cart";
 import Footer from "./components/Footer/Footer";
 import { UpOutlined } from "@ant-design/icons";
+import Message from "./components/Messages/Message";
 function App() {
   const { user } = useSelector((state) => state.auth);
   const [isVisible, setIsVisible] = useState(false);
   const [ListProducts, setListProducts] = useState([]);
   const [ListCart, setListCard] = useState([]);
+  const [open, setOpen] = useState(false);
   const Navigate = useNavigate();
   const ListProducsData = async () => {
     try {
@@ -401,6 +403,21 @@ function App() {
           AI
         </button>
       </div>
+
+      <div className="fixed right-0 bottom-14 mb-24 chat_sp transition-opacity duration-300 z-10">
+        <button
+          className="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center text-white hover:bg-blue-800 transition-colors text-wrap"
+          onClick={() => setOpen((prve) => !prve)}
+        >
+          CHAT
+        </button>
+      </div>
+
+      {open && (
+        <div className="fixed bottom-0 right-0 message_users">
+          <Message />
+        </div>
+      )}
       <div
         className={`fixed right-0 bottom-0 mb-7 transition-opacity duration-300 z-10 ${
           isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
