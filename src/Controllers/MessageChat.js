@@ -135,8 +135,16 @@ const getMessages = async (req, res) => {
         { sender: userId, recipient: adminId },
         { sender: adminId, recipient: userId },
       ],
-    }).sort({ sentAt: 1 });
-
+    })
+      .sort({ sentAt: 1 })
+      .populate({
+        path: "sender", // Populate người gửi
+        select: "avatar name", // Chỉ lấy avatar và name của người gửi
+      })
+      .populate({
+        path: "recipient", // Populate người nhận
+        select: "avatar name", // Chỉ lấy avatar và name của người nhận
+      });
     return res.status(200).json({
       EC: 0,
       data: messages,
@@ -151,8 +159,77 @@ const getMessages = async (req, res) => {
   }
 };
 
+const getMessagesList = async (req, res) => {
+  try {
+    const { userId } = req.query; // userId là người nhận (recipient)
+
+    if (!userId) {
+      return res.status(400).json({
+        EC: 1,
+        message: "userId is required",
+      });
+    }
+
+    // Truy vấn tin nhắn và nhóm theo sender
+    const senders = await Message.find({ recipient: userId })
+      .populate({
+        path: "sender", // Trường tham chiếu đến người gửi
+        select: "avatar name", // Chỉ lấy avatar và name
+      })
+      .sort({ sentAt: -1 });
+
+    return res.status(200).json({
+      EC: 0,
+      data: senders, // Trả về danh sách người gửi
+    });
+  } catch (error) {
+    console.error("Error fetching senders:", error);
+    return res.status(500).json({
+      EC: 1,
+      message: "Unable to fetch senders",
+      error: error.message,
+    });
+  }
+};
+
+const UpdateStatusIsRead = async (req, res) => {
+  try {
+    const { sender, recipient } = req.body;
+
+    // Kiểm tra sender và recipient
+    if (!sender || !recipient) {
+      return res.status(400).json({ message: "Missing sender or recipient" });
+    }
+    console.log(sender, recipient);
+
+    // Cập nhật tất cả tin nhắn từ sender tới recipient
+    const result = await Message.updateMany(
+      { sender, recipient, isRead: false }, // Chỉ cập nhật tin nhắn chưa đọc
+      { $set: { isRead: true } } // Cập nhật trường isRead thành true
+    );
+
+    // Kiểm tra nếu không có tin nhắn nào được cập nhật
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ message: "No unread messages found" });
+    }
+
+    console.log(result.modifiedCount);
+
+    // Trả về phản hồi thành công
+    res.status(200).json({
+      message: "Messages updated successfully",
+      updatedCount: result.modifiedCount,
+    });
+  } catch (error) {
+    // Xử lý lỗi
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   sendMessageCutomerAPI,
   sendMessageToAdminAPI,
   getMessages,
+  getMessagesList,
+  UpdateStatusIsRead,
 };

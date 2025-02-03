@@ -56,6 +56,8 @@ const {
   sendMessageCutomerAPI,
   getMessages,
   sendMessageToAdminAPI,
+  getMessagesList,
+  UpdateStatusIsRead,
 } = require("./../Controllers/MessageChat");
 
 //product
@@ -132,5 +134,7 @@ RouterAPI.get("/search/:page", searchProductsByNameAPI);
 RouterAPI.post("/customer/send", sendMessageCutomerAPI);
 RouterAPI.post("/admin/send", sendMessageToAdminAPI);
 RouterAPI.get("/message", getMessages);
+RouterAPI.get("/message/all-users", getMessagesList);
+RouterAPI.post("/update-isread", UpdateStatusIsRead);
 
 module.exports = RouterAPI;

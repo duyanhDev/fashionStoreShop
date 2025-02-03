@@ -202,7 +202,16 @@ const Forgotpassword = async (req, res) => {
     });
 
     // Tạo mật khẩu mới
-    const newPassword = "dosin1234"; // Mật khẩu bạn tạo
+    function generatePassword(length = 8) {
+      const charset =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      let retVal = "";
+      for (let i = 0; i < length; i++) {
+        retVal += charset.charAt(Math.floor(Math.random() * charset.length));
+      }
+      return retVal;
+    }
+    const newPassword = generatePassword(); // Mật khẩu bạn tạo
 
     // Thiết lập thông tin email
     const mailOptions = {
