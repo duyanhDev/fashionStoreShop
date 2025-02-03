@@ -75,10 +75,17 @@ const ChanglePasswordAPI = async (id, currentPassword, newPassword) => {
     newPassword,
   });
 };
+
+const Forgotpassword = async (email) => {
+  return await axios.post(`http://localhost:9000/api/v1/forgetpassword`, {
+    email,
+  });
+};
 export {
   LoginAuth,
   UserAuth,
   get_profile_user,
   update_profileUser,
   ChanglePasswordAPI,
+  Forgotpassword,
 };

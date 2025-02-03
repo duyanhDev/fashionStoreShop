@@ -6,10 +6,15 @@ import { useState } from "react";
 import { LoginAuth } from "../../service/Auth";
 import { login } from "../../redux/actions/Auth";
 import { useNavigate } from "react-router-dom";
+import ForgetPassword from "../ForgetPassword/ForgetPassword";
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ email: "", password: "" });
+
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   const dispatch = useDispatch();
   const [api, contextHolder] = notification.useNotification();
   const navigate = useNavigate();
@@ -74,6 +79,16 @@ const LoginForm = () => {
       });
       console.error("Login error:", error);
     }
+  };
+
+  const handleForget = () => {
+    setOpen(true);
+    setLoading(true);
+
+    // Simple loading mock. You should add cleanup logic in real world.
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   };
 
   return (
@@ -178,9 +193,12 @@ const LoginForm = () => {
                   Keep me logged in
                 </span>
               </label>
-              <button className="text-sm font-medium text-purple-blue-500">
+              <div
+                className="text-sm font-medium text-purple-blue-500 cursor-pointer"
+                onClick={() => handleForget()}
+              >
                 Forget password?
-              </button>
+              </div>
             </div>
 
             <button className="w-full px-6 py-5 mb-5 text-sm font-bold leading-none text-white transition duration-300 rounded-2xl hover:bg-purple-blue-600 focus:ring-4 focus:ring-purple-blue-100 bg-purple-blue-500">
@@ -200,6 +218,12 @@ const LoginForm = () => {
             </div>
           </form>
         </div>
+        <ForgetPassword
+          open={open}
+          loading={loading}
+          setOpen={setOpen}
+          setLoading={setLoading}
+        />
       </div>
     </div>
   );

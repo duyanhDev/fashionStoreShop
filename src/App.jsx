@@ -415,7 +415,7 @@ function App() {
 
       {open && (
         <div className="fixed bottom-0 right-0 message_users">
-          <Message />
+          <Message open={open} setOpen={setOpen} />
         </div>
       )}
       <div

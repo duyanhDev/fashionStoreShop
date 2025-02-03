@@ -1,6 +1,10 @@
 import { Link, Outlet } from "react-router-dom";
 import "./Admin.css";
-import { SearchOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  MessageOutlined,
+  SearchOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import { Avatar } from "antd";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { FiHome } from "react-icons/fi";
@@ -75,6 +79,12 @@ const Admin = () => {
               <Link to="/manage-store" className="nav-link">
                 <AiTwotoneAppstore />
                 Manage Store
+              </Link>
+            </li>
+            <li>
+              <Link to="/admin/support-chat" className="nav-link">
+                <MessageOutlined />
+                Support Chat
               </Link>
             </li>
           </ul>

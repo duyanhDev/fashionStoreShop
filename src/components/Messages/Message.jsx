@@ -11,7 +11,7 @@ const socket = io("http://localhost:9000", {
   reconnectionAttempts: 5,
 });
 
-const Message = () => {
+const Message = ({ open, setOpen }) => {
   const { user } = useSelector((state) => state.auth);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
@@ -67,7 +67,7 @@ const Message = () => {
     if (!user?._id) return;
 
     try {
-      let res = await getMessages(user._id, "673017dde4526bd79cc61fa6");
+      let res = await getMessages(user._id, "67811ed647cd0befde453481");
       if (res?.data) {
         setMessages(res.data);
         scrollToBottom();
@@ -113,7 +113,7 @@ const Message = () => {
     <div className="flex flex-col mess_chat max-w-md mx-auto bg-gray-100">
       <div className="bg-blue-500 p-4 text-white flex justify-between items-center">
         <h1 className="text-xl font-bold">Admin</h1>
-        <h1>
+        <h1 onClick={() => setOpen((prve) => !prve)} className="cursor-pointer">
           <CloseOutlined />
         </h1>
       </div>
@@ -125,18 +125,27 @@ const Message = () => {
         {Array.isArray(messages) &&
           messages.map((message, index) => (
             <div
-              key={message._id || index}
+              key={message?._id || index}
               className={`flex ${
-                message.sender === user?._id ? "justify-end" : "justify-start"
+                message.sender?._id === user?._id
+                  ? "justify-end"
+                  : "justify-start"
               }`}
             >
               <div
                 className={`max-w-xs px-4 py-2 rounded-lg ${
-                  message.sender === user?._id
+                  message.sender?._id === user?._id
                     ? "bg-blue-500 text-white rounded-br-none"
                     : "bg-white text-gray-800 rounded-bl-none"
                 }`}
               >
+                <div className="flex  items-center gap-1">
+                  <img
+                    className="w-12 h-12 rounded-full"
+                    src={message?.sender?.avatar}
+                  />
+                  <span>{message?.sender?.name}</span>
+                </div>
                 <p className="whitespace-pre-wrap">{message.content}</p>
                 <span className="text-xs opacity-75 mt-1 block">
                   {message.sentAt &&
