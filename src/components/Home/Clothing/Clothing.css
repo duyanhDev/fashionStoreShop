@@ -1,5 +1,5 @@
 .content_dosin {
-  width: 265.8px;
+  width: 250.9px;
   height: 400px;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -31,4 +31,18 @@
 }
 .pagination li svg {
   margin-left: -5px;
+}
+@media (max-width: 390px) {
+  .content_dosin {
+    width: 170.9px;
+  }
+}
+
+@media (min-width: 390px) and (max-width: 789px) {
+  .col {
+    /* CSS styles cho col */
+  }
+  .content_dosin {
+    width: 189.9px;
+  }
 }

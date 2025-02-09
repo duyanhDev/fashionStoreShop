@@ -2,7 +2,8 @@ import "./Clothing.css";
 import { Flex, Rate, Skeleton, Card, Button } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import AOS from "aos";
+import "aos/dist/aos.css";
 export default function Clothing({ ListProducts }) {
   const desc = ["terrible", "bad", "normal", "good", "wonderful"];
   const [loading, setLoading] = useState(true);
@@ -10,8 +11,8 @@ export default function Clothing({ ListProducts }) {
   const navigate = useNavigate();
 
   // State for visible items count
-  const [visibleItems, setVisibleItems] = useState(10);
-  const [visibleAoItems, setVisibleAoItems] = useState(10);
+  const [visibleItems, setVisibleItems] = useState(20);
+  const [visibleAoItems, setVisibleAoItems] = useState(20);
   const [visibleQuanItems, setVisibleQuanItems] = useState(10);
   const [visibleGiayItems, setVisibleGiayItems] = useState(10);
 
@@ -48,12 +49,12 @@ export default function Clothing({ ListProducts }) {
 
   const SkeletonCard = () => (
     <Card
-      style={{ width: 265.8 }}
+      style={{ width: 250.9 }}
       cover={
         <Skeleton.Image active={true} style={{ width: "100%", height: 200 }} />
       }
     >
-      <Skeleton active={true} paragraph={{ rows: 3 }} />
+      <Skeleton active={true} paragraph={{ rows: 5 }} />
     </Card>
   );
 
@@ -80,7 +81,10 @@ export default function Clothing({ ListProducts }) {
   const renderProductSection = (title, products, visibleCount, onLoadMore) => (
     <>
       <div className="ml-4 mt-3 text-xl font-bold">{title}</div>
-      <div className="flex gap-7 flex-wrap mx-4">
+      <div
+        className="flex flex-wrap justify-center items-center gap-2"
+        data-aos="zoom-in"
+      >
         {loading
           ? [...Array(12)].map((_, index) => <SkeletonCard key={index} />)
           : products.slice(0, visibleCount).map((product) => (
@@ -151,13 +155,22 @@ export default function Clothing({ ListProducts }) {
       )}
     </>
   );
+  useEffect(() => {
+    AOS.init({
+      duration: 1000, // Thời gian hiệu ứng (ms)
+      // once: true, // Hiệu ứng chỉ chạy một lần khi scroll
+    });
+  }, []);
 
   return (
     <div className="bg-white">
       {/* Danh sách tất cả sản phẩm */}
-      <div className="flex gap-7 flex-wrap mx-4">
+      <div
+        className="flex gap-2 flex-wrap  justify-center items-center col"
+        data-aos="zoom-in"
+      >
         {loading
-          ? [...Array(15)].map((_, index) => <SkeletonCard key={index} />)
+          ? [...Array(20)].map((_, index) => <SkeletonCard key={index} />)
           : ListProducts.slice(0, visibleItems).map((product) => (
               <div
                 className="content_dosin"

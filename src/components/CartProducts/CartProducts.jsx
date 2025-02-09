@@ -559,7 +559,7 @@ const CartProducts = ({}) => {
 
           res.data.vnpUrl ? (window.location.href = res.data.vnpUrl) : null;
           res.data.data.shortLink
-            ? (window.location.href = res.data.data.shortLink)
+            ? (window.location.href = res.data.data.payUrl)
             : null;
         }, 3000);
       }

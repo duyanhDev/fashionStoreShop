@@ -67,7 +67,7 @@ const Message = ({ open, setOpen }) => {
     if (!user?._id) return;
 
     try {
-      let res = await getMessages(user._id, "67811ed647cd0befde453481");
+      let res = await getMessages(user._id, "673017dde4526bd79cc61fa6");
       if (res?.data) {
         setMessages(res.data);
         scrollToBottom();

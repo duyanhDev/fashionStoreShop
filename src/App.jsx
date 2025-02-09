@@ -100,7 +100,12 @@ function App() {
               <div className="absolute mt-3 w-full hover_item m-auto flex  ">
                 <div className="flex flex-1 justify-between  border-r-2  border-black short_fitter ">
                   <div className="ml-4 ">
-                    <h1 className="text-lg font-bold text-center border-b-2  border-black">
+                    <h1
+                      className="text-lg font-bold text-center border-b-2  border-black"
+                      onClick={() =>
+                        Navigate("category/unisex?currentPage=1&Category=Áo")
+                      }
+                    >
                       Áo
                     </h1>
                     <div className="">
