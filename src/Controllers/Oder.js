@@ -287,10 +287,8 @@ const CreateOrder = async (req, res) => {
       const secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
       const orderInfo = "pay with MoMo";
       const partnerCode = "MOMO";
-      const redirectUrl =
-        "https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b";
-      const ipnUrl =
-        "https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b";
+      const redirectUrl = "http://localhost:5173/vnpay_return";
+      const ipnUrl = "http://localhost:5173/vnpay_return";
       const requestType = "payWithMethod";
       const amount = totalAmount;
       const orderId = partnerCode + new Date().getTime(); // Generate a unique order ID
@@ -317,15 +315,15 @@ const CreateOrder = async (req, res) => {
         partnerName,
         storeId,
         requestId,
+        redirectUrl,
         amount,
         orderId,
         orderInfo,
-        redirectUrl,
         ipnUrl,
         lang,
-        requestType,
         autoCapture,
         extraData,
+        requestType,
         orderGroupId,
         signature,
       };
@@ -338,6 +336,7 @@ const CreateOrder = async (req, res) => {
             "Content-Type": "application/json",
           },
         });
+        console.log(response.data);
 
         // Only send the response data back to the client
         return res.status(200).json({
