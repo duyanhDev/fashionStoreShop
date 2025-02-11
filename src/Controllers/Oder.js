@@ -10,6 +10,12 @@ require("dotenv").config();
 const nodemailer = require("nodemailer");
 const axios = require("axios");
 
+const config = {
+  app_id: "554",
+  key1: "8NdU5pG5R2spGHGhyO99HN1OhD8IQJBn",
+  key2: "uUfsWgfLkRLzq6W2uNXTCxrfxs51auny",
+  endpoint: "https://sb-openapi.zalopay.vn/v2/create",
+};
 const CreateOrder = async (req, res) => {
   try {
     const {
@@ -23,9 +29,7 @@ const CreateOrder = async (req, res) => {
       CartId,
       productId,
     } = req.body;
-    console.log("check", items);
-    console.log("cart", CartId);
-    console.log("ff", productId);
+    console.log(items);
 
     if (!userId || !items || !paymentMethod || !shippingAddress) {
       return res
@@ -222,7 +226,94 @@ const CreateOrder = async (req, res) => {
 
       await adminNotification.save();
     }
+    // handele ZaloPay
 
+    if (paymentMethod === "ZaloPay") {
+      try {
+        // Tạo mã giao dịch ngẫu nhiên
+        const transID = Math.floor(Math.random() * 1000000);
+        const appTime = Date.now(); // Lưu timestamp để đảm bảo nhất quán
+
+        // Tạo embed_data
+        const embed_data = {
+          redirecturl: "http://localhost:5173/",
+          merchantinfo: "Doisin Store",
+          promotioninfo: "",
+          redirectdata: "",
+        };
+
+        // Tạo item array với đầy đủ thông tin
+        const items = [
+          {
+            itemid: "1",
+            itemname: "Order Items",
+            itemprice: totalAmount,
+            itemquantity: 1,
+          },
+        ];
+
+        // Tạo order object với format v2
+        const order = {
+          app_id: parseInt(config.app_id), // Phải là số
+          app_trans_id: `${moment().format("YYMMDD")}_${transID}`,
+          app_time: appTime,
+          app_user: "user123",
+          amount: parseInt(totalAmount),
+          item: JSON.stringify(items),
+          embed_data: JSON.stringify(embed_data),
+          callback_url:
+            "https://ccb5-14-191-105-190.ngrok-free.app/zalopay-callback".trim(),
+          description: `Doisin - Payment for the order #${transID}`,
+          bank_code: "",
+          title: `Thanh toán đơn hàng #${transID}`, // Thêm title cho v2
+        };
+
+        // Tạo chuỗi data để tính MAC theo format v2
+        const data = [
+          config.app_id, // app_id
+          order.app_trans_id, // app_trans_id
+          order.app_user, // app_user
+          order.amount, // amount
+          order.app_time, // app_time
+          order.embed_data, // embed_data
+          order.item, // item
+        ].join("|");
+
+        // Tạo MAC
+        order.mac = crypto
+          .createHmac("sha256", config.key1)
+          .update(data)
+          .digest("hex");
+
+        console.log("Data string for MAC:", data);
+        console.log("Sending order:", order);
+
+        // Gửi request đến ZaloPay v2
+        const result = await axios.post(config.endpoint, order);
+        console.log("ZaloPay response:", result.data);
+
+        if (result.data.return_code === 1) {
+          return res.status(200).json({
+            EC: 0,
+            success: true,
+            orderUrl: result.data.order_url,
+            transID: order.app_trans_id,
+            zp_trans_token: result.data.zp_trans_token, // Thêm token cho v2
+          });
+        } else {
+          throw new Error(
+            `${result.data.return_message}: ${result.data.sub_return_message}`
+          );
+        }
+      } catch (error) {
+        console.error("ZaloPay API error:", error);
+        return res.status(500).json({
+          success: false,
+          error: "Có lỗi xảy ra khi tạo đơn hàng",
+          details: error.message || error.response?.data,
+        });
+      }
+    }
     // Handle VNPay payment method
     if (paymentMethod === "vnpay") {
       const { vnp_TmnCode, vnp_HashSecret, vnp_ReturnUrl } = process.env;
