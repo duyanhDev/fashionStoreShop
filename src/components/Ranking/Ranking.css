@@ -1,0 +1,12 @@
+.main_ranking {
+  position: relative;
+  margin-top: 118px;
+  min-height: 500px;
+  width: 100%;
+}
+.dollar svg {
+  font-size: 30px;
+}
+.top_ranking svg {
+  font-size: 30px;
+}

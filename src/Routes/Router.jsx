@@ -15,6 +15,7 @@ import OderStatus from "../components/OderStatus/OderStatus";
 import Order from "../components/Orders/Order";
 import Products from "../components/Products/Product";
 import Profile from "../components/ProfileUsers/Profile";
+import Ranking from "../components/Ranking/Ranking";
 import ViewSearch from "../components/Sumsearch/ViewSearch";
 import ChatSp from "../components/SupportChat/ChatSp";
 import UpLoad from "../components/UpLoadProducts/UpLoad";
@@ -63,6 +64,10 @@ export const RouterLayout = [
   {
     path: "/search",
     element: <ViewSearch />,
+  },
+  {
+    path: "/ranking",
+    element: <Ranking />,
   },
   {
     path: "/profile/:username",

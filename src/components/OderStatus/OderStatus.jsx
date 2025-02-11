@@ -1,9 +1,15 @@
 import { Popover, Steps } from "antd";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 import "./OderStaus.css";
 import { useParams } from "react-router-dom";
 import { OrderStatusOneProduct } from "../../service/Oder";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import moment from "moment";
+import geoData from "./../../geojs.json";
+
+mapboxgl.accessToken =
+  "pk.eyJ1IjoiZHV5YW5oMjIyMTEiLCJhIjoiY202ejNxZGx1MDBvZDJrb2ltNHkwb296dSJ9.Pr5aXlEATUZwujalLMA8Rg";
 
 const customDot = (dot, { status, index }) => (
   <Popover
@@ -22,6 +28,8 @@ const OderStatus = () => {
   const [orderStatus, SetOrderStatus] = useState("");
   const [createdAt, setCreatedAt] = useState("");
   const [data, setData] = useState([]);
+  const mapContainer = useRef(null);
+  const map = useRef(null);
   const fetchAPIOrderStatus = async () => {
     try {
       const res = await OrderStatusOneProduct(param.id);
@@ -40,14 +48,75 @@ const OderStatus = () => {
   }, [param.id]);
   console.log(data);
 
+  useEffect(() => {
+    if (map.current) return; // Không khởi tạo lại map nếu đã tồn tại
+
+    // Tạo bản đồ
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: "mapbox://styles/mapbox/streets-v11",
+      center: [105.1072, 15.7767], // Tâm bản đồ tại Việt Nam
+      zoom: 5.5,
+    });
+
+    // Giới hạn khu vực bản đồ trong phạm vi Việt Nam
+    const bounds = [
+      [102.14441, 8.17966], // Góc dưới trái
+      [109.46477, 23.39272], // Góc trên phải
+    ];
+    map.current.setMaxBounds(bounds);
+
+    // Thêm nguồn GeoJSON và hiển thị các tỉnh/thành phố của Việt Nam
+    map.current.on("load", () => {
+      map.current.addSource("vietnam", {
+        type: "geojson",
+        data: geoData, // Tệp GeoJSON chứa 63 tỉnh thành
+      });
+
+      // Thêm layer hiển thị các tỉnh/thành phố
+      map.current.addLayer({
+        id: "vietnam-layer",
+        type: "fill",
+        source: "vietnam",
+        paint: {
+          "fill-color": "#088", // Màu nền của vùng
+          "fill-opacity": 0.6, // Độ mờ của vùng
+        },
+      });
+
+      // Viền cho các vùng
+      map.current.addLayer({
+        id: "vietnam-boundaries",
+        type: "line",
+        source: "vietnam",
+        paint: {
+          "line-color": "#000",
+          "line-width": 1.5,
+        },
+      });
+
+      // Hiển thị thông tin khi di chuột vào từng vùng
+      map.current.on("mouseenter", "vietnam-layer", (e) => {
+        map.current.getCanvas().style.cursor = "pointer"; // Thay đổi con trỏ chuột
+        const properties = e.features[0].properties;
+        const provinceName = properties["NAME_1"] || "Không xác định"; // Tên tỉnh/thành
+
+        new mapboxgl.Popup()
+          .setLngLat(e.lngLat)
+          .setHTML(`<h3>${provinceName}</h3>`)
+          .addTo(map.current);
+      });
+
+      // Xóa popup khi rời khỏi vùng
+      map.current.on("mouseleave", "vietnam-layer", () => {
+        map.current.getCanvas().style.cursor = "";
+      });
+    });
+  }, []);
+
   return (
     <div className="m-auto " style={{ width: "1300px" }}>
-      <iframe
-        src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d15666.024280146616!2d106.64748009060058!3d11.000605852809585!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1svi!2s!4v1732372972043!5m2!1svi!2s"
-        width="1300"
-        height="600"
-        className="flex items-center"
-      ></iframe>
+      <div ref={mapContainer} style={{ width: "100%", height: "400px" }} />
       <div className="mt-10">
         <div className="ml-6 car_amiton">
           <div className="car_oder ">

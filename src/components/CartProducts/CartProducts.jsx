@@ -542,6 +542,7 @@ const CartProducts = ({}) => {
 
       if (res && res.data.EC === 0) {
         await CartListProductsUser();
+        console.log("xx", res.data.data);
 
         setTimeout(() => {
           setLoadingSpin(false);
@@ -556,7 +557,8 @@ const CartProducts = ({}) => {
               />
             ),
           });
-
+          console.log("xx", res.data);
+          res.data.orderUrl ? (window.location.href = res.data.orderUrl) : null;
           res.data.vnpUrl ? (window.location.href = res.data.vnpUrl) : null;
           res.data.data.shortLink
             ? (window.location.href = res.data.data.payUrl)
@@ -691,7 +693,7 @@ const CartProducts = ({}) => {
             <div className="mt-3">
               <Radio.Group onChange={onChange} value={value} className="w-full">
                 <div className="h-50 pay">
-                  <Radio value={1}>
+                  <Radio value={"ZaloPay"}>
                     <div className="flex gap-3">
                       <img
                         src="https://mcdn.coolmate.me/image/October2024/mceclip3_6.png"
@@ -789,7 +791,7 @@ const CartProducts = ({}) => {
             <span className="text-center">
               {(() => {
                 switch (value) {
-                  case 1:
+                  case "ZaloPay":
                     return (
                       <img
                         src="https://mcdn.coolmate.me/image/October2024/mceclip3_6.png"
@@ -806,7 +808,7 @@ const CartProducts = ({}) => {
                           className="w-11 h-full"
                         />
 
-                        <p className="font-bold text-sm ">
+                        <p className="font-bold text-sm  text-white">
                           COD thanh toán khi nhận hàng
                         </p>
                       </div>

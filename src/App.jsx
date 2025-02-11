@@ -385,7 +385,7 @@ function App() {
               <Link>Thương hiệu</Link>
             </li>
             <li>
-              <Link>Xếp hạng</Link>
+              <Link to="/ranking">Xếp hạng</Link>
             </li>
             <li>
               <Link>Độc nhất</Link>
