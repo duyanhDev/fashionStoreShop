@@ -466,13 +466,25 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
           </Button>
           {unreadNotifications && unreadNotifications.length > 0 ? (
             unreadNotifications.map((item) => (
-              <div
-                className="border-b-2 p-1 cursor-pointer"
-                onClick={() => handleBtnNocafition(item._id, item.orderId)}
-                key={item._id}
-              >
-                {item.message}
-                <div className="mt-1">{formatTimeAgo(item.createdAt)}</div>
+              <div>
+                <div
+                  className="border-b-2 p-1 cursor-pointer "
+                  onClick={() => handleBtnNocafition(item._id, item.orderId)}
+                  key={item._id}
+                >
+                  {item.message}
+                  <div className="mt-1">{formatTimeAgo(item.createdAt)}</div>
+
+                  {item.read === false && (
+                    <div className="w-3 h-3 bg-blue-600 rounded-full float-right -mt-4 "></div>
+                  )}
+                </div>
+
+                {item.feedBack && (
+                  <div className="-mt-8 m-auto flex justify-center">
+                    <Button className="text-center">Đánh giá</Button>
+                  </div>
+                )}
               </div>
             ))
           ) : (

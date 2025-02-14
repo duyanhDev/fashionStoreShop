@@ -147,6 +147,12 @@ const ChatSp = () => {
       }
     } catch (error) {}
   };
+  const allMessages = [...data, ...messages].map((item) => {
+    return item;
+  }); // Sắp xếp mới nhất
+  console.log("x", messages);
+  console.log("data", data);
+
   return (
     <div className="chat_container ">
       <div className="flex justify-between m-6 main_chat">
@@ -176,7 +182,7 @@ const ChatSp = () => {
                         className="w-12 h-12 rounded-full "
                         alt="avatar"
                       />
-                      <div>
+                      <div className="w-32">
                         <span>{item.sender.name}</span>
                         <p
                           className={`${

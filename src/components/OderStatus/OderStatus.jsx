@@ -1,40 +1,30 @@
-import { Popover, Steps } from "antd";
-import mapboxgl from "mapbox-gl";
+import { Button, Popover, Steps } from "antd";
+
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./OderStaus.css";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { OrderStatusOneProduct } from "../../service/Oder";
 import { useEffect, useRef, useState } from "react";
-import moment from "moment";
-import geoData from "./../../geojs.json";
-
-mapboxgl.accessToken =
-  "pk.eyJ1IjoiZHV5YW5oMjIyMTEiLCJhIjoiY202ejNxZGx1MDBvZDJrb2ltNHkwb296dSJ9.Pr5aXlEATUZwujalLMA8Rg";
-
-const customDot = (dot, { status, index }) => (
-  <Popover
-    content={
-      <span>
-        step {index} status: {status}
-      </span>
-    }
-  >
-    {dot}
-  </Popover>
-);
+import { useSelector } from "react-redux";
+import { EditOutlined } from "@ant-design/icons";
+import { FaUser, FaMoneyBill } from "react-icons/fa";
+import { RiBillFill } from "react-icons/ri";
+import { IoIosNotifications } from "react-icons/io";
+import { FaTruck } from "react-icons/fa";
 
 const OderStatus = () => {
   const param = useParams();
   const [orderStatus, SetOrderStatus] = useState("");
   const [createdAt, setCreatedAt] = useState("");
   const [data, setData] = useState([]);
-  const mapContainer = useRef(null);
-  const map = useRef(null);
+  const { user } = useSelector((state) => state.auth);
   const fetchAPIOrderStatus = async () => {
     try {
       const res = await OrderStatusOneProduct(param.id);
 
       if (res && res.data && res.data.EC === 0) {
+        console.log(res.data.data);
+
         SetOrderStatus(res.data.data.orderStatus);
         setCreatedAt(res.data.data.createdAt);
         setData(res.data.data);
@@ -46,120 +36,149 @@ const OderStatus = () => {
   useEffect(() => {
     fetchAPIOrderStatus();
   }, [param.id]);
-  console.log(data);
+  const formatPrice = (price) => {
+    // Nếu price là chuỗi, chuyển đổi nó thành một số
+    const numericPrice =
+      typeof price === "string"
+        ? parseFloat(price.replace(/[^\d,.-]/g, "").replace(",", "."))
+        : price;
 
-  useEffect(() => {
-    if (map.current) return; // Không khởi tạo lại map nếu đã tồn tại
+    // Định dạng lại giá trị bằng cách thêm dấu chấm ngăn cách hàng nghìn và thêm "đ"
+    return numericPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
+  };
 
-    // Tạo bản đồ
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/streets-v11",
-      center: [105.1072, 15.7767], // Tâm bản đồ tại Việt Nam
-      zoom: 5.5,
-    });
-
-    // Giới hạn khu vực bản đồ trong phạm vi Việt Nam
-    const bounds = [
-      [102.14441, 8.17966], // Góc dưới trái
-      [109.46477, 23.39272], // Góc trên phải
-    ];
-    map.current.setMaxBounds(bounds);
-
-    // Thêm nguồn GeoJSON và hiển thị các tỉnh/thành phố của Việt Nam
-    map.current.on("load", () => {
-      map.current.addSource("vietnam", {
-        type: "geojson",
-        data: geoData, // Tệp GeoJSON chứa 63 tỉnh thành
-      });
-
-      // Thêm layer hiển thị các tỉnh/thành phố
-      map.current.addLayer({
-        id: "vietnam-layer",
-        type: "fill",
-        source: "vietnam",
-        paint: {
-          "fill-color": "#088", // Màu nền của vùng
-          "fill-opacity": 0.6, // Độ mờ của vùng
-        },
-      });
-
-      // Viền cho các vùng
-      map.current.addLayer({
-        id: "vietnam-boundaries",
-        type: "line",
-        source: "vietnam",
-        paint: {
-          "line-color": "#000",
-          "line-width": 1.5,
-        },
-      });
-
-      // Hiển thị thông tin khi di chuột vào từng vùng
-      map.current.on("mouseenter", "vietnam-layer", (e) => {
-        map.current.getCanvas().style.cursor = "pointer"; // Thay đổi con trỏ chuột
-        const properties = e.features[0].properties;
-        const provinceName = properties["NAME_1"] || "Không xác định"; // Tên tỉnh/thành
-
-        new mapboxgl.Popup()
-          .setLngLat(e.lngLat)
-          .setHTML(`<h3>${provinceName}</h3>`)
-          .addTo(map.current);
-      });
-
-      // Xóa popup khi rời khỏi vùng
-      map.current.on("mouseleave", "vietnam-layer", () => {
-        map.current.getCanvas().style.cursor = "";
-      });
-    });
-  }, []);
-
+  const formatPrice1 = (price) => {
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
+  };
   return (
-    <div className="m-auto " style={{ width: "1300px" }}>
-      <div ref={mapContainer} style={{ width: "100%", height: "400px" }} />
-      <div className="mt-10">
-        <div className="ml-6 car_amiton">
-          <div className="car_oder ">
+    <div className="main_order ">
+      <div className="main_ranking__status">
+        <h1 className="m-auto font-bold text-4xl" style={{ width: "1300px" }}>
+          Đơn Mua
+        </h1>
+      </div>
+      <div className="main_stack flex ">
+        <div className="item_products ">
+          <div className="mt-8 flex gap-2">
             <img
-              src="https://mcdn.coolmate.me/image/October2024/mceclip2_42.png"
-              alt="trunks"
+              style={{
+                width: "50px",
+                height: "50px",
+                borderRadius: "50%",
+                objectFit: "fill",
+              }}
+              src={user.avatar}
             />
+            <div>
+              <p className="font-semibold">{user.name}</p>
+              <Link to={`/profile/${user.name}`}>
+                {" "}
+                <EditOutlined />
+                Sửa hồ sơ
+              </Link>
+            </div>
+          </div>
+
+          <div className="mt-8 ">
+            <div>
+              <span className="flex gap-2 items-center">
+                {" "}
+                <FaUser color="brown" /> Tài khoản của tôi
+              </span>
+            </div>
+            <div className="mt-2">
+              <span className="flex gap-2 items-center">
+                {" "}
+                <RiBillFill color="brown" /> Đơn mua
+              </span>
+            </div>
+            <div className="mt-2">
+              <span className="flex gap-2 items-center">
+                {" "}
+                <IoIosNotifications color="brown" /> Thông Báo
+              </span>
+            </div>
+
+            <div className="mt-2">
+              <span className="flex gap-2 items-center">
+                {" "}
+                <FaMoneyBill color="brown" /> Kho Voucher
+              </span>
+            </div>
           </div>
         </div>
-        <Steps
-          current={orderStatus === "Processing" ? 1 : 2}
-          progressDot={customDot}
-          items={[
-            {
-              title: "Đã vận chuyển",
-              description: moment(createdAt).format("DD/MM/YYYY"), // Ngày ban đầu
-            },
-            {
-              title: "Đang chờ giao hàng",
-              description: moment(createdAt)
-                .add(2, "days")
-                .format("DD/MM/YYYY"), // Cộng thêm 2 ngày
-            },
-            {
-              title: "Đã giao hàng thành công",
-              description: moment(createdAt)
-                .add(4, "days")
-                .format("DD/MM/YYYY"), // Ví dụ cộng 4 ngày
-            },
-          ]}
-        />
-      </div>
+        <div className="item_products flex-1">
+          <div className="mt-3 bg-slate-50 rounded-md cursor-pointer">
+            <ul className="flex items-center gap-1 justify-between p-2 main_ul ">
+              <li>Tất cả</li>
+              <li> Chờ xác nhận</li>
+              <li>Chờ giao hàng</li>
+              <li>Đang giao</li>
+              <li>Hoàn thành</li>
+              <li>Đã hủy</li>
+            </ul>
+          </div>
 
-      <div className="flex justify-center mt-4 full_order">
-        <div className="flex-1 text-center ">
-          <h1>ĐỊA CHỈ NHẬN HÀNG</h1>
-          <p>Người nhận : {data.username}</p>
-          <p>Số điện thoại : (+84) {data.phone}</p>
-          <p>
-            Địa chỉ : {data.shippingAddress?.fullAddress || "Không có địa chỉ"}
-          </p>
+          <div className="mt-3 bg-slate-50 rounded-md cursor-pointer min-h-80 p-3">
+            <div className="w-full relative p-3 border-b-2">
+              <div className="main_right flex gap-2 items-center  absolute inset-0 float-right justify-end">
+                <span className="text-green-500 flex items-center gap-1">
+                  {" "}
+                  <FaTruck />
+                  Chờ giao hàng
+                </span>
+                <span>Xem chi tiết</span>
+              </div>
+            </div>
+            <div className="mt-3">
+              {data.items &&
+                data.items.length > 0 &&
+                data.items.map((item) => {
+                  return (
+                    <div
+                      className="flex justify-between mt-2 items-center border-b-2"
+                      key={item._id}
+                    >
+                      <div className="flex gap-2 items-center">
+                        <img
+                          className="w-24 h-24 rounded-full object-cover"
+                          src={item.image}
+                          alt="lỗi"
+                        />
+                        <div>
+                          <span>{item.name}</span>
+                          <span className="text-xs block">
+                            Màu: {item.color}
+                          </span>
+                          <span className="text-xs block">
+                            Số lượng: {item.quantity}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-amber-900">
+                        {formatPrice(item.price)}
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+            <div className="mt-3">
+              <div className="flex items-center justify-end gap-4">
+                <span>Thành tiền:</span>{" "}
+                <span className="text-amber-950">
+                  {data.totalAmount && formatPrice1(data.totalAmount)}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-end gap-4 mt-3">
+                <Button className="bg-amber-800 text-white">Mua lại</Button>
+                <Button className="bg-amber-800 text-white">
+                  Liên hệ người bán
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex-1">2</div>
       </div>
     </div>
   );

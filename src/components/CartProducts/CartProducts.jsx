@@ -136,89 +136,6 @@ const CartProducts = ({}) => {
 
   const [checkedItems, setCheckedItems] = useState([]);
 
-  // const handleCheck = (
-  //   id,
-  //   name,
-  //   size,
-  //   quantity,
-  //   color,
-  //   price,
-  //   itemID,
-  //   productId
-  // ) => {
-  //   // Chuyển đổi giá trị price từ chuỗi (nếu cần) thành số
-  //   setProductId((prev) => {
-  //     if (prev.includes(productId)) {
-  //       return prev.filter((item) => item !== productId);
-  //     } else {
-  //       return [...prev, productId];
-  //     }
-  //   });
-  //   const numericPrice =
-  //     typeof price === "string"
-  //       ? parseFloat(price.replace(/[^\d,.-]/g, "").replace(",", "."))
-  //       : price;
-
-  //   setCartId(itemID);
-
-  //   // Cập nhật state cho id của sản phẩm được chọn
-  //   setProducts((prevState) => {
-  //     if (!Array.isArray(prevState)) {
-  //       prevState = [];
-  //     }
-
-  //     const existingProductIndex = prevState.findIndex(
-  //       (product) => product.id === id
-  //     );
-
-  //     if (existingProductIndex !== -1) {
-  //       return prevState.map((product, index) =>
-  //         index === existingProductIndex
-  //           ? {
-  //               ...product,
-  //               name,
-  //               size,
-  //               quantity,
-  //               color,
-  //               price: numericPrice, // Cập nhật giá trị numericPrice
-  //             }
-  //           : product
-  //       );
-  //     }
-
-  //     return [
-  //       ...prevState,
-  //       {
-  //         id,
-  //         name,
-  //         quantity,
-  //         size,
-  //         color,
-  //         price: numericPrice, // Cập nhật giá trị numericPrice
-  //       },
-  //     ];
-  //   });
-
-  //   // Cập nhật giá trị totalItemPrice cho các sản phẩm đã chọn
-  //   setPriceObj((prevPriceObj) => {
-  //     const newPriceObj = { ...prevPriceObj };
-  //     if (newPriceObj[id]) {
-  //       delete newPriceObj[id];
-  //     } else {
-  //       newPriceObj[id] = numericPrice;
-  //     }
-  //     return newPriceObj;
-  //   });
-
-  //   setCheckedItems((prevCheckedItems) => {
-  //     if (prevCheckedItems.includes(id)) {
-  //       return prevCheckedItems.filter((itemId) => itemId !== id);
-  //     } else {
-  //       return [...prevCheckedItems, id];
-  //     }
-  //   });
-  // };
-
   const handleSelectAll = () => {
     // Kiểm tra xem tất cả các sản phẩm đã được chọn chưa
     const allSelected =
@@ -235,7 +152,11 @@ const CartProducts = ({}) => {
         console.log(product);
 
         const allProductIds = []; // Mảng để lưu tất cả productId
-        const { id, name, size, quantity, color, totalItemPrice } = product;
+        const { id, name, size, quantity, color, totalItemPrice, images } =
+          product;
+
+        const imageUrl = images.props.src;
+        console.log("url", imageUrl);
 
         // Lưu productId vào allProductIds
         allProductIds.push(id);
@@ -288,7 +209,8 @@ const CartProducts = ({}) => {
                     size,
                     quantity,
                     color,
-                    price: numericPrice, // Cập nhật giá
+                    price: numericPrice,
+                    imageUrl, // Cập nhật giá
                   }
                 : product
             );
@@ -304,6 +226,7 @@ const CartProducts = ({}) => {
               size,
               color,
               price: numericPrice,
+              imageUrl,
             },
           ];
         });
@@ -334,17 +257,16 @@ const CartProducts = ({}) => {
     quantity,
     color,
     price,
+    images,
     itemID,
     productId
   ) => {
-    console.log(price);
-
     // Chuyển đổi giá trị price thành số nếu cần
     const numericPrice =
       typeof price === "string"
         ? parseFloat(price.replace(/[^\d,.-]/g, "").replace(",", "."))
         : price;
-
+    const imageUrl = images.props.src;
     // Tạo một key duy nhất cho sản phẩm dựa trên id, size và color
     const uniqueKey = `${id}-${size}-${color}`;
 
@@ -382,6 +304,7 @@ const CartProducts = ({}) => {
                 quantity,
                 color,
                 price: numericPrice,
+                imageUrl,
               }
             : product
         );
@@ -397,6 +320,7 @@ const CartProducts = ({}) => {
           size,
           color,
           price: numericPrice,
+          imageUrl,
         },
       ];
     });
@@ -493,6 +417,7 @@ const CartProducts = ({}) => {
               record.quantity,
               record.color,
               record.totalItemPrice,
+              record.images,
               ListCart._id,
               record.id
             )
@@ -510,6 +435,9 @@ const CartProducts = ({}) => {
         ...item,
         productId: item.id, // Assuming `id` is the field that should be mapped to `productId`
       }));
+
+      console.log("xxx", formattedItems);
+
       if (
         !Name ||
         !email ||

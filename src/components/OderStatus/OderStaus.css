@@ -1,37 +1,22 @@
-.car_oder {
+.main_order {
   position: relative;
-  width: 500px;
-  animation: amition 4s linear forwards /* infinite; */;
+  margin-top: 118px;
+  min-height: 500px;
+  width: 100%;
+  background-color: #eee;
 }
-.ant-steps-item-title {
-  font-size: 14px; /* Hoặc giá trị nhỏ hơn phù hợp */
-}
-.ant-steps-item-title {
-  white-space: nowrap;
+.main_ranking__status {
+  border-bottom: 1px solid #ccc;
 }
 
-.full_order {
-  border: 1px solid #ccc;
-  border-radius: 5px;
+.main_stack {
+  max-width: 1300px;
+  margin: auto;
 }
-@keyframes amition {
-  0% {
-    left: 0;
-  }
-
-  25% {
-    left: 150px;
-  }
-
-  50% {
-    left: 270px;
-  }
-
-  75% {
-    left: 390px;
-  }
-
-  100% {
-    left: 550px;
-  }
+.main_stack .item_products:nth-child(1) {
+  flex-basis: 25%;
+}
+.main_ul li {
+  text-align: center;
+  margin: auto;
 }

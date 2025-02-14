@@ -25,7 +25,8 @@ const createOrder = async (
       quantity: item.quantity,
       size: item.size,
       color: item.color, // quantity must be provided
-      price: item.price, // price must be provided
+      price: item.price,
+      image: item.imageUrl, // price must be provided
     }));
 
     const response = await axios.post("http://localhost:9000/api/v1/order", {

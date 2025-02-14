@@ -52,12 +52,18 @@ const Ranking = () => {
     }
   };
 
+  console.log(users);
+
   useEffect(() => {
     FetechDataUsers();
   }, []);
 
   // Sắp xếp users theo totalPrice
-  const sortRankingTop = [...users].sort((a, b) => b.totalPrice - a.totalPrice);
+  const sortRankingTop = [...users].sort((a, b) => {
+    const priceA = a.totalPrice || 0;
+    const priceB = b.totalPrice || 0;
+    return priceB - priceA;
+  });
 
   return (
     <div className="main_ranking max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-lg">
