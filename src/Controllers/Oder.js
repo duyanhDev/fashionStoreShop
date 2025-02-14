@@ -201,7 +201,7 @@ const CreateOrder = async (req, res) => {
     const userNotification = new Notifications({
       userId,
       orderId: newOrder._id,
-      products: formattedProducts, // Pass the correctly formatted products
+      products: formattedProducts,
       isAdmin: false,
       message: `Bạn đã đặt hàng thành công với các sản phẩm: ${nameProduct}`,
       isCheck: false,
@@ -519,6 +519,22 @@ const UpDateOrder = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
+    const productIdItem = order.items.map((item) => item.productId);
+    const nameProduct = order.items.map((item) => item.name);
+    const formattedProducts = productIdItem.map((id) => ({ productId: id }));
+
+    // Notification for user
+    const userNotification = new Notifications({
+      userId: order.userId,
+      orderId: order._id,
+      products: formattedProducts,
+      isAdmin: false,
+      message: `Đơn hàng của bạn đã được giao thành công: ${nameProduct}`,
+      isCheck: false,
+      feedBack: true,
+    });
+    await userNotification.save();
+
     for (const item of order.items) {
       const product = await Product.findById(item.productId);
 
@@ -618,7 +634,7 @@ const getTotalProductsSoldByType = async (req, res) => {
 
 const ListOderProducts = async (req, res) => {
   try {
-    let data = await Order.find({}).sort({ createdAt: -1 });
+    let data = await Order.find({}).sort({ createdAt: -1 }).populate("");
     return res.status(200).json({
       EC: 0,
       data: data,
