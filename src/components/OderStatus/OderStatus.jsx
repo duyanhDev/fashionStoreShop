@@ -12,6 +12,14 @@ import { RiBillFill } from "react-icons/ri";
 import { IoIosNotifications } from "react-icons/io";
 import { FaTruck } from "react-icons/fa";
 
+import io from "socket.io-client";
+
+const socket = io("http://localhost:9000", {
+  withCredentials: true,
+  reconnection: true,
+  reconnectionAttempts: 5,
+});
+
 const OderStatus = () => {
   const param = useParams();
   const [orderStatus, SetOrderStatus] = useState("");
@@ -36,6 +44,18 @@ const OderStatus = () => {
   useEffect(() => {
     fetchAPIOrderStatus();
   }, [param.id]);
+
+  useEffect(() => {
+    // Lắng nghe sự kiện từ server
+    socket.on(`order-update-${user?._id}`, (data) => {
+      setData(data.data);
+      // alert(data.message);
+    });
+
+    return () => {
+      socket.off(`order-update-${user?._id}`);
+    };
+  }, [user?._id]);
   const formatPrice = (price) => {
     // Nếu price là chuỗi, chuyển đổi nó thành một số
     const numericPrice =
@@ -111,10 +131,43 @@ const OderStatus = () => {
           <div className="mt-3 bg-slate-50 rounded-md cursor-pointer">
             <ul className="flex items-center gap-1 justify-between p-2 main_ul ">
               <li>Tất cả</li>
-              <li> Chờ xác nhận</li>
-              <li>Chờ giao hàng</li>
-              <li>Đang giao</li>
-              <li>Hoàn thành</li>
+              <li
+                className={`${
+                  data.orderStatus === "Processing"
+                    ? "text-amber-950 border-b-amber-800 border-b-2"
+                    : ""
+                }`}
+              >
+                {" "}
+                Chờ xác nhận
+              </li>
+              <li
+                className={`${
+                  data.orderStatus === "Delivered"
+                    ? "text-amber-950 border-b-amber-800 border-b-2"
+                    : ""
+                }`}
+              >
+                Chờ giao hàng
+              </li>
+              <li
+                className={`${
+                  data.orderStatus === "Shipping"
+                    ? "text-amber-950 border-b-amber-800 border-b-2"
+                    : ""
+                }`}
+              >
+                Đang giao
+              </li>
+              <li
+                className={`${
+                  data.orderStatus === "Completed"
+                    ? "text-amber-950 border-b-amber-800 border-b-2"
+                    : ""
+                }`}
+              >
+                Hoàn thành
+              </li>
               <li>Đã hủy</li>
             </ul>
           </div>
@@ -125,7 +178,20 @@ const OderStatus = () => {
                 <span className="text-green-500 flex items-center gap-1">
                   {" "}
                   <FaTruck />
-                  Chờ giao hàng
+                  {(() => {
+                    switch (data.orderStatus) {
+                      case "Processing":
+                        return "Chờ xác nhận";
+                      case "Delivered":
+                        return "Chờ giao hàng";
+                      case "Shipping":
+                        return "Đang giao";
+                      case "Completed":
+                        return "Đơn hàng đã giao thành công";
+                      default:
+                        return "Trạng thái không xác định";
+                    }
+                  })()}
                 </span>
                 <span>Xem chi tiết</span>
               </div>
@@ -171,6 +237,9 @@ const OderStatus = () => {
               </div>
 
               <div className="flex items-center justify-end gap-4 mt-3">
+                {data.orderStatus === "Completed" && (
+                  <Button className="bg-amber-800 text-white">Đánh giá</Button>
+                )}
                 <Button className="bg-amber-800 text-white">Mua lại</Button>
                 <Button className="bg-amber-800 text-white">
                   Liên hệ người bán

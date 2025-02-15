@@ -1,10 +1,16 @@
-import { Table, notification } from "antd";
+import { Button, Table, notification } from "antd";
 import {
   CheckSquareOutlined,
   DeleteOutlined,
   SmileOutlined,
 } from "@ant-design/icons";
-import { ListOderProductsAll, UpDateOrderProductAPI } from "../../service/Oder";
+import {
+  ListOderProductsAll,
+  OrderStatusOneProduct,
+  UpDateCompleted,
+  UpDateOrderProductAPI,
+  updateShipping,
+} from "../../service/Oder";
 import { useEffect, useState } from "react";
 import moment from "moment";
 import "./OrderAdmin.css";
@@ -109,6 +115,7 @@ const OrderAdmin = () => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
   };
   // Function to fetch data
+
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -139,21 +146,71 @@ const OrderAdmin = () => {
               item.paymentStatus && item.paymentStatus === "Completed"
                 ? "Đã thanh toán"
                 : "Chờ thanh toán",
-            orderStatus:
-              item.orderStatus && item.orderStatus === "Delivered"
-                ? "Đơn hàng đã giao thành công"
-                : "Đang giao",
+            orderStatus: (() => {
+              switch (item.orderStatus) {
+                case "Processing":
+                  return "Chờ xác nhận";
+                case "Delivered":
+                  return "Chờ giao hàng";
+                case "Shipping":
+                  return "Đang giao";
+                case "Completed":
+                  return "Đơn hàng đã giao thành công";
+                default:
+                  return "Trạng thái không xác định";
+              }
+            })(),
             totalAmount: formatPrice(item.totalAmount),
             createdAt: moment(item.createdAt).format("DD/MM/YYYY"),
             check: (
               <div className="flex g-4 items-center">
-                {item.orderStatus === "Processing" && (
-                  <CheckSquareOutlined
-                    className="icon-square check"
-                    onClick={() => handleCheckOrder(item._id, item.totalAmount)}
-                  />
+                {(() => {
+                  switch (item.orderStatus) {
+                    case "Processing":
+                      return (
+                        <Button
+                          className="btn btn-warning"
+                          onClick={() =>
+                            handleCheckOrder(item._id, item.totalAmount)
+                          }
+                        >
+                          Chờ xác nhận
+                        </Button>
+                      );
+                    case "Delivered":
+                      return (
+                        <Button
+                          className="btn btn-primary"
+                          onClick={() => updateShippingOrder(item._id)}
+                        >
+                          Chờ giao hàng
+                        </Button>
+                      );
+                    case "Shipping":
+                      return (
+                        <Button
+                          className="btn btn-info"
+                          onClick={() => updateCompleteOrder(item._id)}
+                        >
+                          Đang giao
+                        </Button>
+                      );
+                    case "Completed":
+                      return (
+                        <Button className="btn btn-success">Hoàn thành</Button>
+                      );
+                    default:
+                      return (
+                        <Button className="btn btn-secondary">
+                          Trạng thái không xác định
+                        </Button>
+                      );
+                  }
+                })()}
+
+                {item.orderStatus && item.orderStatus === "Processing" && (
+                  <Button>Hủy</Button>
                 )}
-                <DeleteOutlined className="icon-square delete" />
               </div>
             ),
           };
@@ -176,7 +233,6 @@ const OrderAdmin = () => {
     }
   };
 
-  // Fetch data when the component mounts or when pagination/sorting changes
   useEffect(() => {
     fetchData();
   }, [
@@ -223,6 +279,59 @@ const OrderAdmin = () => {
       console.log(error);
     }
   };
+
+  const updateShippingOrder = async (id) => {
+    try {
+      let res = await updateShipping(id);
+
+      if (res && res.message === "Order updated successfully") {
+        api.open({
+          message: "Đơn hàng đã được duyệt",
+          description: "Đơn hàng đã được xác nhận thành công",
+          icon: (
+            <SmileOutlined
+              style={{
+                color: "#108ee9",
+              }}
+            />
+          ),
+        });
+
+        fetchData();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const updateCompleteOrder = async (id) => {
+    try {
+      let res = await UpDateCompleted(id);
+      console.log(res);
+
+      if (
+        res &&
+        res.data &&
+        res.data.message === "Order updated successfully"
+      ) {
+        api.open({
+          message: "Đơn hàng đã được duyệt",
+          description: "Đơn hàng của bạn đã được đơn vị giao thành công",
+          icon: (
+            <SmileOutlined
+              style={{
+                color: "#108ee9",
+              }}
+            />
+          ),
+        });
+        fetchData();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div>
       {contextHolder}

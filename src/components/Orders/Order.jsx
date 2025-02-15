@@ -111,7 +111,7 @@ const Order = () => {
             : "Chờ thanh toán",
         orderStatus:
           item.orderStatus && item.orderStatus === "Delivered"
-            ? "Đơn hàng đã giao thành công"
+            ? "Chờ giao hàng"
             : "Đang giao",
         totalAmount: formatPrice(item.totalAmount),
         createdAt: moment(item.createdAt).format("DD/MM/YYYY"),

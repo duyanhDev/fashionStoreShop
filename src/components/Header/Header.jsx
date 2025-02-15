@@ -479,12 +479,6 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
                     <div className="w-3 h-3 bg-blue-600 rounded-full float-right -mt-4 "></div>
                   )}
                 </div>
-
-                {item.feedBack && (
-                  <div className="-mt-8 m-auto flex justify-center">
-                    <Button className="text-center">Đánh giá</Button>
-                  </div>
-                )}
               </div>
             ))
           ) : (
