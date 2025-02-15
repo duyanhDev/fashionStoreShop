@@ -38,7 +38,16 @@ const orderSchema = new mongoose.Schema({
   },
 
   paymentStatus: { type: String, default: "Pending" },
-  orderStatus: { type: String, default: "Processing" }, // e.g., "Processing", "Shipped", "Delivered"
+  orderStatus: {
+    type: String,
+    enum: [
+      "Processing", // Chờ giao hàng
+      "Delivered", // Chờ giao hàng (another state)
+      "Shipping", // Giao hàng
+      "Completed", // Đã xong
+    ],
+    default: "Processing",
+  },
   totalAmount: { type: Number, required: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

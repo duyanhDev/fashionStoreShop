@@ -207,6 +207,15 @@ const CreateOrder = async (req, res) => {
       isCheck: false,
     });
     await userNotification.save();
+    const io = req.app.get("io");
+    io.emit(`order-update-${newOrder.userId}`, {
+      orderId: newOrder._id,
+      status: "Shipping",
+      data: newOrder,
+      message: `Bạn đã đặt hàng thành công với các sản phẩm: ${nameProduct.join(
+        ", "
+      )}`,
+    });
     const admins = await Users.find({ isAdmin: true });
 
     if (!admins.length) {
@@ -360,6 +369,9 @@ const CreateOrder = async (req, res) => {
       const vnpUrl = `${process.env.vnp_Url}?${qs.stringify(vnp_Params, {
         encode: false,
       })}`;
+      console.log("vnpram", vnp_Params);
+
+      console.log("vnpUrl", vnpUrl);
 
       return res.status(200).json({
         EC: 0,
@@ -529,7 +541,7 @@ const UpDateOrder = async (req, res) => {
       orderId: order._id,
       products: formattedProducts,
       isAdmin: false,
-      message: `Đơn hàng của bạn đã được giao thành công: ${nameProduct}`,
+      message: `Đơn hàng của bạn đã được shop xác nhận giao hàng thành công: ${nameProduct}`,
       isCheck: false,
       feedBack: true,
     });
@@ -568,13 +580,131 @@ const UpDateOrder = async (req, res) => {
           .json({ message: `Product with ID ${item.productId} not found` });
       }
     }
-
+    const io = req.app.get("io");
+    io.emit(`order-update-${order.userId}`, {
+      orderId: order._id,
+      status: "Shipping",
+      data: order,
+      message: `Đơn hàng của bạn đã được shop xác nhận giao hàng thành công: ${nameProduct.join(
+        ", "
+      )}`,
+    });
     res
       .status(200)
       .json({ message: "Order status updated and stock updated successfully" });
   } catch (error) {
     console.error("Error updating order:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const UpDateDelivered = async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    console.log(id);
+
+    // Cập nhật trạng thái đơn hàng
+    const order = await Order.findOneAndUpdate(
+      { _id: id },
+      {
+        orderStatus: "Shipping",
+      },
+      { new: true }
+    );
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Lấy danh sách sản phẩm từ đơn hàng
+    const productIdItem = order.items.map((item) => item.productId);
+    const nameProduct = order.items.map((item) => item.name);
+    const formattedProducts = productIdItem.map((id) => ({ productId: id }));
+
+    // Tạo thông báo cho người dùng
+    const userNotification = new Notifications({
+      userId: order.userId,
+      orderId: order._id,
+      products: formattedProducts,
+      isAdmin: false,
+      message: `Đơn hàng của bạn đã được shop xác nhận thành công: ${nameProduct.join(
+        ", "
+      )}`,
+      isCheck: false,
+      feedBack: true,
+    });
+
+    await userNotification.save();
+    const io = req.app.get("io");
+    io.emit(`order-update-${order.userId}`, {
+      orderId: order._id,
+      status: "Shipping",
+      data: order,
+      message: `Đơn hàng của bạn đã được shop xác nhận thành công: ${nameProduct.join(
+        ", "
+      )}`,
+    });
+    // Phản hồi API thành công
+    return res.status(200).json({
+      message: "Order updated successfully",
+      order,
+    });
+  } catch (error) {
+    console.error("Error updating order:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+const UpDateCompleted = async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    // Cập nhật trạng thái đơn hàng
+    const order = await Order.findOneAndUpdate(
+      { _id: id },
+      {
+        orderStatus: "Completed",
+      },
+      { new: true }
+    );
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Lấy danh sách sản phẩm từ đơn hàng
+    const productIdItem = order.items.map((item) => item.productId);
+    const nameProduct = order.items.map((item) => item.name);
+    const formattedProducts = productIdItem.map((id) => ({ productId: id }));
+
+    // Tạo thông báo cho người dùng
+    const userNotification = new Notifications({
+      userId: order.userId,
+      orderId: order._id,
+      products: formattedProducts,
+      isAdmin: false,
+      message: `Đơn hàng của bạn đã được bên vận chuyển giao thành công: ${nameProduct.join(
+        ", "
+      )}`,
+      isCheck: false,
+      feedBack: true,
+    });
+
+    await userNotification.save();
+    const io = req.app.get("io");
+    io.emit(`order-update-${order.userId}`, {
+      orderId: order._id,
+      status: "Shipping",
+      data: order,
+    });
+    // Phản hồi API thành công
+    return res.status(200).json({
+      message: "Order updated successfully",
+      order,
+    });
+  } catch (error) {
+    console.error("Error updating order:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -666,4 +796,6 @@ module.exports = {
   getTotalProductsSoldByType,
   ListOderProducts,
   getOrderOneProduct,
+  UpDateDelivered,
+  UpDateCompleted,
 };

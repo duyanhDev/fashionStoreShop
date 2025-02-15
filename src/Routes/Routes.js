@@ -40,6 +40,8 @@ const {
   ListOderProducts,
   getTotalProductsSold,
   getOrderOneProduct,
+  UpDateDelivered,
+  UpDateCompleted,
 } = require("../Controllers/Oder");
 
 const { searchProductsByNameAPI } = require("../Controllers/SearchProductsAPI");
@@ -115,6 +117,8 @@ RouterAPI.get("/order/:userId", listOderUserId);
 RouterAPI.put("/order/:id", UpDateOrder);
 RouterAPI.get("/get-total-products-sold", getTotalProductsSoldByType);
 RouterAPI.get("/get-quantity-all", getTotalProductsSold);
+RouterAPI.post("/check-orderShipping", UpDateDelivered);
+RouterAPI.post("/check-orderCompleted", UpDateCompleted);
 // all hóa đơn thanh toán order
 RouterAPI.get("/get-order-all", ListOderProducts);
 RouterAPI.get("/get-order-one/:id", getOrderOneProduct);
