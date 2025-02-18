@@ -5,7 +5,13 @@ import io from "socket.io-client";
 import { getMessages, sendMessageCutomer } from "../../service/Message";
 import { useSelector } from "react-redux";
 
-const socket = io("http://localhost:9000", {
+// const socket = io("http://localhost:9000", {
+//   withCredentials: true,
+//   reconnection: true,
+//   reconnectionAttempts: 5,
+// });
+
+const socket = io("https://fashionstoreshop.onrender.com/", {
   withCredentials: true,
   reconnection: true,
   reconnectionAttempts: 5,
