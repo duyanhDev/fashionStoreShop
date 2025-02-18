@@ -128,6 +128,16 @@ const searchProductsByNameAPI = async (keyword, page = 1) => {
     params: { keyword },
   });
 };
+
+//đánh giá nhiều sản phẩm
+const feeckacksProductsAPI = async (id, userId, rating, review) => {
+  return await axios.post("http://localhost:9000/api/v1/feedbacks-products", {
+    id,
+    userId,
+    rating,
+    review,
+  });
+};
 export {
   createProductAPI,
   getListProductsAPI,
@@ -136,4 +146,5 @@ export {
   PutFeedbackProductAPI,
   toggleLikeRatingAPI,
   searchProductsByNameAPI,
+  feeckacksProductsAPI,
 };

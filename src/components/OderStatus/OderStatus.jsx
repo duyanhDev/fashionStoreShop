@@ -2,7 +2,7 @@ import { Button, Popover, Steps } from "antd";
 
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./OderStaus.css";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { OrderStatusOneProduct } from "../../service/Oder";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
@@ -13,6 +13,7 @@ import { IoIosNotifications } from "react-icons/io";
 import { FaTruck } from "react-icons/fa";
 
 import io from "socket.io-client";
+import FeedBack from "../FeedBack/FeeBack";
 
 const socket = io("http://localhost:9000", {
   withCredentials: true,
@@ -26,6 +27,8 @@ const OderStatus = () => {
   const [createdAt, setCreatedAt] = useState("");
   const [data, setData] = useState([]);
   const { user } = useSelector((state) => state.auth);
+  const [modal2Open, setModal2Open] = useState(false);
+  const Navigate = useNavigate();
   const fetchAPIOrderStatus = async () => {
     try {
       const res = await OrderStatusOneProduct(param.id);
@@ -70,6 +73,11 @@ const OderStatus = () => {
   const formatPrice1 = (price) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
   };
+
+  const ModelFeedBack = () => {
+    setModal2Open(true);
+  };
+
   return (
     <div className="main_order ">
       <div className="main_ranking__status">
@@ -205,7 +213,10 @@ const OderStatus = () => {
                       className="flex justify-between mt-2 items-center border-b-2"
                       key={item._id}
                     >
-                      <div className="flex gap-2 items-center">
+                      <div
+                        className="flex gap-2 items-center"
+                        onClick={() => Navigate(`/product/${item.productId}`)}
+                      >
                         <img
                           className="w-24 h-24 rounded-full object-cover"
                           src={item.image}
@@ -238,7 +249,12 @@ const OderStatus = () => {
 
               <div className="flex items-center justify-end gap-4 mt-3">
                 {data.orderStatus === "Completed" && (
-                  <Button className="bg-amber-800 text-white">Đánh giá</Button>
+                  <Button
+                    className="bg-amber-800 text-white"
+                    onClick={ModelFeedBack}
+                  >
+                    Đánh giá
+                  </Button>
                 )}
                 <Button className="bg-amber-800 text-white">Mua lại</Button>
                 <Button className="bg-amber-800 text-white">
@@ -248,6 +264,14 @@ const OderStatus = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <FeedBack
+          modal2Open={modal2Open}
+          setModal2Open={setModal2Open}
+          data={data}
+          userid={user?._id}
+        />
       </div>
     </div>
   );

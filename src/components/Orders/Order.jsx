@@ -191,14 +191,14 @@ const Order = () => {
     navigate(`/orderstatus/${id}`);
   };
   return (
-    <>
+    <div style={{ marginTop: "102px" }}>
       <Table
         // rowSelection={rowSelection}
         columns={columns}
         dataSource={dataSource}
       />
       ;
-    </>
+    </div>
   );
 };
 
