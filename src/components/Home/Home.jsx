@@ -76,7 +76,9 @@ const Home = () => {
               <img
                 className="max-w-full h-auto text-center m-auto"
                 src={Aokhoac}
+                alt="Aokhoac"
               />
+
               <span className="">
                 <span className="block font-semibold text-[#003644] ">
                   ÁO KHOÁC
@@ -107,6 +109,7 @@ const Home = () => {
               <img
                 className="max-w-full h-auto text-center m-auto"
                 src={Quan}
+                alt="Quần"
               />
               <span className="">
                 <span className="block font-semibold text-[#003644]">
@@ -124,6 +127,7 @@ const Home = () => {
               <img
                 className="max-w-full h-auto text-center m-auto"
                 src={Unisex}
+                alt="Unisex"
               />
               <span className="">
                 <span className="block font-semibold text-[#003644]">
@@ -141,6 +145,7 @@ const Home = () => {
               <img
                 className="max-w-full h-auto text-center m-auto"
                 src={Phukien}
+                alt="Unisex"
               />
               <span className="">
                 <span className="block font-semibold text-[#003644]">
@@ -158,6 +163,7 @@ const Home = () => {
               <img
                 className="max-w-full h-auto text-center m-auto"
                 src={logo}
+                alt="Unisex"
               />
               <span className="">
                 <span className="block font-semibold text-[#003644]">
