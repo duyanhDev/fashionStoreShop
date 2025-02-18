@@ -101,6 +101,63 @@ const PutFeedbackProduct = async (id, userId, rating, review) => {
     throw error;
   }
 };
+const mongoose = require("mongoose");
+
+const PutFeedbackProducts = async (ids, userId, rating, review) => {
+  try {
+    console.log("IDs nhận được:", ids);
+
+    // Chuyển đổi ID sang ObjectId
+    const objectIds = Array.isArray(ids)
+      ? ids.map((id) => new mongoose.Types.ObjectId(id))
+      : [new mongoose.Types.ObjectId(ids)];
+
+    console.log("ObjectIds đã convert:", objectIds);
+
+    // Kiểm tra sản phẩm có tồn tại không
+    const existingProducts = await Products.find({ _id: { $in: objectIds } });
+    console.log("Sản phẩm tìm thấy:", existingProducts);
+
+    if (existingProducts.length === 0) {
+      throw new Error("Không tìm thấy sản phẩm nào với các ID đã cung cấp.");
+    }
+
+    let feedback;
+    if (objectIds.length === 1) {
+      feedback = await Products.updateOne(
+        { _id: objectIds[0] },
+        {
+          $push: {
+            ratings: {
+              userId: new mongoose.Types.ObjectId(userId),
+              rating,
+              review,
+            },
+          },
+        }
+      );
+    } else {
+      feedback = await Products.updateMany(
+        { _id: { $in: objectIds } },
+        {
+          $push: {
+            ratings: {
+              userId: new mongoose.Types.ObjectId(userId),
+              rating,
+              review,
+            },
+          },
+        }
+      );
+    }
+
+    console.log("Feedback Update Result:", feedback);
+    return feedback;
+  } catch (error) {
+    console.log("Lỗi cập nhật feedback:", error);
+    throw error;
+  }
+};
 
 const toggleLikeRating = async (productId, ratingId, userId) => {
   // Find the product by ID
@@ -308,6 +365,7 @@ module.exports = {
   ListOneProducts,
   UpdateProducts,
   PutFeedbackProduct,
+  PutFeedbackProducts,
   ProductFilter,
   CategoryGenderFitter,
   toggleLikeRating,

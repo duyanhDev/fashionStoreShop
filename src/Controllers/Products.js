@@ -5,6 +5,7 @@ const {
   ListOneProducts,
   UpdateProducts,
   PutFeedbackProduct,
+  PutFeedbackProducts,
   ProductFilter,
   CategoryGenderFitter,
   toggleLikeRating,
@@ -401,6 +402,22 @@ const PutFeedbackProductAPI = async (req, res) => {
     });
   } catch (error) {}
 };
+
+const PutFeedbackProductsAPI = async (req, res) => {
+  try {
+    const { id, userId, rating, review } = req.body;
+    console.log(id, userId, rating, review);
+    const data = await PutFeedbackProducts(id, userId, rating, review);
+    console.log(data);
+
+    return res.status(200).json({
+      EC: "cập nhật thành công",
+      data: data,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
 const CategoryGenderAPI = async (req, res) => {
   const page = parseInt(req.query.page || "1", 10); // Đảm bảo page là số nguyên
   const {
@@ -495,6 +512,7 @@ module.exports = {
   ListOneProductAPI,
   UpdateProductsAPI,
   PutFeedbackProductAPI,
+  PutFeedbackProductsAPI,
   CategoryGenderAPI,
   CategoryGenderFitterAPI,
   toggleLikeRatingAPI,

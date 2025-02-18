@@ -6,6 +6,7 @@ const {
   ListOneProductAPI,
   UpdateProductsAPI,
   PutFeedbackProductAPI,
+  PutFeedbackProductsAPI,
   CategoryGenderAPI,
   CategoryGenderFitterAPI,
   toggleLikeRatingAPI,
@@ -73,6 +74,7 @@ RouterAPI.get("/products/:id", ListOneProductAPI);
 RouterAPI.put("/products/:id", UpdateProductsAPI);
 
 RouterAPI.post("/feedback", PutFeedbackProductAPI);
+RouterAPI.post("/feedbacks-products", PutFeedbackProductsAPI);
 
 RouterAPI.post("/like", toggleLikeRatingAPI);
 
