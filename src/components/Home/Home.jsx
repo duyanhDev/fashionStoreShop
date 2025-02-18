@@ -10,7 +10,7 @@ import { useState, useEffect } from "react";
 import SliderComponent from "../Slider/Slider";
 import Ao from "./../../assets/Image/Home/Ao.png";
 import Quan from "./../../assets/Image/Home/Quan.png";
-import Aokhoac from "./../../assets/Image/Home/Aokhoac.png";
+import Aokhoac from "./../../assets/Image/Home/Aok.png";
 import Phukien from "./../../assets/Image/Home/Mu.png";
 import logo from "./../../assets/Image/Home/Dosin.png";
 import Unisex from "./../../assets/Image/Home/Unisex.png";
