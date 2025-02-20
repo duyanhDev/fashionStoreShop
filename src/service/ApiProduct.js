@@ -5,7 +5,7 @@ const getListProductsAPI = async () => {
 };
 
 const ListOneProductAPI = async (id) => {
-  return await axios.get(`http://localhost:9000/api/v1/products/${id}`);
+  return await axios.get(`/api/v1/products/${id}`);
 };
 
 const createProductAPI = async (

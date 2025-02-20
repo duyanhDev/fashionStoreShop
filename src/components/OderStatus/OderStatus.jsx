@@ -15,17 +15,17 @@ import { FaTruck } from "react-icons/fa";
 import io from "socket.io-client";
 import FeedBack from "../FeedBack/FeeBack";
 
-const socket = io("http://localhost:9000", {
-  withCredentials: true,
-  reconnection: true,
-  reconnectionAttempts: 5,
-});
-
-// const socket = io("https://fashionstoreshop.onrender.com/", {
+// const socket = io("http://localhost:9000", {
 //   withCredentials: true,
 //   reconnection: true,
 //   reconnectionAttempts: 5,
 // });
+
+const socket = io("https://fashionstoreshop.onrender.com/", {
+  withCredentials: true,
+  reconnection: true,
+  reconnectionAttempts: 5,
+});
 
 const OderStatus = () => {
   const param = useParams();
