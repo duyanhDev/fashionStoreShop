@@ -2,7 +2,7 @@ import axios from "./../untils/axios";
 
 const getMessages = async (userId, adminId) => {
   try {
-    const response = await axios.get(`http://localhost:9000/api/v1/message`, {
+    const response = await axios.get(`api/v1/message`, {
       params: { userId, adminId }, // Sử dụng đối tượng { key: value } cho params
     });
     return response.data; // Trả về dữ liệu tin nhắn
@@ -14,12 +14,9 @@ const getMessages = async (userId, adminId) => {
 
 const getMessagesList = async (userId) => {
   try {
-    const response = await axios.get(
-      `http://localhost:9000/api/v1/message/all-users`,
-      {
-        params: { userId }, // Sử dụng đối tượng { key: value } cho params
-      }
-    );
+    const response = await axios.get(`api/v1/message/all-users`, {
+      params: { userId }, // Sử dụng đối tượng { key: value } cho params
+    });
     return response.data; // Trả về dữ liệu tin nhắn
   } catch (error) {
     console.error("Error fetching messages:", error.message); // Log lỗi nếu xảy ra
@@ -40,7 +37,7 @@ const sendMessageCutomer = async (sender, content, image, isAdminChat) => {
 
   try {
     const response = await axios.post(
-      "http://localhost:9000/api/v1/customer/send", // Đường dẫn API của bạn
+      "api/v1/customer/send", // Đường dẫn API của bạn
       formData,
       {
         headers: {
@@ -75,7 +72,7 @@ const sendMessageAdmin = async (
 
   try {
     const response = await axios.post(
-      "http://localhost:9000/api/v1/admin/send", // Đường dẫn API của bạn
+      "api/v1/admin/send", // Đường dẫn API của bạn
       formData,
       {
         headers: {
@@ -91,7 +88,7 @@ const sendMessageAdmin = async (
 };
 
 const UpdateIsReadAPI = async (sender, recipient) => {
-  return await axios.post("http://localhost:9000/api/v1/update-isread", {
+  return await axios.post("api/v1/update-isread", {
     sender,
     recipient,
   });

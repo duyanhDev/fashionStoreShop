@@ -105,7 +105,7 @@ const UpdateProductAPI = async (
 };
 
 const PutFeedbackProductAPI = async (id, userId, rating, review) => {
-  return await axios.post("http://localhost:9000/api/v1/feedback", {
+  return await axios.post("api/v1/feedback", {
     id,
     userId,
     rating,
@@ -114,7 +114,7 @@ const PutFeedbackProductAPI = async (id, userId, rating, review) => {
 };
 
 const toggleLikeRatingAPI = async (productId, ratingId, userId) => {
-  return await axios.post("http://localhost:9000/api/v1/like", {
+  return await axios.post("api/v1/like", {
     productId,
     ratingId,
     userId,
@@ -131,7 +131,7 @@ const searchProductsByNameAPI = async (keyword, page = 1) => {
 
 //đánh giá nhiều sản phẩm
 const feeckacksProductsAPI = async (id, userId, rating, review) => {
-  return await axios.post("http://localhost:9000/api/v1/feedbacks-products", {
+  return await axios.post("api/v1/feedbacks-products", {
     id,
     userId,
     rating,

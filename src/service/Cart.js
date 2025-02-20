@@ -1,7 +1,7 @@
 import axios from "./../untils/axios";
 
 const AddCartAPI = async (userId, productId, quantity, size, color, price) => {
-  return await axios.post("http://localhost:9000/api/v1/cart", {
+  return await axios.post("api/v1/cart", {
     userId,
     productId,
     quantity,
@@ -12,14 +12,13 @@ const AddCartAPI = async (userId, productId, quantity, size, color, price) => {
 };
 
 const CartListProduct = async (userId) => {
-  return await axios.get(`http://localhost:9000/api/v1/cart/${userId}`);
+  return await axios.get(`api/v1/cart/${userId}`);
 };
 const RemoveCartOnePorduct = async (cartId, itemId, userId) => {
   try {
-    const response = await axios.put(
-      `http://localhost:9000/api/v1/cart/${cartId}/${itemId}`,
-      { userId }
-    );
+    const response = await axios.put(`api/v1/cart/${cartId}/${itemId}`, {
+      userId,
+    });
     return response;
   } catch (error) {
     console.error(

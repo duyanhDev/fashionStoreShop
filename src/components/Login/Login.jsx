@@ -7,9 +7,13 @@ import { LoginAuth } from "../../service/Auth";
 import { login } from "../../redux/actions/Auth";
 import { useNavigate } from "react-router-dom";
 import ForgetPassword from "../ForgetPassword/ForgetPassword";
+import Register from "../Register/Register";
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const [modal2Open, setModal2Open] = useState(false);
+
   const [errors, setErrors] = useState({ email: "", password: "" });
 
   const [open, setOpen] = useState(false);
@@ -91,6 +95,9 @@ const LoginForm = () => {
     }, 2000);
   };
 
+  const handelRegister = () => {
+    setModal2Open(true);
+  };
   return (
     <div className="min-h-screen flex">
       {contextHolder}
@@ -106,7 +113,7 @@ const LoginForm = () => {
       {/* Right side - Login Form */}
       <div className="w-1/3 flex items-center justify-center bg-white p-8">
         <div className="w-full max-w-md">
-          <form className="flex flex-col w-full pb-6 text-center">
+          <div className="flex flex-col w-full pb-6 text-center">
             <h3 className="mb-3 text-4xl font-extrabold text-dark-grey-900">
               Sign In
             </h3>
@@ -210,13 +217,13 @@ const LoginForm = () => {
                 Not registered yet?{" "}
                 <button
                   className="font-bold text-grey-700"
-                  onClick={() => navigate("/")}
+                  onClick={() => handelRegister()}
                 >
                   Create an Account
                 </button>
               </p>
             </div>
-          </form>
+          </div>
         </div>
         <ForgetPassword
           open={open}
@@ -224,6 +231,7 @@ const LoginForm = () => {
           setOpen={setOpen}
           setLoading={setLoading}
         />
+        <Register modal2Open={modal2Open} setModal2Open={setModal2Open} />
       </div>
     </div>
   );

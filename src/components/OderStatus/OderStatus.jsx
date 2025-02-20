@@ -21,6 +21,12 @@ const socket = io("http://localhost:9000", {
   reconnectionAttempts: 5,
 });
 
+// const socket = io("https://fashionstoreshop.onrender.com/", {
+//   withCredentials: true,
+//   reconnection: true,
+//   reconnectionAttempts: 5,
+// });
+
 const OderStatus = () => {
   const param = useParams();
   const [orderStatus, SetOrderStatus] = useState("");

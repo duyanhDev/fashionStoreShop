@@ -1,7 +1,7 @@
 import axios from "./../untils/axios";
 
 const listOderUserIdAPI = async (userId) => {
-  return await axios.get(`http://localhost:9000/api/v1/order/${userId}`);
+  return await axios.get(`api/v1/order/${userId}`);
 };
 
 // tạo hóa đơn
@@ -30,7 +30,7 @@ const createOrder = async (
       image: item.imageUrl, // price must be provided
     }));
 
-    const response = await axios.post("http://localhost:9000/api/v1/order", {
+    const response = await axios.post("api/v1/order", {
       userId,
       username,
       phone,
@@ -61,10 +61,7 @@ const createOrder = async (
 
 const updateShipping = async (id) => {
   try {
-    const response = await axios.post(
-      "http://localhost:9000/api/v1/check-orderShipping",
-      { id: id }
-    );
+    const response = await axios.post("api/v1/check-orderShipping", { id: id });
 
     return response.data; // Trả về dữ liệu từ API nếu thành công
   } catch (error) {
@@ -82,28 +79,28 @@ const updateShipping = async (id) => {
 
 // hoàn thành
 const UpDateCompleted = async (id) => {
-  return await axios.post("http://localhost:9000/api/v1/check-orderCompleted", {
+  return await axios.post("api/v1/check-orderCompleted", {
     id: id,
   });
 };
 const ListAllSumProduct = async () => {
-  return await axios.get("http://localhost:9000/api/v1/get-quantity-all");
+  return await axios.get("api/v1/get-quantity-all");
 };
 
 // sum price oder one proudct
 const ListOderProductsAll = async () => {
-  return await axios.get("http://localhost:9000/api/v1/get-order-all");
+  return await axios.get("api/v1/get-order-all");
 };
 
 // xác nhận đơn hàng
 const UpDateOrderProductAPI = async (id, totalPrice) => {
-  return await axios.put(`http://localhost:9000/api/v1/order/${id}`, {
+  return await axios.put(`api/v1/order/${id}`, {
     totalPrice,
   });
 };
 
 const OrderStatusOneProduct = async (id) => {
-  return await axios.get(`http://localhost:9000/api/v1/get-order-one/${id}`);
+  return await axios.get(`api/v1/get-order-one/${id}`);
 };
 
 export {

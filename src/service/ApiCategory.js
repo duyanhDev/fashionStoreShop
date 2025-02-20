@@ -1,29 +1,29 @@
 import axios from "./../untils/axios";
 
 const ListCategoryAPI = async () => {
-  return await axios.get("http://localhost:9000/api/v1/category");
+  return await axios.get("api/v1/category");
 };
 
 const AddCategoryAPI = async (name, description) => {
-  return await axios.post("http://localhost:9000/api/v1/category", {
+  return await axios.post("api/v1/category", {
     name,
     description,
   });
 };
 
 const ListOneCategoryAPI = async (id) => {
-  return await axios.get(`http://localhost:9000/api/v1/category/${id}`);
+  return await axios.get(`api/v1/category/${id}`);
 };
 
 const UpdateOneCatogryAPI = async (id, name, description) => {
-  return await axios.put(`http://localhost:9000/api/v1/category/${id}`, {
+  return await axios.put(`api/v1/category/${id}`, {
     name,
     description,
   });
 };
 
 const DeleteOneCategoryAPI = async (id) => {
-  return await axios.delete(`http://localhost:9000/api/v1/category/${id}`);
+  return await axios.delete(`api/v1/category/${id}`);
 };
 const CategoryProductsGender = async (
   gender,
@@ -36,7 +36,7 @@ const CategoryProductsGender = async (
   sortSold,
   page
 ) => {
-  return axios.get(`http://localhost:9000/api/v1/categoryProductsFilter`, {
+  return axios.get(`api/v1/categoryProductsFilter`, {
     params: {
       gender,
       category,
@@ -52,9 +52,7 @@ const CategoryProductsGender = async (
 };
 
 const CategoryGenderFitterAPI = async (gender, category, page) => {
-  return axios.get(
-    `http://localhost:9000/api/v1/categoryfilter/${gender}/${category}/${page}`
-  );
+  return axios.get(`api/v1/categoryfilter/${gender}/${category}/${page}`);
 };
 export {
   ListCategoryAPI,
