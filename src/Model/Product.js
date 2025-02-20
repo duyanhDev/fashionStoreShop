@@ -183,20 +183,6 @@ productSchema.pre("save", function (next) {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
-
-  // Tạo từ khóa tìm kiếm kết hợp nhiều thông tin
-  // this.searchKeywords = [
-  //   this.name,
-  //   this.normalizedName,
-  //   this.brand,
-  //   ...this.name.split(" "),
-  //   ...this.normalizedName.split(" "),
-  //   this.gender,
-  //   // Thêm màu sắc vào từ khóa tìm kiếm
-  //   ...this.color,
-  //   // Thêm size vào từ khóa tìm kiếm
-  //   ...this.size,
-  // ].filter(Boolean); // Loại bỏ các giá trị null/undefined/empty
   next();
 });
 
