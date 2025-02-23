@@ -179,16 +179,6 @@ const CreateOrder = async (req, res) => {
     const idsToDelete = productId; // productId là mảng các _id cần xóa
 
     // Sử dụng $pull để xóa các phần tử trong mảng items
-    const resultCart = await Cart.updateOne(
-      { _id: CartId },
-      { $pull: { items: { productId: { $in: idsToDelete } } } }
-    );
-
-    if (resultCart.modifiedCount > 0) {
-      console.log(`${idsToDelete.length} sản phẩm đã được xóa khỏi giỏ hàng.`);
-    } else {
-      console.log("Không có sản phẩm nào được xóa.");
-    }
 
     const nameProduct = newOrder.items.map((item) => item.name);
     console.log(nameProduct);
@@ -203,7 +193,7 @@ const CreateOrder = async (req, res) => {
       orderId: newOrder._id,
       products: formattedProducts,
       isAdmin: false,
-      message: `Bạn đã đặt hàng thành công với các sản phẩm: ${nameProduct}`,
+      message: `Bạn đã đặt hàng thành công với các sản phẩm và đang chờ shop xác nhận: ${nameProduct}`,
       isCheck: false,
     });
     await userNotification.save();
@@ -212,7 +202,7 @@ const CreateOrder = async (req, res) => {
       orderId: newOrder._id,
       status: "Shipping",
       data: newOrder,
-      message: `Bạn đã đặt hàng thành công với các sản phẩm: ${nameProduct.join(
+      message: `Bạn đã đặt hàng thành công với các sản phẩm và đang chờ shop xác nhận: ${nameProduct.join(
         ", "
       )}`,
     });
@@ -249,6 +239,7 @@ const CreateOrder = async (req, res) => {
           merchantinfo: "Doisin Store",
           promotioninfo: "",
           redirectdata: "",
+          bankgroup: "ATM", // Đưa thẳng vào embed_data
         };
 
         // Tạo item array với đầy đủ thông tin
@@ -300,7 +291,18 @@ const CreateOrder = async (req, res) => {
         // Gửi request đến ZaloPay v2
         const result = await axios.post(config.endpoint, order);
         console.log("ZaloPay response:", result.data);
+        let resultCart = await Cart.updateOne(
+          { _id: CartId },
+          { $pull: { items: { productId: { $in: idsToDelete } } } }
+        );
 
+        if (resultCart.modifiedCount > 0) {
+          console.log(
+            `${idsToDelete.length} sản phẩm đã được xóa khỏi giỏ hàng.`
+          );
+        } else {
+          console.log("Không có sản phẩm nào được xóa.");
+        }
         if (result.data.return_code === 1) {
           return res.status(200).json({
             EC: 0,
@@ -369,9 +371,18 @@ const CreateOrder = async (req, res) => {
       const vnpUrl = `${process.env.vnp_Url}?${qs.stringify(vnp_Params, {
         encode: false,
       })}`;
-      console.log("vnpram", vnp_Params);
+      let resultCart = await Cart.updateOne(
+        { _id: CartId },
+        { $pull: { items: { productId: { $in: idsToDelete } } } }
+      );
 
-      console.log("vnpUrl", vnpUrl);
+      if (resultCart.modifiedCount > 0) {
+        console.log(
+          `${idsToDelete.length} sản phẩm đã được xóa khỏi giỏ hàng.`
+        );
+      } else {
+        console.log("Không có sản phẩm nào được xóa.");
+      }
 
       return res.status(200).json({
         EC: 0,
@@ -379,6 +390,18 @@ const CreateOrder = async (req, res) => {
         vnpUrl: vnpUrl,
       });
     } else if (paymentMethod === "cod") {
+      let resultCart = await Cart.updateOne(
+        { _id: CartId },
+        { $pull: { items: { productId: { $in: idsToDelete } } } }
+      );
+
+      if (resultCart.modifiedCount > 0) {
+        console.log(
+          `${idsToDelete.length} sản phẩm đã được xóa khỏi giỏ hàng.`
+        );
+      } else {
+        console.log("Không có sản phẩm nào được xóa.");
+      }
       return res.status(200).json({
         EC: 0,
         message:
@@ -439,8 +462,19 @@ const CreateOrder = async (req, res) => {
             "Content-Type": "application/json",
           },
         });
-        console.log(response.data);
 
+        let resultCart = await Cart.updateOne(
+          { _id: CartId },
+          { $pull: { items: { productId: { $in: idsToDelete } } } }
+        );
+
+        if (resultCart.modifiedCount > 0) {
+          console.log(
+            `${idsToDelete.length} sản phẩm đã được xóa khỏi giỏ hàng.`
+          );
+        } else {
+          console.log("Không có sản phẩm nào được xóa.");
+        }
         // Only send the response data back to the client
         return res.status(200).json({
           EC: 0,
@@ -503,10 +537,11 @@ const listOderUserId = async (req, res) => {
     });
   }
 };
+
+// duyệt đơn hàng thành công
 const UpDateOrder = async (req, res) => {
   try {
     const { id } = req.params;
-    const { totalPrice } = req.body;
 
     const order = await Order.findOneAndUpdate(
       { _id: id },
@@ -517,16 +552,6 @@ const UpDateOrder = async (req, res) => {
       { new: true } // Chỉ định trả về đối tượng đã cập nhật
     );
 
-    const user = await Users.findOneAndUpdate(
-      { _id: order.userId },
-      {
-        $inc: { totalPrice: totalPrice }, // Sử dụng $inc để cộng dồn giá trị
-      },
-      { new: true }
-    );
-    if (!user) {
-      return res.status(404).json({ message: "Order not found" });
-    }
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
@@ -541,7 +566,7 @@ const UpDateOrder = async (req, res) => {
       orderId: order._id,
       products: formattedProducts,
       isAdmin: false,
-      message: `Đơn hàng của bạn đã được shop xác nhận giao hàng thành công: ${nameProduct}`,
+      message: `Đơn hàng của bạn đang được shop xác nhận : ${nameProduct}`,
       isCheck: false,
       feedBack: true,
     });
@@ -585,7 +610,7 @@ const UpDateOrder = async (req, res) => {
       orderId: order._id,
       status: "Shipping",
       data: order,
-      message: `Đơn hàng của bạn đã được shop xác nhận giao hàng thành công: ${nameProduct.join(
+      message: `Đơn hàng của bạn đang được chờ shop chờ xác nhận: ${nameProduct.join(
         ", "
       )}`,
     });
@@ -598,6 +623,7 @@ const UpDateOrder = async (req, res) => {
   }
 };
 
+// chờ giao hàng
 const UpDateDelivered = async (req, res) => {
   try {
     const { id } = req.body;
@@ -628,7 +654,7 @@ const UpDateDelivered = async (req, res) => {
       orderId: order._id,
       products: formattedProducts,
       isAdmin: false,
-      message: `Đơn hàng của bạn đã được shop xác nhận thành công: ${nameProduct.join(
+      message: `Đơn hàng của bạn đã được shop giao bên vận chuyển thành công: ${nameProduct.join(
         ", "
       )}`,
       isCheck: false,
@@ -641,7 +667,7 @@ const UpDateDelivered = async (req, res) => {
       orderId: order._id,
       status: "Shipping",
       data: order,
-      message: `Đơn hàng của bạn đã được shop xác nhận thành công: ${nameProduct.join(
+      message: `Đơn hàng của bạn đã được shop giao bên vận chuyển thành công: ${nameProduct.join(
         ", "
       )}`,
     });
@@ -655,9 +681,12 @@ const UpDateDelivered = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+// giao hàng thành công
 const UpDateCompleted = async (req, res) => {
   try {
     const { id } = req.body;
+    const { totalPrice } = req.body;
 
     // Cập nhật trạng thái đơn hàng
     const order = await Order.findOneAndUpdate(
@@ -667,6 +696,33 @@ const UpDateCompleted = async (req, res) => {
       },
       { new: true }
     );
+
+    const user = await Users.findOneAndUpdate(
+      { _id: order.userId },
+      {
+        $inc: { totalPrice: totalPrice }, // Sử dụng $inc để cộng dồn giá trị
+      },
+      { new: true }
+    );
+    if (!user) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Cập nhật userGroup theo tổng tiền mới
+    let updatedUserGroup = "all"; // Mặc định
+    if (user.totalPrice >= 100000000) {
+      updatedUserGroup = "loyalCustomer";
+    } else if (user.totalPrice >= 10000000) {
+      updatedUserGroup = "vip";
+    } else if (user.totalPrice >= 1000000) {
+      updatedUserGroup = "newUser";
+    }
+
+    // Nếu userGroup thay đổi, cập nhật lại trong database
+    if (user.userGroup !== updatedUserGroup) {
+      user.userGroup = updatedUserGroup;
+      await user.save(); // Lưu thay đổi
+    }
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
@@ -683,7 +739,7 @@ const UpDateCompleted = async (req, res) => {
       orderId: order._id,
       products: formattedProducts,
       isAdmin: false,
-      message: `Đơn hàng của bạn đã được bên vận chuyển giao thành công: ${nameProduct.join(
+      message: `Đơn hàng của bạn đã được giao bên vận chuyển giao thành công: ${nameProduct.join(
         ", "
       )}`,
       isCheck: false,
@@ -696,6 +752,9 @@ const UpDateCompleted = async (req, res) => {
       orderId: order._id,
       status: "Shipping",
       data: order,
+      message: `Đơn hàng của bạn đã được shop giao bên vận chuyển thành công: ${nameProduct.join(
+        ", "
+      )}`,
     });
     // Phản hồi API thành công
     return res.status(200).json({

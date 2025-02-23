@@ -22,6 +22,11 @@ const UserSchema = new mongoose.Schema(
     cart: [{ type: mongoose.Schema.Types.ObjectId, ref: "Cart" }],
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
     orders: [{ type: mongoose.Schema.Types.ObjectId, ref: "Order" }],
+    userGroup: {
+      type: String,
+      enum: ["all", "newUser", "vip", "loyalCustomer"],
+      default: "all",
+    },
   },
   { timestamps: { createdAt: "created_at", updatedAt: "updatedAt" } }
 );
@@ -29,6 +34,15 @@ const UserSchema = new mongoose.Schema(
 UserSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
+  if (this.totalPrice >= 100000000) {
+    this.userGroup = "loyalCustomer";
+  } else if (this.totalPrice >= 10000000) {
+    this.userGroup = "vip";
+  } else if (this.totalPrice >= 1000000) {
+    this.userGroup = "newUser";
+  } else {
+    this.userGroup = "all";
+  }
   next();
 });
 
