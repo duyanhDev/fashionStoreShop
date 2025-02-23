@@ -5,17 +5,17 @@ import io from "socket.io-client";
 import { getMessages, sendMessageCutomer } from "../../service/Message";
 import { useSelector } from "react-redux";
 
-// const socket = io("http://localhost:9000", {
-//   withCredentials: true,
-//   reconnection: true,
-//   reconnectionAttempts: 5,
-// });
-
-const socket = io("https://fashionstoreshop.onrender.com/", {
+const socket = io("http://localhost:9000", {
   withCredentials: true,
   reconnection: true,
   reconnectionAttempts: 5,
 });
+
+// const socket = io("https://fashionstoreshop.onrender.com/", {
+//   withCredentials: true,
+//   reconnection: true,
+//   reconnectionAttempts: 5,
+// });
 
 const Message = ({ open, setOpen }) => {
   const { user } = useSelector((state) => state.auth);
@@ -73,7 +73,7 @@ const Message = ({ open, setOpen }) => {
     if (!user?._id) return;
 
     try {
-      let res = await getMessages(user._id, "673017dde4526bd79cc61fa6");
+      let res = await getMessages(user._id, "67811ed647cd0befde453481");
       if (res?.data) {
         setMessages(res.data);
         scrollToBottom();

@@ -409,14 +409,16 @@ function App() {
         </button>
       </div>
 
-      <div className="fixed right-0 bottom-14 mb-24 chat_sp transition-opacity duration-300 z-10">
-        <button
-          className="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center text-white hover:bg-blue-800 transition-colors text-wrap"
-          onClick={() => setOpen((prve) => !prve)}
-        >
-          CHAT
-        </button>
-      </div>
+      {!user.isAdmin && (
+        <div className="fixed right-0 bottom-14 mb-24 chat_sp transition-opacity duration-300 z-10">
+          <button
+            className="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center text-white hover:bg-blue-800 transition-colors text-wrap"
+            onClick={() => setOpen((prve) => !prve)}
+          >
+            CHAT
+          </button>
+        </div>
+      )}
 
       {open && (
         <div className="fixed bottom-0 right-0 message_users">

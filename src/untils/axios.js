@@ -6,13 +6,13 @@ NProgress.configure({
   trickleSpeed: 100,
 });
 
-// const instance = axios.create({
-//   baseURL: "http://localhost:9000/",
-// });
-
 const instance = axios.create({
-  baseURL: "https://fashionstoreshop.onrender.com/",
+  baseURL: "http://localhost:9000/",
 });
+
+// const instance = axios.create({
+//   baseURL: "https://fashionstoreshop.onrender.com/",
+// });
 
 // Add a request interceptor
 instance.interceptors.request.use(

@@ -78,9 +78,10 @@ const updateShipping = async (id) => {
 };
 
 // hoàn thành
-const UpDateCompleted = async (id) => {
+const UpDateCompleted = async (id, totalPrice) => {
   return await axios.post("api/v1/check-orderCompleted", {
     id: id,
+    totalPrice: totalPrice,
   });
 };
 const ListAllSumProduct = async () => {
@@ -93,10 +94,8 @@ const ListOderProductsAll = async () => {
 };
 
 // xác nhận đơn hàng
-const UpDateOrderProductAPI = async (id, totalPrice) => {
-  return await axios.put(`api/v1/order/${id}`, {
-    totalPrice,
-  });
+const UpDateOrderProductAPI = async (id) => {
+  return await axios.put(`api/v1/order/${id}`);
 };
 
 const OrderStatusOneProduct = async (id) => {

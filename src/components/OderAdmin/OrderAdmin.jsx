@@ -170,9 +170,7 @@ const OrderAdmin = () => {
                       return (
                         <Button
                           className="btn btn-warning"
-                          onClick={() =>
-                            handleCheckOrder(item._id, item.totalAmount)
-                          }
+                          onClick={() => handleCheckOrder(item._id)}
                         >
                           Chờ xác nhận
                         </Button>
@@ -190,7 +188,9 @@ const OrderAdmin = () => {
                       return (
                         <Button
                           className="btn btn-info"
-                          onClick={() => updateCompleteOrder(item._id)}
+                          onClick={() =>
+                            updateCompleteOrder(item._id, item.totalAmount)
+                          }
                         >
                           Đang giao
                         </Button>
@@ -258,9 +258,9 @@ const OrderAdmin = () => {
   };
   console.log(data);
 
-  const handleCheckOrder = async (id, totalPrice) => {
+  const handleCheckOrder = async (id) => {
     try {
-      let res = await UpDateOrderProductAPI(id, totalPrice);
+      let res = await UpDateOrderProductAPI(id);
       if (res) {
         api.open({
           message: "Đơn hàng đã được duyệt",
@@ -304,11 +304,10 @@ const OrderAdmin = () => {
     }
   };
 
-  const updateCompleteOrder = async (id) => {
+  const updateCompleteOrder = async (id, totalPrice) => {
     try {
-      let res = await UpDateCompleted(id);
+      let res = await UpDateCompleted(id, totalPrice);
       console.log(res);
-
       if (
         res &&
         res.data &&

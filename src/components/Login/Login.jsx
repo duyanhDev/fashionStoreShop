@@ -1,6 +1,7 @@
 import { FcGoogle } from "react-icons/fc";
 import { FaCheckSquare } from "react-icons/fa";
-import { Button, notification } from "antd";
+import { Button, notification, Spin, Input } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
 import { LoginAuth } from "../../service/Auth";
@@ -8,7 +9,9 @@ import { login } from "../../redux/actions/Auth";
 import { useNavigate } from "react-router-dom";
 import ForgetPassword from "../ForgetPassword/ForgetPassword";
 import Register from "../Register/Register";
+import "./Login.css";
 const LoginForm = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -62,14 +65,17 @@ const LoginForm = () => {
 
     try {
       let res = await LoginAuth(email, password);
-
+      setIsLoading(true);
       if (res && res.data.EC === 0) {
-        dispatch(login(res.data.data.token, res.data.data.user));
-        api["success"]({
-          message: "Đăng nhập thành công",
-          description: "Chào mừng bạn đã quay trở lại",
-        });
-        navigate("/");
+        setTimeout(() => {
+          dispatch(login(res.data.data.token, res.data.data.user));
+          api["success"]({
+            message: "Đăng nhập thành công",
+            description: "Chào mừng bạn đã quay trở lại",
+          });
+          navigate("/");
+          setIsLoading(false);
+        }, 5000);
       } else {
         api["error"]({
           message: "Lỗi đăng nhập",
@@ -77,9 +83,10 @@ const LoginForm = () => {
         });
       }
     } catch (error) {
+      setIsLoading(false);
       api["error"]({
         message: "Lỗi đăng nhập",
-        description: "Đã có lỗi xảy ra, vui lòng thử lại sau",
+        description: "Vui lòng nhập đúng tài khoản hoặc mật khẩu",
       });
       console.error("Login error:", error);
     }
@@ -103,6 +110,13 @@ const LoginForm = () => {
       {contextHolder}
       {/* Left side - Image */}
       <div className="w-8/12">
+        {isLoading && (
+          <Spin
+            className="spin_loading"
+            indicator={<LoadingOutlined spin />}
+            size="large"
+          />
+        )}
         <img
           src="https://marketplace.canva.com/EAFfT9NH-JU/1/0/1600w/canva-gray-minimalist-fashion-big-sale-banner-TvkdMwoxWP8.jpg"
           className="w-full h-full object-cover"
@@ -165,7 +179,7 @@ const LoginForm = () => {
             >
               Password*
             </label>
-            <input
+            <Input.Password
               id="password"
               type="password"
               placeholder="Enter a password"

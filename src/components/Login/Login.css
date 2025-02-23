@@ -1,0 +1,11 @@
+.spin_loading {
+  z-index: 99999;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
