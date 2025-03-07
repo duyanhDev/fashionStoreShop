@@ -12,6 +12,10 @@ const crypto = require("crypto");
 const { Server } = require("socket.io");
 const server = http.createServer(app);
 
+const passport = require("passport");
+const configurePassport = require("./Config/passport");
+const authRoutes = require("./Routes/auth");
+const session = require("express-session");
 // Cấu hình CORS cho Socket.IO
 const io = new Server(server, {
   cors: {
@@ -31,6 +35,18 @@ app.use(
 );
 
 app.use(express.json());
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+configurePassport(passport);
+
 app.use(fileUpload());
 
 // Route cơ bản
@@ -145,6 +161,7 @@ app.post("/zalopay-callback", async (req, res) => {
 
 // Thêm Router API
 app.use("/api/v1/", RouterAPI);
+app.use("/auth", authRoutes);
 app.set("io", io);
 // Kết nối Socket.IO
 // app.use((req, res, next) => {

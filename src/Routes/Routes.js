@@ -61,7 +61,10 @@ const {
   sendMessageToAdminAPI,
   getMessagesList,
   UpdateStatusIsRead,
+  getMessagesSenderList,
 } = require("./../Controllers/MessageChat");
+
+const { addVoucherAPI, listVoucherAPI } = require("../Controllers/Voucher");
 
 //product
 
@@ -142,5 +145,10 @@ RouterAPI.post("/admin/send", sendMessageToAdminAPI);
 RouterAPI.get("/message", getMessages);
 RouterAPI.get("/message/all-users", getMessagesList);
 RouterAPI.post("/update-isread", UpdateStatusIsRead);
+RouterAPI.get("/get-list-sender/:sender", getMessagesSenderList);
 
+// Voucher
+
+RouterAPI.post("/add-voucher", addVoucherAPI);
+RouterAPI.get("/voucher", listVoucherAPI);
 module.exports = RouterAPI;

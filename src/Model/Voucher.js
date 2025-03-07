@@ -8,6 +8,9 @@ const voucherSchema = new mongoose.Schema(
       unique: true,
       uppercase: true,
     },
+    content: {
+      type: String,
+    },
     discountType: {
       type: String,
       enum: ["percentage", "fixed"], //Loại giảm giá (percentage hoặc fixed).
@@ -20,16 +23,6 @@ const voucherSchema = new mongoose.Schema(
     minOrderValue: {
       type: Number, //Giá trị đơn hàng tối thiểu để áp dụng voucher.
       default: 0,
-    },
-    category: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
-      default: null,
-    },
-    product: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
-      default: null,
     },
     startDate: {
       type: Date,

@@ -226,10 +226,80 @@ const UpdateStatusIsRead = async (req, res) => {
   }
 };
 
+const getMessagesSenderList = async (req, res) => {
+  try {
+    const { sender } = req.params; // sender là userId của người dùng hiện tại
+    if (!sender) {
+      return res.status(400).json({
+        EC: 1,
+        message: "userId is required",
+      });
+    }
+
+    // Truy vấn tin nhắn mà người dùng hiện tại (sender) gửi hoặc nhận
+    const messages = await Message.find({
+      $or: [
+        { sender: sender }, // Tin nhắn mà user gửi
+        { recipient: sender }, // Tin nhắn mà user nhận
+      ],
+    })
+      .populate({
+        path: "sender", // Lấy thông tin người gửi
+        select: "avatar name",
+      })
+      .populate({
+        path: "recipient", // Lấy thông tin người nhận
+        select: "avatar name",
+      })
+      .sort({ sentAt: -1 }); // Sắp xếp theo thời gian, mới nhất trước
+
+    // Nhóm tin nhắn theo người liên quan và lấy tin nhắn mới nhất
+    const conversations = {};
+    messages.forEach((message) => {
+      // Xác định người liên quan (ngoài user hiện tại)
+      const otherUserId =
+        message.sender._id.toString() === sender
+          ? message.recipient._id.toString()
+          : message.sender._id.toString();
+
+      // Chỉ cập nhật nếu chưa có hoặc tin nhắn hiện tại mới hơn
+      if (
+        !conversations[otherUserId] ||
+        new Date(message.sentAt) > new Date(conversations[otherUserId].sentAt)
+      ) {
+        conversations[otherUserId] = {
+          recipient:
+            message.sender._id.toString() === sender
+              ? message.recipient
+              : message.sender, // Người liên quan (ngoài user hiện tại)
+          messageSender: message.sender, // Người gửi tin nhắn mới nhất
+          content: message.content,
+          sentAt: message.sentAt,
+          isRead: message.isRead || false,
+        };
+      }
+    });
+
+    // Chuyển đổi object conversations thành mảng để trả về
+    const senderList = Object.values(conversations);
+
+    return res.status(200).json({
+      EC: 0,
+      data: senderList, // Trả về danh sách các cuộc trò chuyện
+    });
+  } catch (error) {
+    console.error("Error in getMessagesSenderList:", error);
+    return res.status(500).json({
+      EC: 1,
+      message: "Internal server error",
+    });
+  }
+};
 module.exports = {
   sendMessageCutomerAPI,
   sendMessageToAdminAPI,
   getMessages,
   getMessagesList,
   UpdateStatusIsRead,
+  getMessagesSenderList,
 };
