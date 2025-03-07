@@ -21,6 +21,7 @@ import ChatSp from "../components/SupportChat/ChatSp";
 import UpLoad from "../components/UpLoadProducts/UpLoad";
 import UserStatsCard from "../components/UserChar/UserChart";
 import VNpay from "../components/VNpay/VNpay";
+import Voucher from "../components/Voucher/Voucher";
 import View from "../components/VỉewProducts/View";
 
 export const RouterLayout = [
@@ -88,6 +89,7 @@ export const RouterAdmin = [
       { path: "viewproduct/:id", element: <View /> },
       { path: "order", element: <OrderAdmin /> },
       { path: "support-chat", element: <ChatSp /> },
+      { path: "voucher", element: <Voucher /> },
     ],
   },
 ];

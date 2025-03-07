@@ -105,6 +105,11 @@ const LoginForm = () => {
   const handelRegister = () => {
     setModal2Open(true);
   };
+
+  const handleGoogleLogin = () => {
+    // Chuyển hướng đến backend để bắt đầu quá trình xác thực Google
+    window.location.href = "http://localhost:9000/auth/google";
+  };
   return (
     <div className="min-h-screen flex">
       {contextHolder}
@@ -135,7 +140,10 @@ const LoginForm = () => {
 
             <div className="flex items-center justify-center gap-2 mb-6">
               <FcGoogle size={30} />
-              <button className="px-4 py-2 text-sm font-medium transition duration-300 rounded-2xl text-grey-900 bg-grey-300 hover:bg-grey-400 focus:ring-4 focus:ring-grey-300">
+              <button
+                className="px-4 py-2 text-sm font-medium transition duration-300 rounded-2xl text-grey-900 bg-grey-300 hover:bg-grey-400 focus:ring-4 focus:ring-grey-300"
+                onClick={handleGoogleLogin}
+              >
                 Sign in with Google
               </button>
             </div>

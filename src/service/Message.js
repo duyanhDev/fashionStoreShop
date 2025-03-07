@@ -93,10 +93,15 @@ const UpdateIsReadAPI = async (sender, recipient) => {
     recipient,
   });
 };
+
+const getListSender = async (sender) => {
+  return await axios.get(`api/v1/get-list-sender/${sender}`);
+};
 export {
   getMessages,
   sendMessageCutomer,
   getMessagesList,
   sendMessageAdmin,
   UpdateIsReadAPI,
+  getListSender,
 };

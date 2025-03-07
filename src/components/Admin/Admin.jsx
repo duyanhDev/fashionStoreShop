@@ -1,6 +1,8 @@
 import { Link, Outlet } from "react-router-dom";
 import "./Admin.css";
 import {
+  GifOutlined,
+  GiftFilled,
   MessageOutlined,
   SearchOutlined,
   UserOutlined,
@@ -85,6 +87,12 @@ const Admin = () => {
               <Link to="/admin/support-chat" className="nav-link">
                 <MessageOutlined />
                 Support Chat
+              </Link>
+            </li>
+            <li>
+              <Link to="/admin/voucher" className="nav-link">
+                <GiftFilled />
+                Voucher
               </Link>
             </li>
           </ul>

@@ -5,6 +5,7 @@ import { RouterLayout, RouterAdmin } from "./Routes/Router";
 import App from "./App";
 import { useSelector } from "react-redux";
 import LoginForm from "./components/Login/Login";
+import AuthCallback from "./components/AuthCallback/AuthCallback";
 function MainLayout() {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
 
@@ -17,6 +18,7 @@ function MainLayout() {
           ))}
         </Route>
         <Route path="/login" element={<LoginForm />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         {isAuthenticated && user.isAdmin === true ? (
           RouterAdmin.map((adminRoute, index) => (
             <Route

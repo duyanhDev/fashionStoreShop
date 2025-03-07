@@ -7,7 +7,8 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import { createOrder } from "../../service/Oder";
 import { SmileOutlined } from "@ant-design/icons";
 import ClipLoader from "react-spinners/ClipLoader";
-
+import { getVoucherAPI } from "../../service/APIVoucher,js";
+import moment from "moment";
 const CartProducts = ({}) => {
   const { ListCart, user, CartListProductsUser } = useOutletContext();
 
@@ -32,6 +33,7 @@ const CartProducts = ({}) => {
   const [fullAddress, setFullAddress] = useState("");
   const [CartId, setCartId] = useState("");
   const [productId, setProductId] = useState([]);
+  const [voucher, setVoucher] = useState("");
 
   const formatPrice = (price) => {
     // Nếu price là chuỗi, chuyển đổi nó thành một số
@@ -499,6 +501,25 @@ const CartProducts = ({}) => {
     }
   };
 
+  const fetchApiVoucher = async () => {
+    try {
+      let res = await getVoucherAPI();
+
+      if (res.data && res.data.EC === 0) {
+        setVoucher(res.data.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    fetchApiVoucher();
+  }, []);
+
+  const [selectedVouCher, setSelectedVoucher] = useState(null);
+  const onChangeVoucher = (id) => {
+    setSelectedVoucher((prve) => (prve === id ? null : id));
+  };
   return (
     <div className="h-screen w-full mt-28">
       <div className="cart flex justify-between">
@@ -711,8 +732,49 @@ const CartProducts = ({}) => {
               className: "pagination-custom",
             }}
           />
+
+          <div className="voucher relative top-70 right-0 mr-6 flex gap-2 overflow-x-auto whitespace-nowrap">
+            {voucher &&
+              voucher.length > 0 &&
+              voucher.map((voucher, index) => {
+                return (
+                  <label
+                    key={index + 1}
+                    className="flex items-center justify-between w-80 h-32 bg-[#f1f1f1] shrink-0 border border-gray-300 rounded-md px-3 cursor-pointer"
+                    onClick={() => onChangeVoucher(voucher._id)}
+                    htmlFor="voucher"
+                  >
+                    <div className="flex-1 py-5">
+                      <span className="font-bold text-sm">{voucher.code}</span>
+                      <i className="text-sm font-medium">
+                        (Còn {voucher.usageLimit})
+                      </i>
+                      <div>
+                        <span className="whitespace-pre-wrap text-sm">
+                          {voucher.content}
+                        </span>
+                      </div>
+                      <div className="flex justify-between mt-4">
+                        <span className="text-sm">
+                          HSD : {moment(voucher.endDate).format("DD-MM-YYYY")}
+                        </span>
+                        <span className="text-sm">Điều kiện</span>
+                      </div>
+                    </div>
+                    <input
+                      type="radio"
+                      name="voucher"
+                      className="w-5 h-5"
+                      checked={selectedVouCher === voucher._id}
+                      readOnly
+                    />
+                  </label>
+                );
+              })}
+          </div>
         </div>
       </div>
+
       <div className="footer w-full flex">
         <div className="flex flex-1 cart_1 justify-between items-center">
           <div className="flex items-center justify-center flex-1 border-r-2 border-r-[#333]">

@@ -7,6 +7,7 @@ import {
   sendMessageAdmin,
   getMessagesList,
   UpdateIsReadAPI,
+  getListSender,
 } from "../../service/Message";
 import { useSelector } from "react-redux";
 
@@ -25,6 +26,7 @@ const ChatSp = () => {
   const { user } = useSelector((state) => state.auth);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [MessFriends, setMessFriends] = useState([]);
   const [data, SetData] = useState([]);
   const textareaRef = useRef(null);
   const messagesContainerRef = useRef(null);
@@ -71,6 +73,7 @@ const ChatSp = () => {
 
       setNewMessage("");
       scrollToBottom();
+      getListSenderId();
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -153,57 +156,61 @@ const ChatSp = () => {
       }
     } catch (error) {}
   };
-  const allMessages = [...data, ...messages].map((item) => {
-    return item;
-  }); // Sắp xếp mới nhất
-  console.log("x", messages);
-  console.log("data", data);
 
+  const getListSenderId = async () => {
+    try {
+      let res = await getListSender(user._id);
+
+      if (res.data && res.data.EC === 0) {
+        setMessFriends(res.data.data);
+      }
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    getListSenderId();
+  }, [user._id]);
   return (
     <div className="chat_container ">
       <div className="flex justify-between m-6 main_chat">
         <div className="w-1/5 main_chat-users">
           <h1 className="text_main-h1 text-center">Tất cả</h1>
-          {data
-            .filter(
-              (item, index, self) =>
-                item.sender?._id && // Kiểm tra item.recipient và item.recipient._id
-                index ===
-                  self.findIndex((t) => t.sender?._id === item.sender?._id)
-            )
-            .map(
-              (item) =>
-                item.sender?._id !== user._id && (
-                  <div
-                    key={item.sender._id}
-                    className="mt-5 cursor-pointer"
-                    onClick={onChangeIsread}
+          {MessFriends.filter(
+            (item, index, self) =>
+              item.recipient?._id &&
+              item.recipient?._id !== user._id && // Lọc bỏ cuộc trò chuyện với chính mình
+              index ===
+                self.findIndex((t) => t.recipient?._id === item.recipient?._id)
+          ).map((item) => (
+            <div
+              key={item.recipient._id}
+              className="mt-5 cursor-pointer"
+              onClick={onChangeIsread}
+            >
+              <div
+                className="flex justify-center gap-3 items-center"
+                onClick={() => handleChangeSetId(item.recipient._id)}
+              >
+                <img
+                  src={item.recipient.avatar}
+                  className="w-12 h-12 rounded-full"
+                  alt="avatar"
+                />
+                <div className="w-32">
+                  <span>{item.recipient.name}</span>
+                  <p
+                    className={`${
+                      item.isRead ? "text-blue-400" : "text-black  font-bold"
+                    }`}
                   >
-                    <div
-                      className="flex justify-center gap-3 items-center "
-                      onClick={() => handleChangeSetId(item.sender._id)}
-                    >
-                      <img
-                        src={item.sender.avatar}
-                        className="w-12 h-12 rounded-full "
-                        alt="avatar"
-                      />
-                      <div className="w-32">
-                        <span>{item.sender.name}</span>
-                        <p
-                          className={`${
-                            item.isRead
-                              ? "text-blue-400"
-                              : "text-black font-bold"
-                          }`}
-                        >
-                          {item.content}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )
-            )}
+                    {item.messageSender?._id === user?._id
+                      ? `Bạn: ${item.content}`
+                      : item.content}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
 
         <div className="w-4/5">
