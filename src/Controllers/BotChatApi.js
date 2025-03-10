@@ -11,7 +11,7 @@ const BotChatAPI = async (req, res) => {
   try {
     // Sending the request to the Ollama API
     const response = await ollama.chat({
-      model: "gemma2",
+      model: "gemma2:27b",
       messages: [{ role: "user", content: message }],
     });
 

@@ -3,7 +3,7 @@ const Users = require("./../Model/User");
 require("dotenv").config(); // Fix: added parentheses to call the function
 
 const configurePassport = (passport) => {
-  console.log("Google Client ID:", process.env.GOOGLE_CLIENT_ID); // Add this for debugging
+  console.log("Google Client ID:", process.env.GOOGLE_CLIENT_ID);
 
   passport.use(
     new GoogleStrategy(

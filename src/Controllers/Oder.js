@@ -3,6 +3,7 @@ const Users = require("./../Model/User");
 const Product = require("../Model/Product");
 const Cart = require("../Model/Cart");
 const Notifications = require("../Model/Notifications");
+const Voucher = require("../Model/Voucher");
 const qs = require("qs");
 const crypto = require("crypto");
 const moment = require("moment");
@@ -28,8 +29,9 @@ const CreateOrder = async (req, res) => {
       email,
       CartId,
       productId,
+      discountValue,
+      idDiscount,
     } = req.body;
-    console.log(items);
 
     if (!userId || !items || !paymentMethod || !shippingAddress) {
       return res
@@ -73,11 +75,14 @@ const CreateOrder = async (req, res) => {
       if (!product) {
         throw new Error("Product not found.");
       }
-      console.log(item.price);
 
-      // Calculate total amount for the order
-      totalAmount += item.price;
+      const discountAmount = (discountValue / 100) * item.price;
 
+      const finalPrice = item.price - discountAmount;
+
+      discountValue > 0
+        ? (totalAmount += finalPrice)
+        : (totalAmount += item.price);
       // Add product details to the email content
       emailContent += `
       <li style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #ffffff;">
@@ -143,6 +148,7 @@ const CreateOrder = async (req, res) => {
       shippingAddress,
       paymentMethod,
       totalAmount,
+      idDiscount,
     });
     await newOrder.save();
 
@@ -181,7 +187,6 @@ const CreateOrder = async (req, res) => {
     // Sử dụng $pull để xóa các phần tử trong mảng items
 
     const nameProduct = newOrder.items.map((item) => item.name);
-    console.log(nameProduct);
 
     const productIdItem = newOrder.items.map((item) => item.productId);
 
@@ -209,7 +214,6 @@ const CreateOrder = async (req, res) => {
     const admins = await Users.find({ isAdmin: true });
 
     if (!admins.length) {
-      console.log("No admins found!");
       return;
     }
     // Notification for admin
@@ -285,12 +289,9 @@ const CreateOrder = async (req, res) => {
           .update(data)
           .digest("hex");
 
-        console.log("Data string for MAC:", data);
-        console.log("Sending order:", order);
-
         // Gửi request đến ZaloPay v2
         const result = await axios.post(config.endpoint, order);
-        console.log("ZaloPay response:", result.data);
+
         let resultCart = await Cart.updateOne(
           { _id: CartId },
           { $pull: { items: { productId: { $in: idsToDelete } } } }
@@ -605,6 +606,7 @@ const UpDateOrder = async (req, res) => {
           .json({ message: `Product with ID ${item.productId} not found` });
       }
     }
+
     const io = req.app.get("io");
     io.emit(`order-update-${order.userId}`, {
       orderId: order._id,
@@ -727,6 +729,25 @@ const UpDateCompleted = async (req, res) => {
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
+
+    // trừ mã giảm giá
+    const idVoucher = order.idDiscount;
+
+    // Lấy voucher hiện tại để lấy usageLimit
+    const voucher = await Voucher.findById(idVoucher);
+    if (!voucher) {
+      throw new Error("Voucher không tồn tại");
+    }
+
+    // Giảm usageLimit và cập nhật lại voucher
+    const voucherProduct = await Voucher.findOneAndUpdate(
+      { _id: idVoucher },
+      {
+        $set: { usageLimit: voucher.usageLimit - 1 },
+      },
+      { new: true } // Để trả về dữ liệu mới sau khi cập nhật
+    );
+    console.log(voucherProduct);
 
     // Lấy danh sách sản phẩm từ đơn hàng
     const productIdItem = order.items.map((item) => item.productId);
