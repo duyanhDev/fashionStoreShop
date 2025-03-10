@@ -71,14 +71,13 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
         navigate(`/profile/${user.name}`);
       },
     },
-    {
+    user && {
       key: "3",
-      label: "Đơn hàng",
+      label: `Đơn hàng`,
       extra: "⌘B",
-      onClick: () => {
-        navigate("/order");
-      },
+      onClick: () => navigate("/order"),
     },
+
     {
       key: "4",
       label: "Settings",

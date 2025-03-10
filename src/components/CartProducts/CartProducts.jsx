@@ -35,6 +35,10 @@ const CartProducts = ({}) => {
   const [productId, setProductId] = useState([]);
   const [voucher, setVoucher] = useState("");
 
+  const [contentVoucher, setContentvoucher] = useState("");
+  const [idDiscount, setidDiscount] = useState("");
+  const [discountValue, setDiscountValue] = useState(0);
+
   const formatPrice = (price) => {
     // Nếu price là chuỗi, chuyển đổi nó thành một số
     const numericPrice =
@@ -109,7 +113,6 @@ const CartProducts = ({}) => {
   };
 
   const onChange = (e) => {
-    console.log("radio checked", e.target.value);
     setValue(e.target.value);
   };
 
@@ -158,7 +161,6 @@ const CartProducts = ({}) => {
           product;
 
         const imageUrl = images.props.src;
-        console.log("url", imageUrl);
 
         // Lưu productId vào allProductIds
         allProductIds.push(id);
@@ -350,10 +352,24 @@ const CartProducts = ({}) => {
     });
   };
 
+  const onChangediscountValue = (value, idDiscount, content) => {
+    setDiscountValue(value);
+    setidDiscount(idDiscount);
+    setContentvoucher(content);
+
+    if (selectedVouCher === idDiscount) {
+      setDiscountValue("");
+      setidDiscount(0);
+      setContentvoucher("");
+    }
+  };
+
   const totalCheckedPrice = checkedItems.reduce((total, itemId) => {
     return total + (priceObj[itemId] || 0);
   }, 0);
 
+  const discountAmount = (discountValue / 100) * totalCheckedPrice;
+  const finalPrice = totalCheckedPrice - discountAmount;
   const columns = [
     {
       title: "Hình Ảnh",
@@ -438,8 +454,7 @@ const CartProducts = ({}) => {
         productId: item.id, // Assuming `id` is the field that should be mapped to `productId`
       }));
 
-      console.log("xxx", formattedItems);
-
+      console.log(formattedItems);
       if (
         !Name ||
         !email ||
@@ -467,7 +482,9 @@ const CartProducts = ({}) => {
         value,
         email,
         CartId,
-        productId
+        productId,
+        discountValue,
+        idDiscount
       );
 
       if (res && res.data.EC === 0) {
@@ -737,6 +754,8 @@ const CartProducts = ({}) => {
             {voucher &&
               voucher.length > 0 &&
               voucher.map((voucher, index) => {
+                console.log(voucher);
+
                 return (
                   <label
                     key={index + 1}
@@ -767,6 +786,13 @@ const CartProducts = ({}) => {
                       className="w-5 h-5"
                       checked={selectedVouCher === voucher._id}
                       readOnly
+                      onChange={() =>
+                        onChangediscountValue(
+                          voucher.discountValue,
+                          voucher._id,
+                          voucher.content
+                        )
+                      }
                     />
                   </label>
                 );
@@ -827,7 +853,7 @@ const CartProducts = ({}) => {
           </div>
           <div className="flex flex-1 justify-center w-full ">
             <span className="text-center text-[#2F5ACF] font-bold">
-              Chưa dùng voucher
+              {discountValue > 0 ? contentVoucher : " Chưa dùng voucher"}
             </span>
           </div>
         </div>
@@ -836,7 +862,9 @@ const CartProducts = ({}) => {
             <span>Thành tiền </span>
             <span className="text-xl text-[#2F5ACF] font-bold">
               {checkedItems.length > 0
-                ? formatPrice(totalCheckedPrice)
+                ? discountValue > 0
+                  ? formatPrice(finalPrice)
+                  : formatPrice(totalCheckedPrice)
                 : formatPrice(0)}
             </span>
           </div>

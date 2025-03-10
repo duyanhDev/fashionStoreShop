@@ -267,7 +267,7 @@ const BotChatAI = () => {
                 )}
               </div>
               {msg.sender === "user" && (
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 ">
                   <UserIcon />
                   <p className="text-sm text-gray-400">
                     {user?.name || "Người dùng"}

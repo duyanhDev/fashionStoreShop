@@ -409,15 +409,17 @@ function App() {
         </button>
       </div>
 
-      {!user.isAdmin && (
+      {user?.isAdmin ? (
         <div className="fixed right-0 bottom-14 mb-24 chat_sp transition-opacity duration-300 z-10">
           <button
             className="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center text-white hover:bg-blue-800 transition-colors text-wrap"
-            onClick={() => setOpen((prve) => !prve)}
+            onClick={() => setOpen((prev) => !prev)}
           >
             CHAT
           </button>
         </div>
+      ) : (
+        <div></div>
       )}
 
       {open && (

@@ -17,7 +17,9 @@ const createOrder = async (
   paymentMethod,
   email,
   CartId,
-  productId
+  productId,
+  discountValue,
+  idDiscount
 ) => {
   try {
     const formattedItems = items.map((item) => ({
@@ -45,6 +47,8 @@ const createOrder = async (
       email,
       CartId,
       productId,
+      discountValue,
+      idDiscount,
     });
 
     return response;

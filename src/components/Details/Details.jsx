@@ -209,23 +209,33 @@ const Details = () => {
     }
   };
 
-  const handleFeedBack = async () => {
-    try {
-      const res = await PutFeedbackProductAPI(
-        param.id,
-        user._id,
-        ratings,
-        review
-      );
+  // const handleFeedBack = async () => {
+  //   try {
+  //     const res = await PutFeedbackProductAPI(
+  //       param.id,
+  //       user._id,
+  //       ratings,
+  //       review
+  //     );
 
-      if (res && res.data) {
-        setReivew("");
-        FetchAPIDetaillProuduct();
-      }
-    } catch (error) {}
-  };
+  //     if (res && res.data) {
+  //       setReivew("");
+  //       FetchAPIDetaillProuduct();
+  //     }
+  //   } catch (error) {}
+  // };
 
   const hanldetoggleLikeRatingAPI = async (ratings) => {
+    if (!user) {
+      api.open({
+        message: "Yêu cầu đăng nhập",
+        description: "Vui lòng đăng nhập.",
+        duration: 3,
+        type: "warning",
+      });
+      // navigation("/login");
+      return;
+    }
     try {
       const res = await toggleLikeRatingAPI(param.id, ratings, user._id);
 
@@ -533,15 +543,14 @@ const Details = () => {
               return (
                 <div className="" key={item._id}>
                   <div className="w-full m-4 flex items-center gap-3">
-                    {user ? (
+                    {item && (
                       <img
                         className="w-10 h-10 rounded-full"
-                        src={item && item.userId.avatar}
+                        src={item ? item.userId.avatar : <Avatar>U</Avatar>}
                         alt="avatar lỗi"
                       />
-                    ) : (
-                      <Avatar>U</Avatar>
                     )}
+
                     {item && <p>{item.userId.name}</p>}
                   </div>
                   <div className="ml-5 flex gap-2 items-center">
@@ -555,7 +564,7 @@ const Details = () => {
                           data-prefix="fas"
                           data-icon="heart"
                           className={`svg-inline--fa fa-heart w-5 ${
-                            item.likes.includes(user._id)
+                            user?._id && item.likes.includes(user._id)
                               ? "text-[#ed2b48]"
                               : ""
                           }`}
@@ -564,7 +573,7 @@ const Details = () => {
                           viewBox="0 0 512 512"
                           onClick={() => hanldetoggleLikeRatingAPI(item._id)}
                         >
-                          {item.likes.includes(user._id) ? (
+                          {user?._id && item.likes.includes(user._id) ? (
                             <path
                               fill="currentColor"
                               d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"
@@ -638,7 +647,7 @@ const Details = () => {
             containerClassName={"pagination"}
             activeClassName={"active"}
           />
-          <div className="w-full text-center flex justify-center gap-2">
+          {/* <div className="w-full text-center flex justify-center gap-2">
             <Input
               showCount
               maxLength={50}
@@ -648,7 +657,7 @@ const Details = () => {
               value={review}
             />
             <Button onClick={handleFeedBack}>Gửi phản hồi</Button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

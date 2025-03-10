@@ -41,14 +41,7 @@ const columns = [
     title: "Giá trị đơn hàng tối thiểu",
     dataIndex: "minOrderValue",
   },
-  {
-    title: "Loại sản phẩm",
-    dataIndex: "category",
-  },
-  {
-    title: "Tên sản phẩm",
-    dataIndex: "product",
-  },
+
   {
     title: "Hiệu lực ",
     dataIndex: "startDate",
@@ -136,8 +129,7 @@ const Voucher = () => {
       discountType: voucher.discountType,
       discountValue: voucher.discountValue,
       minOrderValue: voucher.minOrderValue,
-      category: voucher.category.name,
-      product: voucher.product,
+
       startDate: moment(voucher.startDate).format("DD-MM-YYYY"),
       endDate: moment(voucher.endDate).format("DD-MM-YYYY"),
       usageLimit: voucher.usageLimit,

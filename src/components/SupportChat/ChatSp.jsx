@@ -200,7 +200,7 @@ const ChatSp = () => {
                   <span>{item.recipient.name}</span>
                   <p
                     className={`${
-                      item.isRead ? "text-blue-400" : "text-black  font-bold"
+                      item.isRead ? "text-blue-400" : "text-black font-bold"
                     }`}
                   >
                     {item.messageSender?._id === user?._id

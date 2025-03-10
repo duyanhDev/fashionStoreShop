@@ -134,9 +134,8 @@ const LoginForm = () => {
         <div className="w-full max-w-md">
           <div className="flex flex-col w-full pb-6 text-center">
             <h3 className="mb-3 text-4xl font-extrabold text-dark-grey-900">
-              Sign In
+              ĐĂNG NHẬP BẰNG GOOGLE
             </h3>
-            <p className="mb-4 text-grey-700">Enter your email and password</p>
 
             <div className="flex items-center justify-center gap-2 mb-6">
               <FcGoogle size={30} />
@@ -144,7 +143,7 @@ const LoginForm = () => {
                 className="px-4 py-2 text-sm font-medium transition duration-300 rounded-2xl text-grey-900 bg-grey-300 hover:bg-grey-400 focus:ring-4 focus:ring-grey-300"
                 onClick={handleGoogleLogin}
               >
-                Sign in with Google
+                Đăng nhập google
               </button>
             </div>
 
@@ -219,14 +218,14 @@ const LoginForm = () => {
                   <FaCheckSquare />
                 </div>
                 <span className="ml-1 text-sm font-normal text-grey-900">
-                  Keep me logged in
+                  Lưu mật khẩu
                 </span>
               </label>
               <div
                 className="text-sm font-medium text-purple-blue-500 cursor-pointer"
                 onClick={() => handleForget()}
               >
-                Forget password?
+                Quên mật khẩu?
               </div>
             </div>
 
@@ -236,12 +235,12 @@ const LoginForm = () => {
 
             <div className="-mt-20">
               <p className="text-sm leading-relaxed text-grey-900">
-                Not registered yet?{" "}
+                Bạn đã có tài khoản chưa?{" "}
                 <button
                   className="font-bold text-grey-700"
                   onClick={() => handelRegister()}
                 >
-                  Create an Account
+                  Đăng kí tài khoản
                 </button>
               </p>
             </div>
