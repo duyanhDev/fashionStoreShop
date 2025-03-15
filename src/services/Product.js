@@ -196,9 +196,10 @@ const ProductFilter = async ({
   sortPrice,
   sortDate,
   sortSold,
+  care,
   page = 1,
 }) => {
-  console.log(minPrice, maxPrice);
+  console.log(care, page);
 
   try {
     const perPage = 20;
@@ -212,6 +213,9 @@ const ProductFilter = async ({
       filter.discountedPrice = {};
       if (minPrice) filter.discountedPrice.$gte = Number(minPrice);
       if (maxPrice) filter.discountedPrice.$lte = Number(maxPrice);
+    }
+    if (care) {
+      filter.care = care;
     }
 
     // Tạo tiêu chí sắp xếp

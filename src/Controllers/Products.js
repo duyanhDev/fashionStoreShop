@@ -429,6 +429,7 @@ const CategoryGenderAPI = async (req, res) => {
     sortPrice,
     sortDate,
     sortSold,
+    care,
   } = req.query;
 
   try {
@@ -441,6 +442,7 @@ const CategoryGenderAPI = async (req, res) => {
       sortPrice,
       sortDate,
       sortSold,
+      care,
       page,
     });
 
