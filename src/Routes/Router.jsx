@@ -2,6 +2,7 @@
 import BotChatAI from "../ChatAI/BotChat";
 import Create from "../components/AddProducts/Create";
 import Admin from "../components/Admin/Admin";
+import Blog from "../components/Blog/Blog";
 import CartProducts from "../components/CartProducts/CartProducts";
 import Category from "../components/Category/Category";
 import ClothingMale from "../components/ClothingMale/ClothingMale";
@@ -73,6 +74,10 @@ export const RouterLayout = [
   {
     path: "/profile/:username",
     element: <Profile />,
+  },
+  {
+    path: "/blog",
+    element: <Blog />,
   },
 ];
 

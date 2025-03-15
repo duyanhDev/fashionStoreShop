@@ -18,7 +18,7 @@ export const setTotalPages = (total) => ({
 });
 
 export const fetchProducts = (params) => async (dispatch) => {
-  console.log(params.minPrice);
+  console.log(params.care);
 
   dispatch(setLoading(true));
   try {
@@ -31,6 +31,7 @@ export const fetchProducts = (params) => async (dispatch) => {
       params.sortPrice,
       params.sortDate,
       params.sortSold,
+      params.care,
       params.currentPage
     );
 

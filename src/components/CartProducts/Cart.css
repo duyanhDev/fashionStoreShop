@@ -23,13 +23,11 @@ label.ant-radio-wrapper.css-dev-only-do-not-override-apn68 {
   padding: 10px;
 }
 
-.footer.w-full.flex {
-  height: 100px;
+.footer {
   position: fixed;
-  bottom: -18px;
-  left: 0;
-  right: 0;
-  margin-bottom: 10px;
+  bottom: 0;
+  height: 100px;
+
   border: 1px solid #ccc;
 }
 .footer .cart_1 {

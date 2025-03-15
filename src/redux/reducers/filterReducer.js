@@ -12,6 +12,7 @@ const initialState = {
   selectedColor: "",
   priceRange: 0,
   products: [],
+  care: "",
   totalPages: 1,
   loading: false,
 };
@@ -54,6 +55,12 @@ export const filterReducer = (state = initialState, action) => {
       return {
         ...state,
         category: action.payload,
+        currentPage: 1,
+      };
+    case FILTER_TYPES.SET_CATEGORY:
+      return {
+        ...state,
+        care: action.payload,
         currentPage: 1,
       };
 

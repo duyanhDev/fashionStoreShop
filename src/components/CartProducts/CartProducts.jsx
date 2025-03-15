@@ -14,7 +14,7 @@ const CartProducts = ({}) => {
 
   const [loadingSpin, setLoadingSpin] = useState(false);
   const [api, contextHolder] = notification.useNotification();
-  const [value, setValue] = useState(1);
+  const [value, setValue] = useState("cod");
   const [provine, SetProvine] = useState([]);
   const [district, setDistrict] = useState([]);
   const [warn, setWarn] = useState([]);
@@ -356,12 +356,6 @@ const CartProducts = ({}) => {
     setDiscountValue(value);
     setidDiscount(idDiscount);
     setContentvoucher(content);
-
-    if (selectedVouCher === idDiscount) {
-      setDiscountValue("");
-      setidDiscount(0);
-      setContentvoucher("");
-    }
   };
 
   const totalCheckedPrice = checkedItems.reduce((total, itemId) => {
@@ -538,7 +532,7 @@ const CartProducts = ({}) => {
     setSelectedVoucher((prve) => (prve === id ? null : id));
   };
   return (
-    <div className="h-screen w-full mt-28">
+    <div className="min-h-screen w-full mt-28">
       <div className="cart flex justify-between">
         <div className="w-1/2">
           <h1 className="text-3xl font-semibold">Thông tin đặt hàng</h1>
@@ -824,7 +818,7 @@ const CartProducts = ({}) => {
                           className="w-11 h-full"
                         />
 
-                        <p className="font-bold text-sm  text-white">
+                        <p className="font-bold text-sm  text-[#2F5ACF]">
                           COD thanh toán khi nhận hàng
                         </p>
                       </div>

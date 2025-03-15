@@ -1,4 +1,4 @@
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import "./App.css";
 import Header from "./components/Header/Header";
 import { getListProductsAPI } from "./service/ApiProduct";
@@ -19,6 +19,8 @@ function App() {
   const [ListCart, setListCard] = useState([]);
   const [open, setOpen] = useState(false);
   const Navigate = useNavigate();
+  const location = useLocation();
+  const hideFooter = location.pathname === "/cart";
   const ListProducsData = async () => {
     try {
       let res = await getListProductsAPI();
@@ -388,7 +390,7 @@ function App() {
               <Link to="/ranking">Xếp hạng</Link>
             </li>
             <li>
-              <Link>Độc nhất</Link>
+              <Link to="/blog">Blog</Link>
             </li>
           </ul>
         </div>
@@ -409,7 +411,7 @@ function App() {
         </button>
       </div>
 
-      {user?.isAdmin ? (
+      {user?.isAdmin === false ? (
         <div className="fixed right-0 bottom-14 mb-24 chat_sp transition-opacity duration-300 z-10">
           <button
             className="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center text-white hover:bg-blue-800 transition-colors text-wrap"
@@ -440,9 +442,7 @@ function App() {
         </button>
       </div>
 
-      <footer>
-        <Footer />
-      </footer>
+      {!hideFooter && <Footer />}
     </div>
   );
 }

@@ -34,6 +34,7 @@ const CategoryProductsGender = async (
   sortPrice,
   sortDate,
   sortSold,
+  care,
   page
 ) => {
   return axios.get(`api/v1/categoryProductsFilter`, {
@@ -46,6 +47,7 @@ const CategoryProductsGender = async (
       sortPrice,
       sortDate,
       sortSold,
+      care,
       page,
     },
   });

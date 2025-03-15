@@ -20,6 +20,7 @@ const ClothingMale = () => {
   const [valueId, setValueId] = useState("");
 
   const [priceRange, setPriceRange] = useState([0, 1000000]);
+  const [selectedCare, setSelectedCare] = useState("");
 
   const menuRef = useRef(null);
   // xử khi click bên ngoài
@@ -41,6 +42,7 @@ const ClothingMale = () => {
   );
 
   const queryParams = new URLSearchParams(location.search);
+  const careParams = queryParams.get("care") || "";
   const savedSortPrice = queryParams.get("sortPrice") || "";
   const saveCateogry = queryParams.get("Category");
   const savedCurrentPage = parseInt(queryParams.get("currentPage")) || 1;
@@ -63,6 +65,7 @@ const ClothingMale = () => {
       sortSold: savedsortSold,
       minPrice: UrlMinPrice,
       maxPrice: UrlMaxPrice,
+      care: careParams,
       currentPage: savedCurrentPage,
     };
   }, [
@@ -75,6 +78,7 @@ const ClothingMale = () => {
     UrlMinPrice,
     UrlMaxPrice,
     savedsortSold,
+    careParams,
     savedCurrentPage,
   ]);
 
@@ -171,12 +175,12 @@ const ClothingMale = () => {
   };
   const SkeletonCard = () => (
     <Card
-      style={{ width: 265.8 }}
+      style={{ width: 200.8 }}
       cover={
         <Skeleton.Image active={true} style={{ width: "100%", height: 200 }} />
       }
     >
-      <Skeleton active={true} paragraph={{ rows: 3 }} />
+      <Skeleton active={true} paragraph={{ rows: 5 }} />
     </Card>
   );
 
@@ -246,9 +250,11 @@ const ClothingMale = () => {
         category: "",
         sortPrice: "",
         sortDate: "",
+        care: "",
         minPrice: undefined,
         maxPrice: undefined,
       };
+      setSelectedCare("");
       setHidden(false);
       dispatch(fetchProducts(params));
 
@@ -295,6 +301,29 @@ const ClothingMale = () => {
   useEffect(() => {
     setHidden(true);
   }, [savedSortPrice, savedSortDate, UrlMinPrice, UrlMaxPrice, savedsortSold]);
+
+  const onChangeCare = (e) => {
+    setSelectedCare(e.target.value);
+    const careItem = e.target.value;
+    const queryParams = new URLSearchParams(location.search);
+    queryParams.set("care", careItem);
+    queryParams.set("currentPage", 1);
+
+    Navigate(`${location.pathname}?${queryParams.toString()}`); // Update URL
+
+    // Gọi API sau khi URL đã thay đổi
+    const params = {
+      gender: param.gender,
+      category: valueId,
+      care: careItem,
+      currentPage: 1,
+    };
+
+    setHidden(true);
+    setCheckFilter(false);
+    dispatch(fetchProducts(params));
+  };
+
   return (
     <section>
       <SliderComponent />
@@ -318,19 +347,23 @@ const ClothingMale = () => {
           </div>
           <div>
             <h1 className="mt-2">Bộ sưu tập</h1>
-            <Radio.Group className="mr-5" onChange={onChange} value={1}>
+            <Radio.Group
+              className="mr-5"
+              onChange={onChangeCare}
+              value={selectedCare}
+            >
               <Space direction="vertical">
-                <Radio value={1}>Áo sơ mi</Radio>
-                <Radio value={2}>Áo thun</Radio>
-                <Radio value={3}>Áo khoác</Radio>
-                <Radio value={4}>Áo polo</Radio>
-                <Radio value={5}>Quần jean</Radio>
-                <Radio value={6}>Quần tây</Radio>
-                <Radio value={7}>Quần âu</Radio>
-                <Radio value={7}>Quần âu âu</Radio>
-                <Radio value={10}>Giày tây</Radio>
-                <Radio value={11}>Giày lười</Radio>
-                <Radio value={12}>Giày Boat</Radio>
+                {products &&
+                  products
+                    .filter(
+                      (item, index, self) =>
+                        index === self.findIndex((t) => t.care === item.care)
+                    )
+                    .map((item) => (
+                      <Radio key={item.care} value={item.care}>
+                        {item.care}
+                      </Radio>
+                    ))}
               </Space>
             </Radio.Group>
           </div>
@@ -452,50 +485,30 @@ const ClothingMale = () => {
           </div>
         </div>
         <div className="colletion_right flex-1">
-          <div className="w-full">
-            <div className="flex  items-center ">
+          <div className="w-full flex justify-between items-center px-10">
+            <div className="flex items-center gap-3 ">
               <Link>
                 <h1 className="text-[#a3a3a3]">Trang chủ</h1>
               </Link>
+              /
+              <Link>
+                <h1 className="text-[#a3a3a3]">Đồ {param.gender}</h1>
+              </Link>
+            </div>
+
+            <div className="flex items-center gap-3 ">
+              <Link>
+                <h1 className="text-[#333] text-xl font-bold">
+                  Đồ {param.gender}
+                </h1>
+              </Link>
+              /
               <Link className="ml-3 font-normal products_link relative">
-                {" "}
-                {products.length} sản phẩm
+                Trang {savedCurrentPage} - {products.length} sản phẩm
               </Link>
             </div>
           </div>
           <div className="mt-5">
-            <div className="">
-              <p className="text-xl text-black font-bold">
-                Một số sản phẩm bán chạy
-              </p>
-            </div>
-
-            <div className="mt-5 flex gap-4 items-center flex-nowrap border-b border-gray-200 p-2 sm:flex-wrap lg:flex-nowrap ">
-              <div className="flex gap-4 ml-6">
-                {products &&
-                  products.length > 0 &&
-                  products
-                    .slice(0, 8)
-                    .sort((a, b) => {
-                      return b.sold - a.sold;
-                    })
-                    .map((product) => (
-                      <div key={product.id} className="w-32">
-                        <div>
-                          <img
-                            className="img_male"
-                            src={product.variants[0]?.images[0]?.url}
-                            alt="lỗi"
-                          />
-                        </div>
-                        <div className="text-center">
-                          <p>{product.name}</p>
-                        </div>
-                      </div>
-                    ))}
-              </div>
-            </div>
-            {/* lọc sản phẩm theo price , day*/}
             <div className="ml-10 mt-5 ">
               <div className="relative ">
                 <ul className="flex items-center gap-3">
