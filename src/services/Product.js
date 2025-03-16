@@ -1,4 +1,5 @@
 const Products = require("./../Model/Product");
+const mongoose = require("mongoose");
 
 const AddProducts = async (productData) => {
   try {
@@ -101,7 +102,6 @@ const PutFeedbackProduct = async (id, userId, rating, review) => {
     throw error;
   }
 };
-const mongoose = require("mongoose");
 
 const PutFeedbackProducts = async (ids, userId, rating, review) => {
   try {
@@ -197,13 +197,15 @@ const ProductFilter = async ({
   sortDate,
   sortSold,
   care,
+  size,
+  color,
   page = 1,
 }) => {
-  console.log(care, page);
-
   try {
     const perPage = 20;
     const skip = (page - 1) * perPage;
+
+    console.log("xxx", color);
 
     // Tạo bộ lọc
     const filter = {};
@@ -217,7 +219,13 @@ const ProductFilter = async ({
     if (care) {
       filter.care = care;
     }
+    if (Array.isArray(size) && size.length > 0) {
+      filter["variants.sizes.size"] = { $in: size };
+    }
 
+    if (color) {
+      filter["variants.color"] = color;
+    }
     // Tạo tiêu chí sắp xếp
     const sortCriteria = {};
     if (sortName === "az") {
@@ -247,6 +255,8 @@ const ProductFilter = async ({
       Products.find(filter).sort(sortCriteria).skip(skip).limit(perPage),
       Products.countDocuments(filter),
     ]);
+
+    console.log("products", count);
 
     // Tính tổng số trang
     const totalPages = Math.ceil(count / perPage);

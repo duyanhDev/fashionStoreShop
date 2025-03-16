@@ -266,7 +266,7 @@ const UpdateProductsAPI = async (req, res) => {
       discount,
       stock,
       sold,
-      size,
+      size, // New sizes to update for the "black" variant
       color,
       costPrice,
     } = req.body;
@@ -281,7 +281,7 @@ const UpdateProductsAPI = async (req, res) => {
       });
     }
 
-    // Xử lý size và color thành mảng
+    // Xử lý size thành mảng
     const sizeArray = size
       ? Array.isArray(size)
         ? size
@@ -293,16 +293,16 @@ const UpdateProductsAPI = async (req, res) => {
         : color.split(",").map((item) => item.trim())
       : [];
 
-    // Xử lý hình ảnh và variants
-    let variants = [...existingProduct.variants]; // Bản sao của variants cũ
+    // Sao chép variants cũ
+    let variants = [...existingProduct.variants];
 
+    // Xử lý hình ảnh và variants nếu có ảnh mới
     if (req.files && req.files.images) {
       try {
         const files = Array.isArray(req.files.images)
           ? req.files.images
           : [req.files.images];
 
-        // Kiểm tra số lượng ảnh khớp với số màu mới
         if (files.length !== colorArray.length) {
           return res.status(400).json({
             success: false,
@@ -310,17 +310,13 @@ const UpdateProductsAPI = async (req, res) => {
           });
         }
 
-        // Xử lý từng màu và ảnh tương ứng
         for (let i = 0; i < colorArray.length; i++) {
           const resultImage = await uploadFileToCloudinary(files[i]);
-
-          // Tạo hoặc cập nhật variant mới
           const existingVariant = variants.find(
             (variant) => variant.color === colorArray[i]
           );
 
           if (existingVariant) {
-            // Cập nhật hình ảnh và kích thước của variant cũ
             existingVariant.images.push({ url: resultImage.secure_url });
             existingVariant.sizes = sizeArray.map((size) => ({
               size,
@@ -331,7 +327,6 @@ const UpdateProductsAPI = async (req, res) => {
                 existingVariant.sizes.find((s) => s.size === size)?.sold || 0,
             }));
           } else {
-            // Tạo variant mới
             const newVariant = {
               color: colorArray[i],
               sizes: sizeArray.map((size) => ({
@@ -351,10 +346,43 @@ const UpdateProductsAPI = async (req, res) => {
           message: "Lỗi khi tải lên hình ảnh",
         });
       }
+    } else if (sizeArray.length > 0) {
+      // Nếu không có ảnh mới nhưng có size mới, chỉ cập nhật sizes cho variant "black"
+      const blackVariantIndex = variants.findIndex(
+        (variant) => variant.color === "black"
+      );
+
+      if (blackVariantIndex !== -1) {
+        // Cập nhật sizes cho variant "black"
+        variants[blackVariantIndex].sizes = sizeArray.map((size) => ({
+          size,
+          quantity:
+            variants[blackVariantIndex].sizes.find((s) => s.size === size)
+              ?.quantity || 100,
+          sold:
+            variants[blackVariantIndex].sizes.find((s) => s.size === size)
+              ?.sold || 0,
+        }));
+      } else if (sizeArray.length > 0) {
+        // Nếu không tìm thấy variant "black" và có size mới, thêm variant "black"
+        variants.push({
+          color: "black",
+          sizes: sizeArray.map((size) => ({
+            size,
+            quantity: 100,
+            sold: 0,
+          })),
+          images: existingProduct.variants.find((v) => v.images.length > 0)
+            ?.images || [{ url: "default-image-url" }], // Cần có ảnh mặc định nếu không có ảnh cũ
+        });
+      }
     }
+
+    // Tính toán giá sau giảm giá
     const finalCostPrice = costPrice || existingProduct.costPrice;
     const finalDiscount = discount || existingProduct.discount;
     const discountedPrice = finalCostPrice * (1 - finalDiscount / 100);
+
     // Tạo object chứa các trường cần update
     const updateFields = {
       name: name || existingProduct.name,
@@ -364,17 +392,17 @@ const UpdateProductsAPI = async (req, res) => {
       brand: brand || existingProduct.brand,
       care: care || existingProduct.care,
       price: price ? Number(price) : existingProduct.price,
-      discount: discount || existingProduct.discount,
+      discount: finalDiscount,
       stock: stock ? Number(stock) : existingProduct.stock,
       sold: sold ? Number(sold) : existingProduct.sold,
-      costPrice: costPrice || existingProduct.costPrice,
-      discountedPrice: discountedPrice || existingProduct.discountedPrice,
+      costPrice: finalCostPrice,
+      discountedPrice,
       variants, // Cập nhật variants
     };
 
     // Update sản phẩm
     const updatedProduct = await Products.findByIdAndUpdate(id, updateFields, {
-      new: true, // Trả về document sau khi update
+      new: true,
     });
 
     return res.status(200).json({
@@ -430,6 +458,8 @@ const CategoryGenderAPI = async (req, res) => {
     sortDate,
     sortSold,
     care,
+    size,
+    color,
   } = req.query;
 
   try {
@@ -443,6 +473,8 @@ const CategoryGenderAPI = async (req, res) => {
       sortDate,
       sortSold,
       care,
+      size,
+      color,
       page,
     });
 
