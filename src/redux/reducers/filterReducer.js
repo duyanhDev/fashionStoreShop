@@ -13,6 +13,8 @@ const initialState = {
   priceRange: 0,
   products: [],
   care: "",
+  setsize: "",
+  color: "",
   totalPages: 1,
   loading: false,
 };

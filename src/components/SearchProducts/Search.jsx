@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import "./Search.css";
 import { CloseCircleOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const Search = ({
   open,
@@ -20,6 +21,8 @@ const Search = ({
   const formatPrice = (price) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
   };
+
+  const navigate = useNavigate();
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -88,7 +91,11 @@ const Search = ({
                   data.slice(0, 4).map((product, index) => {
                     // Dùng slice đúng cách
                     return (
-                      <div className="product-header-search" key={index}>
+                      <div
+                        className="product-header-search"
+                        key={index}
+                        onClick={() => navigate(`/product/${product._id}`)}
+                      >
                         <img
                           src={product.variants[0]?.images[0]?.url}
                           alt="ảnh"
