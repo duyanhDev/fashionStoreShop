@@ -1,5 +1,10 @@
 const { uploadFileToCloudinary } = require("./../services/Cloudinary");
-const { RegisterUser, LoginUser } = require("./../services/Auth");
+const {
+  RegisterUser,
+  LoginUser,
+  SendverifyFileOTP,
+  verifyOTP,
+} = require("./../services/Auth");
 const Users = require("./../Model/User");
 const nodemailer = require("nodemailer");
 require("dotenv").config;
@@ -239,6 +244,43 @@ const Forgotpassword = async (req, res) => {
   }
 };
 
+// gửi mã otp
+
+const SendverifyFileOTPUser = async (req, res) => {
+  let { email } = req.body;
+  if (!email) {
+    throw new Error("Email không tồn tại");
+  }
+  const user = await SendverifyFileOTP(email);
+
+  return res.status(200).json({
+    EC: 0,
+    data: user.otp,
+  });
+};
+
+const verifyOTPUser = async (req, res) => {
+  try {
+    let { email, otp } = req.body;
+    console.log(email, otp);
+
+    const result = await verifyOTP(email, otp); // Nhận object { success, message }
+    console.log(result);
+
+    return res.status(200).json({
+      success: result.success,
+      message: result.message,
+      data: result.success ? email : null, // Trả về email nếu OTP đúng
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi server",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   RegisterUserAPI,
   LoginUserAPI,
@@ -247,4 +289,6 @@ module.exports = {
   UpDateProfileUserAPI,
   ChanglePasswordAPI,
   Forgotpassword,
+  SendverifyFileOTPUser,
+  verifyOTPUser,
 };

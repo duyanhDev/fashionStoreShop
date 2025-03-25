@@ -27,6 +27,8 @@ const {
   UpDateProfileUserAPI,
   Forgotpassword,
   ChanglePasswordAPI,
+  SendverifyFileOTPUser,
+  verifyOTPUser,
 } = require("./../Controllers/Auth");
 const {
   addToCart,
@@ -151,4 +153,9 @@ RouterAPI.get("/get-list-sender/:sender", getMessagesSenderList);
 
 RouterAPI.post("/add-voucher", addVoucherAPI);
 RouterAPI.get("/voucher", listVoucherAPI);
+
+// otp
+
+RouterAPI.post("/otp", SendverifyFileOTPUser);
+RouterAPI.put("/veryfy-otp", verifyOTPUser);
 module.exports = RouterAPI;

@@ -27,6 +27,8 @@ const UserSchema = new mongoose.Schema(
       enum: ["all", "newUser", "vip", "loyalCustomer"],
       default: "all",
     },
+    otp: { type: String },
+    otpExpires: { type: Date },
   },
   { timestamps: { createdAt: "created_at", updatedAt: "updatedAt" } }
 );
