@@ -94,6 +94,14 @@ const RegisterUser = async (name, email, password, avatar) => {
     },
   });
 };
+
+const SendverifyOTP = async (email) => {
+  return await axios.post("api/v1/otp", { email });
+};
+
+const verifyOTP = async (email, otp) => {
+  return await axios.put("api/v1/veryfy-otp", { email, otp });
+};
 export {
   LoginAuth,
   UserAuth,
@@ -102,4 +110,6 @@ export {
   ChanglePasswordAPI,
   Forgotpassword,
   RegisterUser,
+  SendverifyOTP,
+  verifyOTP,
 };

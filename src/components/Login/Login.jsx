@@ -3,15 +3,17 @@ import { FaCheckSquare } from "react-icons/fa";
 import { Button, notification, Spin, Input } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { useDispatch } from "react-redux";
-import { useState } from "react";
-import { LoginAuth } from "../../service/Auth";
+import { useEffect, useRef, useState } from "react";
+import { LoginAuth, SendverifyOTP, verifyOTP } from "../../service/Auth";
 import { login } from "../../redux/actions/Auth";
 import { useNavigate } from "react-router-dom";
 import ForgetPassword from "../ForgetPassword/ForgetPassword";
 import Register from "../Register/Register";
 import "./Login.css";
+import { set } from "nprogress";
 const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [hiddenOTP, setHiddenOTP] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -25,7 +27,9 @@ const LoginForm = () => {
   const dispatch = useDispatch();
   const [api, contextHolder] = notification.useNotification();
   const navigate = useNavigate();
-
+  const [timer, setTimer] = useState(0); // Thời gian đếm ngược
+  const [isDisabled, setIsDisabled] = useState(false); // Vô hiệu hóa nút
+  const [buttonText, setButtonText] = useState("Send Code"); // Nội dung nút
   // Validate email format
   const isValidEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -65,15 +69,12 @@ const LoginForm = () => {
 
     try {
       let res = await LoginAuth(email, password);
+
       setIsLoading(true);
       if (res && res.data.EC === 0) {
-        setTimeout(() => {
+        setTimeout(async () => {
           dispatch(login(res.data.data.token, res.data.data.user));
-          api["success"]({
-            message: "Đăng nhập thành công",
-            description: "Chào mừng bạn đã quay trở lại",
-          });
-          navigate("/");
+          setHiddenOTP(true);
           setIsLoading(false);
         }, 5000);
       } else {
@@ -109,6 +110,101 @@ const LoginForm = () => {
   const handleGoogleLogin = () => {
     // Chuyển hướng đến backend để bắt đầu quá trình xác thực Google
     window.location.href = "http://localhost:9000/auth/google";
+  };
+
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const inputRefs = useRef([]);
+
+  console.log(otp);
+
+  // Xử lý khi nhập OTP
+  const handleChange = (index, event) => {
+    const value = event.target.value;
+    if (isNaN(value)) return; // Chỉ cho phép nhập số
+
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    // Chuyển focus sang ô tiếp theo nếu có số
+    if (value && index < 5) {
+      inputRefs.current[index + 1].focus();
+    }
+  };
+
+  // Xử lý khi nhấn phím Backspace
+  const handleKeyDown = (index, event) => {
+    if (event.key === "Backspace" && !otp[index] && index > 0) {
+      inputRefs.current[index - 1].focus();
+    }
+  };
+
+  const handleSendcode = async () => {
+    try {
+      const otpResponse = await SendverifyOTP(email);
+      console.log(otpResponse);
+
+      if (otpResponse && otpResponse.status === 200) {
+        setIsDisabled(true);
+        setTimer(300); // 5 phút = 300 giây
+        setButtonText("Resend Code");
+        api.success({
+          message: "Mã otp đã được gửi vào mail",
+          description:
+            otpResponse.message || "Vui lòng check  email để nhận mã code",
+        });
+      } else {
+        api.error({
+          message: "Lỗi gửi OTP",
+          description:
+            otpResponse.message || "Không thể gửi OTP, vui lòng thử lại!",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // Gửi OTP để xác nhận
+  const handleSubmit = async (event) => {
+    // Gửi OTP dạng "1234"
+
+    try {
+      const onVerify = otp.join("");
+
+      const res = await verifyOTP(email, onVerify);
+      console.log(res);
+
+      if (res && res.status === 200 && res.data.success === true) {
+        navigate("/");
+        setHiddenOTP(false);
+      } else {
+        api.error({
+          message: res.data.message,
+          description: res.data.message || "OTP không chính xác",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (timer > 0) {
+      const interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+
+      return () => clearInterval(interval);
+    } else {
+      setIsDisabled(false);
+      setButtonText("Resend Code");
+    }
+  }, [timer]);
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
   };
   return (
     <div className="min-h-screen flex">
@@ -254,6 +350,45 @@ const LoginForm = () => {
         />
         <Register modal2Open={modal2Open} setModal2Open={setModal2Open} />
       </div>
+
+      {hiddenOTP && (
+        <div className="otp_container">
+          <div className="otp-form">
+            <span className="mainHeading">Enter OTP</span>
+            <p className="otpSubheading">
+              We have sent a verification code to your mobile number
+            </p>
+            <div className="inputContainer">
+              {otp.map((value, index) => (
+                <input
+                  key={index}
+                  ref={(el) => (inputRefs.current[index] = el)}
+                  type="text"
+                  className="otp-input"
+                  maxLength="1"
+                  value={value}
+                  onChange={(e) => handleChange(index, e)}
+                  onKeyDown={(e) => handleKeyDown(index, e)}
+                />
+              ))}
+            </div>
+            <button className="verifyButton" onClick={() => handleSubmit()}>
+              Verify
+            </button>
+            <button className="exitBtn">×</button>
+            <p className="resendNote">
+              Didn't receive the code?{" "}
+              <button
+                className="resendBtn"
+                onClick={handleSendcode}
+                disabled={isDisabled}
+              >
+                {isDisabled ? `Resend in ${formatTime(timer)}` : buttonText}
+              </button>
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
