@@ -114,6 +114,10 @@ const Create = () => {
     { label: "L", value: "L" },
     { label: "XL", value: "XL" },
     { label: "XXL", value: "XXL" },
+    { label: "28", value: "28" },
+    { label: "29", value: "29" },
+    { label: "30", value: "30" },
+    { label: "31", value: "31" },
   ];
 
   const colorArr = ["đen", "trắng", "xanh", "nâu", "be"];

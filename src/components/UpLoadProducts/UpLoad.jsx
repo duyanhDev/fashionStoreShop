@@ -180,7 +180,7 @@ const UpLoad = () => {
     { label: "34", value: 34 },
   ];
 
-  const colorArr = ["đen", "trắng", "vàng", "đỏ", "be"];
+  const colorArr = ["đen", "trắng", "xanh", "nâu", "be"];
   const optionsColor = colorArr.map((color) => ({
     label: color,
     value: color,

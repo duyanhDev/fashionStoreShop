@@ -14,6 +14,8 @@ const ClothingMale = () => {
   const navigate = useNavigate(); // Fixed: lowercase navigate
   const dispatch = useDispatch();
 
+  console.log(param);
+
   const [hidden, setHidden] = useState(false);
   const [checkFilter, setCheckFilter] = useState(false);
   const [listCategory, setListCategory] = useState([]);
@@ -109,7 +111,7 @@ const ClothingMale = () => {
       const params = getFetchParams();
       dispatch(fetchProducts(params));
     }
-  }, [location.search, listCategory.length, dispatch]); // Depend on URL changes
+  }, [param.gender, location.search, listCategory.length, dispatch]); // Depend on URL changes
 
   // Handle click outside for filter menu
   useEffect(() => {
