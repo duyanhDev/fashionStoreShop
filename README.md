@@ -16,8 +16,11 @@ Template này sử dụng React kết hợp với Vite, hỗ trợ HMR (Hot Modu
 git clone <URL-cua-repository>
 
 2. Di chuyển vào thư mục dự án:
+
    cd ShopDior
+
 3. Cài đặt các thư viện cần thiết:
+   npm install
 4. Chạy dự án:
    npm run dev
 
@@ -86,6 +89,27 @@ git clone <URL-cua-repository>
 #### Voucher
 
 ![Voucher](./images/voucher.png)
+
+#### Trang tìm kiếm
+
+![TÌM KIẾM1](./images/search.png)
+![TÌM KIẾM2](./images/search2.png)
+
+### Thông báo
+
+![THÔNG BÁO](./images/thongbao.png)
+
+### Tích hợp thanh toán bằng momo
+
+![MOMO] (./images/momo.png)
+
+### Tích hợp ví VNPAY
+
+![VNPAY] (./images/viVNP.png)
+
+### Tích hợp ví zaloPay
+
+![VNPAY] (./images/zalopay.png)
 
 ## Công nghệ sử dụng
 
