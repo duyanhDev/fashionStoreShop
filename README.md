@@ -101,15 +101,15 @@ git clone <URL-cua-repository>
 
 ### Tích hợp thanh toán bằng momo
 
-![MOMO] (./images/momo.png)
+![MOMO](./images/momo.png)
 
 ### Tích hợp ví VNPAY
 
-![VNPAY] (./images/viVNP.png)
+![VNPAY](./images/viVNP.png)
 
 ### Tích hợp ví zaloPay
 
-![VNPAY] (./images/zalopay.png)
+![VNPAY](./images/zalopay.png)
 
 ## Công nghệ sử dụng
 
