@@ -1,5 +1,5 @@
-import { Modal, Flex, Rate, Input, message } from "antd";
-
+import { Modal, Flex, Rate, Input, message, Upload } from "antd";
+import ImgCrop from "antd-img-crop";
 import { useState } from "react";
 
 import "./FeedBack.css";
@@ -10,6 +10,10 @@ const FeedBack = ({ modal2Open, setModal2Open, data, userid }) => {
   const [value, setValue] = useState(0);
   const [content, setContent] = useState("");
   const [messageApi, contextHolder] = message.useMessage();
+  const [fileList, setFileList] = useState([]);
+  const [images, setImages] = useState([]);
+  console.log(value);
+
   const formatPrice = (price) => {
     // Nếu price là chuỗi, chuyển đổi nó thành một số
     const numericPrice =
@@ -32,8 +36,6 @@ const FeedBack = ({ modal2Open, setModal2Open, data, userid }) => {
       return item.productId;
     });
 
-  console.log(ids);
-
   const handleFeedBack = async () => {
     if (!content) {
       messageApi.open({
@@ -46,10 +48,10 @@ const FeedBack = ({ modal2Open, setModal2Open, data, userid }) => {
     }
 
     try {
-      let res = await feeckacksProductsAPI(ids, userid, value, content);
+      let res = await feeckacksProductsAPI(ids, userid, value, content, images);
       console.log(res);
 
-      if (res?.data?.EC === "cập nhật thành công") {
+      if (res?.EC === "cập nhật thành công") {
         // Kiểm tra đúng phản hồi API
         messageApi.open({
           type: "success",
@@ -75,6 +77,36 @@ const FeedBack = ({ modal2Open, setModal2Open, data, userid }) => {
       });
     }
   };
+
+  const onChange = ({ fileList: newFileList }) => {
+    if (!newFileList || newFileList.length === 0) {
+      setFileList([]);
+      return;
+    }
+
+    setFileList(newFileList);
+
+    const imagesUrl = newFileList.map((file) => file.originFileObj);
+    setImages(imagesUrl);
+  };
+
+  const onPreview = (file) =>
+    __awaiter(void 0, void 0, void 0, function* () {
+      let src = file.url;
+      if (!src) {
+        src = yield new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file.originFileObj);
+          reader.onload = () => resolve(reader.result);
+        });
+      }
+      const image = new Image();
+      image.src = src;
+      const imgWindow = window.open(src);
+      imgWindow === null || imgWindow === void 0
+        ? void 0
+        : imgWindow.document.write(image.outerHTML);
+    });
 
   return (
     <div>
@@ -119,7 +151,7 @@ const FeedBack = ({ modal2Open, setModal2Open, data, userid }) => {
         <div className="">
           <p>Đánh giá sản phẩm</p>
           <Flex gap="middle" vertical className="mt-2">
-            <Rate tooltips={desc} onChange={setValue} value={value} />
+            <Rate allowHalf tooltips={desc} onChange={setValue} value={value} />
           </Flex>
         </div>
         <div className="mt-2">
@@ -133,6 +165,18 @@ const FeedBack = ({ modal2Open, setModal2Open, data, userid }) => {
               resize: "none",
             }}
           />
+
+          <ImgCrop rotationSlider>
+            <Upload
+              action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+              listType="picture-card"
+              fileList={fileList}
+              onChange={onChange}
+              onPreview={onPreview}
+            >
+              {fileList.length < 5 && "+ Upload"}
+            </Upload>
+          </ImgCrop>
         </div>
       </Modal>
     </div>

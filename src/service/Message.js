@@ -24,6 +24,7 @@ const getMessagesList = async (userId) => {
   }
 };
 
+//  Gửi tin nhắn từ khách hàng đến admin
 const sendMessageCutomer = async (sender, content, image, isAdminChat) => {
   const formData = new FormData();
   formData.append("sender", sender); // Người gửi
@@ -52,6 +53,7 @@ const sendMessageCutomer = async (sender, content, image, isAdminChat) => {
   }
 };
 
+//  Gửi tin nhắn từ admin đến admin khách hàng
 const sendMessageAdmin = async (
   sender,
   recipient,

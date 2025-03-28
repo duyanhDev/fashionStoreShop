@@ -16,6 +16,7 @@ import {
 } from "../../service/ApiProduct";
 import { AddCartAPI } from "../../service/Cart";
 import { useSelector } from "react-redux";
+import moment from "moment";
 
 import ReactPaginate from "react-paginate";
 const Details = () => {
@@ -52,7 +53,12 @@ const Details = () => {
 
   const pageCount = Math.ceil(feedback.length / itemsPerPage);
   const offset = currentPage * itemsPerPage;
-  const currentFeedback = feedback.slice(offset, offset + itemsPerPage);
+  const currentFeedback = feedback
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
+    .slice(offset, offset + itemsPerPage);
 
   const handlePageClick = ({ selected }) => {
     setCurrentPage(selected);
@@ -225,6 +231,13 @@ const Details = () => {
   //   } catch (error) {}
   // };
 
+  const TotalRatings =
+    feedback &&
+    feedback?.reduce((acc, current) => {
+      return acc + current.rating;
+    }, 0);
+  console.log(TotalRatings);
+
   const hanldetoggleLikeRatingAPI = async (ratings) => {
     if (!user) {
       api.open({
@@ -343,7 +356,7 @@ const Details = () => {
                 </span>
               </div>
               <h1>
-                <Rate />
+                <Rate disabled value={TotalRatings > 30 ? 5 : 4} />
               </h1>
             </div>
           </div>
@@ -528,7 +541,7 @@ const Details = () => {
             <h1 className="text-center text-6xl font-bold">5</h1>
           </div>
           <div className="text-center mt-2">
-            <Rate defaultValue={5} size={30} />
+            <Rate disabled value={TotalRatings > 30 ? 5 : 4} size={30} />
           </div>
           <div className="text-center mt-2">
             <p className="text-[#4d4d4d] text-xl italic">
@@ -539,79 +552,112 @@ const Details = () => {
         <div className="flex-1">
           <div className="text-center font-bold text-xl mt-16">PHẢN HỒI</div>
           {currentFeedback &&
-            currentFeedback.map((item) => {
-              return (
-                <div className="" key={item._id}>
-                  <div className="w-full m-4 flex items-center gap-3">
-                    {item && (
-                      <img
-                        className="w-10 h-10 rounded-full"
-                        src={item ? item.userId.avatar : <Avatar>U</Avatar>}
-                        alt="avatar lỗi"
+            [...currentFeedback]
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .map((item) => {
+                console.log(item);
+
+                return (
+                  <div className="comment_users" key={item._id}>
+                    <div className="w-full m-4 flex items-center gap-3">
+                      {item && (
+                        <img
+                          className="w-10 h-10 rounded-full"
+                          src={item ? item.userId.avatar : <Avatar>U</Avatar>}
+                          alt="avatar lỗi"
+                        />
+                      )}
+
+                      {item && (
+                        <p className="flex items-center text-neutral-900 font-bold">
+                          {item.userId.name}{" "}
+                          <span className="ml-2 time_span">
+                            {" "}
+                            {moment(item.createdAt).format("DD-MM-YY")}
+                          </span>
+                        </p>
+                      )}
+                    </div>
+                    <div className="ml-5">
+                      <Rate
+                        allowHalf={true}
+                        defaultValue={item.rating}
+                        disabled
                       />
-                    )}
+                    </div>
+                    <div className="ml-5 flex gap-2 items-center">
+                      <p>{item.review}</p>
 
-                    {item && <p>{item.userId.name}</p>}
-                  </div>
-                  <div className="ml-5 flex gap-2 items-center">
-                    <p>{item.review}</p>
-
-                    {item.likes && item.likes.length > 0 ? (
-                      <p className="flex items-center gap-1">
-                        <svg
-                          aria-hidden="true"
-                          focusable="false"
-                          data-prefix="fas"
-                          data-icon="heart"
-                          className={`svg-inline--fa fa-heart w-5 ${
-                            user?._id && item.likes.includes(user._id)
-                              ? "text-[#ed2b48]"
-                              : ""
-                          }`}
-                          role="img"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 512 512"
-                          onClick={() => hanldetoggleLikeRatingAPI(item._id)}
-                        >
-                          {user?._id && item.likes.includes(user._id) ? (
-                            <path
-                              fill="currentColor"
-                              d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"
-                            ></path>
-                          ) : (
+                      {item.likes && item.likes.length > 0 ? (
+                        <p className="flex items-center gap-1">
+                          <svg
+                            aria-hidden="true"
+                            focusable="false"
+                            data-prefix="fas"
+                            data-icon="heart"
+                            className={`svg-inline--fa fa-heart w-5 ${
+                              user?._id && item.likes.includes(user._id)
+                                ? "text-[#ed2b48]"
+                                : ""
+                            }`}
+                            role="img"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 512 512"
+                            onClick={() => hanldetoggleLikeRatingAPI(item._id)}
+                          >
+                            {user?._id && item.likes.includes(user._id) ? (
+                              <path
+                                fill="currentColor"
+                                d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"
+                              ></path>
+                            ) : (
+                              <path
+                                fill="currentColor"
+                                d="M225.8 468.2l-2.5-2.3L48.1 303.2C17.4 274.7 0 234.7 0 192.8v-3.3c0-70.4 50-130.8 119.2-144C158.6 37.9 198.9 47 231 69.6c9 6.4 17.4 13.8 25 22.3c4.2-4.8 8.7-9.2 13.5-13.3c3.7-3.2 7.5-6.2 11.5-9c0 0 0 0 0 0C313.1 47 353.4 37.9 392.8 45.4C462 58.6 512 119.1 512 189.5v3.3c0 41.9-17.4 81.9-48.1 110.4L288.7 465.9l-2.5 2.3c-8.2 7.6-19 11.9-30.2 11.9s-22-4.2-30.2-11.9zM239.1 145c-.4-.3-.7-.7-1-1.1l-17.8-20c0 0-.1-.1-.1-.1c0 0 0 0 0 0c-23.1-25.9-58-37.7-92-31.2C81.6 101.5 48 142.1 48 189.5v3.3c0 28.5 11.9 55.8 32.8 75.2L256 430.7 431.2 268c20.9-19.4 32.8-46.7 32.8-75.2v-3.3c0-47.3-33.6-88-80.1-96.9c-34-6.5-69 5.4-92 31.2c0 0 0 0-.1 .1s0 0-.1 .1l-17.8 20c-.3 .4-.7 .7-1 1.1c-4.5 4.5-10.6 7-16.9 7s-12.4-2.5-16.9-7z"
+                              ></path>
+                            )}
+                          </svg>
+                          <span>{item.likes.length}</span>
+                        </p>
+                      ) : (
+                        <p>
+                          {" "}
+                          <svg
+                            aria-hidden="true"
+                            focusable="false"
+                            data-prefix="far"
+                            data-icon="heart"
+                            className="svg-inline--fa fa-heart w-5"
+                            role="img"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 512 512"
+                            onClick={() => hanldetoggleLikeRatingAPI(item._id)}
+                          >
                             <path
                               fill="currentColor"
                               d="M225.8 468.2l-2.5-2.3L48.1 303.2C17.4 274.7 0 234.7 0 192.8v-3.3c0-70.4 50-130.8 119.2-144C158.6 37.9 198.9 47 231 69.6c9 6.4 17.4 13.8 25 22.3c4.2-4.8 8.7-9.2 13.5-13.3c3.7-3.2 7.5-6.2 11.5-9c0 0 0 0 0 0C313.1 47 353.4 37.9 392.8 45.4C462 58.6 512 119.1 512 189.5v3.3c0 41.9-17.4 81.9-48.1 110.4L288.7 465.9l-2.5 2.3c-8.2 7.6-19 11.9-30.2 11.9s-22-4.2-30.2-11.9zM239.1 145c-.4-.3-.7-.7-1-1.1l-17.8-20c0 0-.1-.1-.1-.1c0 0 0 0 0 0c-23.1-25.9-58-37.7-92-31.2C81.6 101.5 48 142.1 48 189.5v3.3c0 28.5 11.9 55.8 32.8 75.2L256 430.7 431.2 268c20.9-19.4 32.8-46.7 32.8-75.2v-3.3c0-47.3-33.6-88-80.1-96.9c-34-6.5-69 5.4-92 31.2c0 0 0 0-.1 .1s0 0-.1 .1l-17.8 20c-.3 .4-.7 .7-1 1.1c-4.5 4.5-10.6 7-16.9 7s-12.4-2.5-16.9-7z"
                             ></path>
-                          )}
-                        </svg>
-                        <span>{item.likes.length}</span>
-                      </p>
-                    ) : (
-                      <p>
-                        {" "}
-                        <svg
-                          aria-hidden="true"
-                          focusable="false"
-                          data-prefix="far"
-                          data-icon="heart"
-                          className="svg-inline--fa fa-heart w-5"
-                          role="img"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 512 512"
-                          onClick={() => hanldetoggleLikeRatingAPI(item._id)}
-                        >
-                          <path
-                            fill="currentColor"
-                            d="M225.8 468.2l-2.5-2.3L48.1 303.2C17.4 274.7 0 234.7 0 192.8v-3.3c0-70.4 50-130.8 119.2-144C158.6 37.9 198.9 47 231 69.6c9 6.4 17.4 13.8 25 22.3c4.2-4.8 8.7-9.2 13.5-13.3c3.7-3.2 7.5-6.2 11.5-9c0 0 0 0 0 0C313.1 47 353.4 37.9 392.8 45.4C462 58.6 512 119.1 512 189.5v3.3c0 41.9-17.4 81.9-48.1 110.4L288.7 465.9l-2.5 2.3c-8.2 7.6-19 11.9-30.2 11.9s-22-4.2-30.2-11.9zM239.1 145c-.4-.3-.7-.7-1-1.1l-17.8-20c0 0-.1-.1-.1-.1c0 0 0 0 0 0c-23.1-25.9-58-37.7-92-31.2C81.6 101.5 48 142.1 48 189.5v3.3c0 28.5 11.9 55.8 32.8 75.2L256 430.7 431.2 268c20.9-19.4 32.8-46.7 32.8-75.2v-3.3c0-47.3-33.6-88-80.1-96.9c-34-6.5-69 5.4-92 31.2c0 0 0 0-.1 .1s0 0-.1 .1l-17.8 20c-.3 .4-.7 .7-1 1.1c-4.5 4.5-10.6 7-16.9 7s-12.4-2.5-16.9-7z"
-                          ></path>
-                        </svg>
-                      </p>
-                    )}
+                          </svg>
+                        </p>
+                      )}
+                    </div>
+                    <div className="feedback_div">
+                      {item.images &&
+                        item.images.length > 0 &&
+                        item.images.map((url, index) => {
+                          return (
+                            <img
+                              className="feedback_images"
+                              src={url}
+                              alt="lỗi"
+                              key={index}
+                            />
+                          );
+                        })}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
           <ReactPaginate
             previousLabel={
               <svg

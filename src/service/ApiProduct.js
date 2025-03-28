@@ -130,14 +130,69 @@ const searchProductsByNameAPI = async (keyword, page = 1) => {
 };
 
 //đánh giá nhiều sản phẩm
-const feeckacksProductsAPI = async (id, userId, rating, review) => {
-  return await axios.post("api/v1/feedbacks-products", {
-    id,
-    userId,
-    rating,
-    review,
-  });
+
+const feeckacksProductsAPI = async (ids, userId, rating, review, images) => {
+  try {
+    const formData = new FormData();
+    console.log("IDs gửi lên:", ids);
+
+    // Kiểm tra ids hợp lệ
+    if (!ids || (Array.isArray(ids) && ids.length === 0)) {
+      throw new Error("Danh sách ID sản phẩm không được trống.");
+    }
+
+    // Đảm bảo ids là mảng
+    if (!Array.isArray(ids)) {
+      ids = [ids];
+    }
+
+    // Gửi danh sách ID
+    formData.append("id", ids);
+
+    // Kiểm tra userId hợp lệ
+    if (!userId) {
+      throw new Error("User ID không hợp lệ.");
+    }
+    formData.append("userId", userId);
+
+    // Kiểm tra rating hợp lệ (nếu cần)
+    if (!rating || isNaN(rating) || rating < 1 || rating > 5) {
+      throw new Error("Rating phải là số từ 1 đến 5.");
+    }
+    formData.append("rating", rating);
+
+    // Kiểm tra review hợp lệ
+    if (review && typeof review !== "string") {
+      throw new Error("Review phải là một chuỗi.");
+    }
+    formData.append("review", review || "");
+
+    // Kiểm tra images có hợp lệ không
+    if (Array.isArray(images) && images.length > 0) {
+      images.forEach((image, index) => {
+        if (image instanceof File || image instanceof Blob) {
+          formData.append(`images`, image);
+        } else {
+          console.warn(`Ảnh thứ ${index + 1} không hợp lệ, bỏ qua.`);
+        }
+      });
+    }
+
+    // Gửi request
+    const response = await axios.post("api/v1/feedbacks-products", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    console.log("Phản hồi từ server:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi gửi phản hồi sản phẩm:", error);
+    throw error;
+  }
 };
+
 export {
   createProductAPI,
   getListProductsAPI,
