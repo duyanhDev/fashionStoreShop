@@ -80,28 +80,6 @@ const productSchema = new mongoose.Schema({
       ],
     },
   ],
-  // size: [
-  //   {
-  //     type: String,
-  //   },
-  // ],
-  // color: [
-  //   {
-  //     type: String,
-  //   },
-  // ],
-  // images: [
-  //   {
-  //     color: {
-  //       type: String,
-  //       required: true,
-  //     },
-  //     url: {
-  //       type: String,
-  //       required: true,
-  //     },
-  //   },
-  // ],
   ratings: [
     {
       userId: {
@@ -116,6 +94,12 @@ const productSchema = new mongoose.Schema({
       review: {
         type: String,
       },
+      images: [
+        {
+          type: String,
+        },
+      ],
+
       likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Users" }],
       replies: [
         {
@@ -127,11 +111,17 @@ const productSchema = new mongoose.Schema({
             type: String,
             required: true,
           },
-
+          likes: [
+            {
+              type: mongoose.Schema.Types.ObjectId,
+              ref: "Users",
+            },
+          ],
           createdAt: {
             type: Date,
             default: Date.now,
           },
+
           replies: [
             {
               userId: {

@@ -28,6 +28,7 @@ const AddProductsAPI = async (req, res) => {
     costPrice,
   } = req.body;
   const quantity = 100;
+
   // Parse sizes and colors into arrays
   const sizeArray = Array.isArray(size)
     ? size
@@ -49,13 +50,20 @@ const AddProductsAPI = async (req, res) => {
       if (files.length !== colorArray.length) {
         return res.status(400).json({
           success: false,
-          message: "Number of images must match the number of colors",
+          message: "Số lượng ảnh phải khớp với số lượng màu sắc",
         });
       }
 
+      // Upload all images at once using uploadFileToCloudinary
+      const resultImages = await uploadFileToCloudinary(files);
+
       // Process each color and its associated image
       for (let i = 0; i < colorArray.length; i++) {
-        const resultImage = await uploadFileToCloudinary(files[i]);
+        const result = resultImages[i]; // Lấy kết quả tương ứng
+        if (!result || !result.secure_url) {
+          throw new Error(`Không thể tải lên ảnh cho màu ${colorArray[i]}`);
+        }
+
         const variant = {
           color: colorArray[i],
           sizes: sizeArray.map((size) => ({
@@ -63,15 +71,15 @@ const AddProductsAPI = async (req, res) => {
             quantity: quantity,
             sold: 0,
           })),
-          images: [{ url: resultImage.secure_url }],
+          images: [{ url: result.secure_url }],
         };
         variants.push(variant);
       }
     } catch (uploadError) {
-      console.error("Error uploading images:", uploadError.message);
+      console.error("Lỗi khi tải ảnh lên Cloudinary:", uploadError.message);
       return res
         .status(500)
-        .json({ success: false, message: "Error uploading images" });
+        .json({ success: false, message: "Lỗi khi tải ảnh lên Cloudinary" });
     }
   }
 
@@ -94,13 +102,13 @@ const AddProductsAPI = async (req, res) => {
     return res.status(200).json({
       EC: 0,
       data: data,
-      message: "Product added successfully",
+      message: "Thêm sản phẩm thành công",
     });
   } catch (error) {
-    console.error("Error adding product:", error.message);
+    console.error("Lỗi khi thêm sản phẩm:", error.message);
     return res
       .status(500)
-      .json({ success: false, message: "Error adding product" });
+      .json({ success: false, message: "Lỗi khi thêm sản phẩm" });
   }
 };
 
@@ -422,7 +430,27 @@ const UpdateProductsAPI = async (req, res) => {
 const PutFeedbackProductAPI = async (req, res) => {
   try {
     const { id, userId, rating, review } = req.body;
-    const data = await PutFeedbackProduct(id, userId, rating, review);
+
+    const imagesUrl = [];
+
+    if (req.files && req.files.images) {
+      console.log(req.files.images);
+
+      let result = req.files.images;
+      let resultImage = await uploadFileToCloudinary(result);
+      console.log(resultImage);
+
+      imagesUrl.push(resultImage.secure_url);
+    }
+    console.log(imagesUrl);
+
+    const data = await PutFeedbackProduct(
+      id,
+      userId,
+      rating,
+      review,
+      imagesUrl
+    );
 
     return res.status(200).json({
       EC: "cập nhật thành công",
@@ -434,16 +462,41 @@ const PutFeedbackProductAPI = async (req, res) => {
 const PutFeedbackProductsAPI = async (req, res) => {
   try {
     const { id, userId, rating, review } = req.body;
-    console.log(id, userId, rating, review);
-    const data = await PutFeedbackProducts(id, userId, rating, review);
-    console.log(data);
+
+    const imagesUrl = [];
+
+    if (req.files && req.files.images) {
+      console.log("Tệp nhận được trong API:", req.files.images);
+
+      const resultImages = await uploadFileToCloudinary(req.files.images);
+
+      resultImages.forEach((result) => {
+        if (result && result.secure_url) {
+          imagesUrl.push(result.secure_url);
+        }
+      });
+    }
+
+    console.log("URL ảnh đã tải lên:", imagesUrl);
+
+    const data = await PutFeedbackProducts(
+      id,
+      userId,
+      rating,
+      review,
+      imagesUrl
+    );
 
     return res.status(200).json({
       EC: "cập nhật thành công",
       data: data,
     });
   } catch (error) {
-    console.log(error);
+    console.error("Lỗi trong PutFeedbackProductsAPI:", error);
+    return res.status(500).json({
+      EC: "lỗi server",
+      error: error.message,
+    });
   }
 };
 const CategoryGenderAPI = async (req, res) => {

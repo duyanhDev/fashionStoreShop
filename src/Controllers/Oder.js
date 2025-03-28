@@ -735,18 +735,28 @@ const UpDateCompleted = async (req, res) => {
 
     // Lấy voucher hiện tại để lấy usageLimit
     const voucher = await Voucher.findById(idVoucher);
-    if (!voucher) {
-      throw new Error("Voucher không tồn tại");
-    }
 
-    // Giảm usageLimit và cập nhật lại voucher
-    const voucherProduct = await Voucher.findOneAndUpdate(
-      { _id: idVoucher },
-      {
-        $set: { usageLimit: voucher.usageLimit - 1 },
-      },
-      { new: true } // Để trả về dữ liệu mới sau khi cập nhật
-    );
+    if (idVoucher) {
+      try {
+        // Lấy voucher hiện tại để lấy usageLimit
+        const voucher = await Voucher.findById(idVoucher);
+        if (!voucher) {
+          throw new Error("Voucher không tồn tại");
+        }
+
+        // Giảm usageLimit và cập nhật lại voucher
+        const voucherProduct = await Voucher.findOneAndUpdate(
+          { _id: idVoucher },
+          {
+            $set: { usageLimit: voucher.usageLimit - 1 },
+          },
+          { new: true } // Để trả về dữ liệu mới sau khi cập nhật
+        );
+        console.log(voucherProduct);
+      } catch (error) {
+        console.error("Lỗi khi cập nhật voucher:", error);
+      }
+    }
     console.log(voucherProduct);
 
     // Lấy danh sách sản phẩm từ đơn hàng

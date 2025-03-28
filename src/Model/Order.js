@@ -48,6 +48,7 @@ const orderSchema = new mongoose.Schema({
     ],
     default: "Processing",
   },
+  active: { type: Boolean, default: true },
   idDiscount: { type: String },
   totalAmount: { type: Number, required: true },
   createdAt: { type: Date, default: Date.now },

@@ -6,6 +6,7 @@ const {
   sendMessageToCustomer,
 } = require("./../services/Message");
 
+// Gửi tin nhắn từ khách hàng  đến admin
 const sendMessageCutomerAPI = async (req, res) => {
   try {
     console.log("Request Body:", req.body);
@@ -58,6 +59,7 @@ const sendMessageCutomerAPI = async (req, res) => {
   }
 };
 
+// / Gửi tin nhắn từ admin đến khách hàng
 const sendMessageToAdminAPI = async (req, res) => {
   try {
     console.log("Request Body:", req.body);
@@ -228,7 +230,10 @@ const UpdateStatusIsRead = async (req, res) => {
 
 const getMessagesSenderList = async (req, res) => {
   try {
-    const { sender } = req.params; // sender là userId của người dùng hiện tại
+    const { sender } = req.params;
+
+    console.log(sender);
+    // sender là userId của người dùng hiện tại
     if (!sender) {
       return res.status(400).json({
         EC: 1,

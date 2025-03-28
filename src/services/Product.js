@@ -80,7 +80,7 @@ const UpdateProducts = async (productData) => {
 };
 
 // đánh giá
-const PutFeedbackProduct = async (id, userId, rating, review) => {
+const PutFeedbackProduct = async (id, userId, rating, review, images) => {
   try {
     const feedback = await Products.findOneAndUpdate(
       { _id: id },
@@ -90,6 +90,7 @@ const PutFeedbackProduct = async (id, userId, rating, review) => {
             userId,
             rating,
             review,
+            images,
           },
         },
       },
@@ -103,55 +104,44 @@ const PutFeedbackProduct = async (id, userId, rating, review) => {
   }
 };
 
-const PutFeedbackProducts = async (ids, userId, rating, review) => {
+const PutFeedbackProducts = async (ids, userId, rating, review, images) => {
   try {
-    console.log("IDs nhận được:", ids);
+    // Chuyển đổi chuỗi thành mảng nếu `ids` là string
+    if (typeof ids === "string") {
+      ids = ids.split(",").map((id) => id.trim()); // Cắt bỏ khoảng trắng nếu có
+    }
 
-    // Chuyển đổi ID sang ObjectId
-    const objectIds = Array.isArray(ids)
-      ? ids.map((id) => new mongoose.Types.ObjectId(id))
-      : [new mongoose.Types.ObjectId(ids)];
+    // Kiểm tra nếu ID nào không hợp lệ
+    const validIds = ids.filter((id) => mongoose.Types.ObjectId.isValid(id));
+    if (validIds.length === 0) {
+      throw new Error("Không có ID hợp lệ để cập nhật.");
+    }
 
+    const objectIds = validIds.map((id) => new mongoose.Types.ObjectId(id));
     console.log("ObjectIds đã convert:", objectIds);
 
     // Kiểm tra sản phẩm có tồn tại không
     const existingProducts = await Products.find({ _id: { $in: objectIds } });
-    console.log("Sản phẩm tìm thấy:", existingProducts);
 
     if (existingProducts.length === 0) {
       throw new Error("Không tìm thấy sản phẩm nào với các ID đã cung cấp.");
     }
 
-    let feedback;
-    if (objectIds.length === 1) {
-      feedback = await Products.updateOne(
-        { _id: objectIds[0] },
-        {
-          $push: {
-            ratings: {
-              userId: new mongoose.Types.ObjectId(userId),
-              rating,
-              review,
-            },
-          },
-        }
-      );
-    } else {
-      feedback = await Products.updateMany(
-        { _id: { $in: objectIds } },
-        {
-          $push: {
-            ratings: {
-              userId: new mongoose.Types.ObjectId(userId),
-              rating,
-              review,
-            },
-          },
-        }
-      );
+    // Chuyển đổi userId nếu hợp lệ
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      throw new Error("UserId không hợp lệ.");
     }
+    const userObjectId = new mongoose.Types.ObjectId(userId);
 
-    console.log("Feedback Update Result:", feedback);
+    const feedback = await Products.updateMany(
+      { _id: { $in: objectIds } },
+      {
+        $push: {
+          ratings: { userId: userObjectId, rating, review, images },
+        },
+      }
+    );
+
     return feedback;
   } catch (error) {
     console.log("Lỗi cập nhật feedback:", error);

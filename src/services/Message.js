@@ -22,7 +22,7 @@ const createMessage = async (
   return savedMessage;
 };
 
-// Send message from admin to customer
+// Gửi tin nhắn từ admin đến khách hàng
 const sendMessageToCustomer = async (sender, recipient, content, image) => {
   // Validate message content
   if (!content || content.trim() === "") {
@@ -37,10 +37,10 @@ const sendMessageToCustomer = async (sender, recipient, content, image) => {
   }
 
   // Create the message and return the saved message
-  return createMessage(sender, recipient, content, image, true); // Admin message
+  return createMessage(sender, recipient, content, image, true);
 };
 
-// Send message from customer to admin
+// Gửi tin nhắn từ khách hàng đến admin
 const sendMessageToAdmin = async (sender, content, image) => {
   console.log("sendMessageToAdmin: sender is Customer, recipient is Admin");
 
@@ -57,8 +57,8 @@ const sendMessageToAdmin = async (sender, content, image) => {
   }
 
   // Create messages for all admins and save them
-  const messages = recipients.map(
-    (admin) => createMessage(sender, admin._id, content, image, false) // Customer message
+  const messages = recipients.map((admin) =>
+    createMessage(sender, admin._id, content, image, false)
   );
 
   // Save all messages and return the saved messages
