@@ -71,3 +71,9 @@ label.ant-radio-wrapper.css-dev-only-do-not-override-apn68 {
 .voucher::-webkit-scrollbar-thumb:hover {
   background: #333; /* Màu khi di chuột vào */
 }
+.voucher_item_price {
+  margin: 35px 69px;
+}
+.voucher_item_price_1 {
+  margin-top: 16px;
+}

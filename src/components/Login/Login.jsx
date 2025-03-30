@@ -74,8 +74,9 @@ const LoginForm = () => {
       if (res && res.data.EC === 0) {
         setTimeout(async () => {
           dispatch(login(res.data.data.token, res.data.data.user));
-          setHiddenOTP(true);
+          // setHiddenOTP(true);
           setIsLoading(false);
+          navigate("/");
         }, 5000);
       } else {
         api["error"]({
@@ -206,6 +207,12 @@ const LoginForm = () => {
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
   };
+
+  const handleChangeOnkeyLogin = (e) => {
+    if (e.key === "Enter") {
+      handleLogin();
+    }
+  };
   return (
     <div className="min-h-screen flex">
       {contextHolder}
@@ -294,6 +301,7 @@ const LoginForm = () => {
                 setPassword(e.target.value);
                 if (errors.password) setErrors({ ...errors, password: "" });
               }}
+              onKeyDown={(e) => handleChangeOnkeyLogin(e)}
             />
             {errors.password && (
               <span className="text-red-500 text-xs mb-4 text-left">

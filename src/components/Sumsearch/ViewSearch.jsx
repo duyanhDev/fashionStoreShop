@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import "./Style.css";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { searchProductsByNameAPI } from "../../service/ApiProduct";
 import { logout, Search as SearchAction } from "../../redux/actions/Auth";
@@ -9,6 +9,7 @@ const ViewSearch = ({}) => {
   const dispatch = useDispatch();
   const [DataProducts, setDataProducts] = useState(data);
   const [page, setPage] = useState(1);
+  const navigate = useNavigate();
 
   const formatPrice = (price) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
@@ -38,7 +39,7 @@ const ViewSearch = ({}) => {
   }, [searchKeyword]);
 
   return (
-    <div className="m-10">
+    <div className="mx-10 mt-32">
       <div className="border-b-2 h-10">
         <span className="text-black font-bold mt-4 text-2xl">KẾT QUẢ</span>
       </div>
@@ -46,7 +47,11 @@ const ViewSearch = ({}) => {
         {DataProducts && DataProducts.length > 0 ? (
           DataProducts.map((product) => {
             return (
-              <div className="product-header-search-1 " key={product.id}>
+              <div
+                className="product-header-search-1 "
+                key={product.id}
+                onClick={() => navigate(`/product/${product._id}`)}
+              >
                 <img
                   src={
                     product.variants && product.variants.length > 0

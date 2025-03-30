@@ -686,11 +686,6 @@ const Profile = () => {
                     </div>
                   </div>
                 )}
-                <div>
-                  <Button onClick={() => handleUpdateProfileUser()}>
-                    Cập nhật
-                  </Button>
-                </div>
               </div>
             </div>
           </div>
@@ -990,6 +985,9 @@ const Profile = () => {
           centered
           open={openResponsive}
           onCancel={() => setOpenResponsive(false)}
+          footer={
+            <Button onClick={() => handleUpdateProfileUser()}>Cập Nhật</Button>
+          }
           width={{
             with: "1000px",
             sm: "80%",

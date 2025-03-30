@@ -9,6 +9,7 @@ import { SmileOutlined } from "@ant-design/icons";
 import ClipLoader from "react-spinners/ClipLoader";
 import { getVoucherAPI } from "../../service/APIVoucher,js";
 import moment from "moment";
+
 const CartProducts = ({}) => {
   const { ListCart, user, CartListProductsUser } = useOutletContext();
 
@@ -23,7 +24,6 @@ const CartProducts = ({}) => {
   const [WarnDistrict, setSelectedWarnDistrict] = useState("");
   const [priceObj, setPriceObj] = useState({});
   const [Products, setProducts] = useState([]);
-
   const [Name, setName] = useState("");
   const [number, setNumber] = useState("");
   const [email, setEmail] = useState("");
@@ -33,31 +33,31 @@ const CartProducts = ({}) => {
   const [fullAddress, setFullAddress] = useState("");
   const [CartId, setCartId] = useState("");
   const [productId, setProductId] = useState([]);
-  const [voucher, setVoucher] = useState("");
-
+  const [voucher, setVoucher] = useState([]);
   const [contentVoucher, setContentvoucher] = useState("");
   const [idDiscount, setidDiscount] = useState("");
   const [discountValue, setDiscountValue] = useState(0);
+  const [selectedVouCher, setSelectedVoucher] = useState(null);
+  const [checkedItems, setCheckedItems] = useState([]);
 
   const formatPrice = (price) => {
-    // Nếu price là chuỗi, chuyển đổi nó thành một số
     const numericPrice =
       typeof price === "string"
         ? parseFloat(price.replace(/[^\d,.-]/g, "").replace(",", "."))
         : price;
-
-    // Định dạng lại giá trị bằng cách thêm dấu chấm ngăn cách hàng nghìn và thêm "đ"
     return numericPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
   };
 
+  // Các hàm xử lý địa chỉ (giữ nguyên)
   const DataProvine = async () => {
     try {
       let api = "https://esgoo.net/api-tinhthanh/1/0.htm";
       let res = await axios.get(api);
       if (res.data && res.data.data) {
-        const dataProvines = res.data.data.map((data) => {
-          return { id: data.id, name: data.name };
-        });
+        const dataProvines = res.data.data.map((data) => ({
+          id: data.id,
+          name: data.name,
+        }));
         SetProvine(dataProvines);
       }
     } catch (error) {}
@@ -68,25 +68,29 @@ const CartProducts = ({}) => {
       let url = `https://esgoo.net/api-tinhthanh/2/${id}.htm`;
       let res = await axios.get(url);
       if (res.data && res.data.data) {
-        const data = res.data.data.map((item) => {
-          return { id: item.id, name: item.full_name };
-        });
+        const data = res.data.data.map((item) => ({
+          id: item.id,
+          name: item.full_name,
+        }));
         setDistrict(data);
       }
     } catch (error) {}
   };
+
   const WarnData = async () => {
     try {
       let url = `https://esgoo.net/api-tinhthanh/3/${selectedDistrict}.htm`;
       let res = await axios.get(url);
       if (res.data && res.data.data) {
-        const data = res.data.data.map((item) => {
-          return { id: item.id, name: item.full_name };
-        });
+        const data = res.data.data.map((item) => ({
+          id: item.id,
+          name: item.full_name,
+        }));
         setWarn(data);
       }
     } catch (error) {}
   };
+
   useEffect(() => {
     DataProvine();
   }, []);
@@ -94,17 +98,18 @@ const CartProducts = ({}) => {
   useEffect(() => {
     DistrstData();
   }, [id]);
+
   useEffect(() => {
     WarnData();
   }, [selectedDistrict]);
 
   const handleProvinceChange = (value, name) => {
     SetId(value);
-    setDistrict([]); // Xóa các quận/huyện khi thay đổi tỉnh
+    setDistrict([]);
     setSelectedDistrict("");
     setSelectedWarnDistrict("");
     setCity(name.label);
-    setWarn([]); // Reset giá trị quận/huyện đã chọn
+    setWarn([]);
   };
 
   const handleDistrictChange = (value, name) => {
@@ -118,138 +123,73 @@ const CartProducts = ({}) => {
 
   const data =
     ListCart && ListCart.items && ListCart.items.length > 0
-      ? ListCart.items.map((item, index) => {
-          return {
-            key: index + 1,
-            id: item.productId._id,
-            images: (
-              <img
-                src={item.productId.variants[0]?.images[0]?.url}
-                alt="Product"
-                style={{ width: "50px", height: "50px" }}
-              />
-            ),
-            name: item.productId.name,
-            color: item.color,
-            quantity: item.quantity,
-            size: item.size,
-            price: formatPrice(item.price),
-            totalItemPrice: item.totalItemPrice + "đ",
-          };
-        })
+      ? ListCart.items.map((item, index) => ({
+          key: index + 1,
+          id: item.productId._id,
+          images: (
+            <img
+              src={item.productId.variants[0]?.images[0]?.url}
+              alt="Product"
+              style={{ width: "50px", height: "50px" }}
+            />
+          ),
+          name: item.productId.name,
+          color: item.color,
+          quantity: item.quantity,
+          size: item.size,
+          price: formatPrice(item.price),
+          totalItemPrice: item.totalItemPrice + "đ",
+        }))
       : [];
 
-  const [checkedItems, setCheckedItems] = useState([]);
-
   const handleSelectAll = () => {
-    // Kiểm tra xem tất cả các sản phẩm đã được chọn chưa
-    const allSelected =
-      Array.isArray(checkedItems) && checkedItems.length === data?.length;
+    const allSelected = checkedItems.length === data?.length;
     if (allSelected) {
-      // Nếu tất cả đã được chọn, bỏ chọn tất cả
       setCheckedItems([]);
       setPriceObj({});
       setProductId([]);
       setCartId("");
     } else {
-      // Nếu chưa chọn tất cả, chọn tất cả
-      data.map((product) => {
-        console.log(product);
-
-        const allProductIds = []; // Mảng để lưu tất cả productId
+      data.forEach((product) => {
         const { id, name, size, quantity, color, totalItemPrice, images } =
           product;
-
         const imageUrl = images.props.src;
-
-        // Lưu productId vào allProductIds
-        allProductIds.push(id);
-
-        setCartId(ListCart._id);
-
-        // Chuyển đổi giá trị price thành số nếu cần
         const numericPrice =
           typeof totalItemPrice === "string"
             ? parseFloat(
-                totalItemPrice
-                  .replace(/[^\d,.-]/g, "") // Loại bỏ ký tự không phải số
-                  .replace(",", ".") // Thay dấu phẩy thành dấu chấm
+                totalItemPrice.replace(/[^\d,.-]/g, "").replace(",", ".")
               )
             : totalItemPrice;
-
-        // Tạo key duy nhất cho sản phẩm
         const uniqueKey = `${id}-${size}-${color}`;
 
-        // Cập nhật danh sách productId (chọn tất cả productId)
-        setProductId((prev) => {
-          if (prev.includes(allProductIds)) {
-            return prev.filter((item) => item !== id);
-          } else {
-            return [...prev, id];
-          }
-        });
-
-        // Cập nhật danh sách sản phẩm
+        setCartId(ListCart._id);
+        setProductId((prev) => [...new Set([...prev, id])]);
         setProducts((prevState) => {
-          if (!Array.isArray(prevState)) {
-            prevState = [];
-          }
-
-          // Kiểm tra sản phẩm dựa trên key duy nhất
           const existingProductIndex = prevState.findIndex(
-            (product) =>
-              product.id === id &&
-              product.size === size &&
-              product.color === color
+            (p) => p.id === id && p.size === size && p.color === color
           );
-
           if (existingProductIndex !== -1) {
-            // Nếu sản phẩm đã tồn tại, cập nhật thông tin
-            return prevState.map((product, index) =>
+            return prevState.map((p, index) =>
               index === existingProductIndex
                 ? {
-                    ...product,
+                    ...p,
                     name,
                     size,
                     quantity,
                     color,
                     price: numericPrice,
-                    imageUrl, // Cập nhật giá
+                    imageUrl,
                   }
-                : product
+                : p
             );
           }
-
-          // Nếu sản phẩm chưa tồn tại, thêm mới
           return [
             ...prevState,
-            {
-              id,
-              name,
-              quantity,
-              size,
-              color,
-              price: numericPrice,
-              imageUrl,
-            },
+            { id, name, quantity, size, color, price: numericPrice, imageUrl },
           ];
         });
-
-        // Cập nhật giá trị priceObj
-        setPriceObj((prevPriceObj) => {
-          const newPriceObj = { ...prevPriceObj };
-          newPriceObj[uniqueKey] = numericPrice; // Lưu giá trị giá sản phẩm
-          return newPriceObj;
-        });
-
-        // Cập nhật danh sách sản phẩm đã chọn
-        setCheckedItems((prevCheckedItems) => {
-          if (prevCheckedItems.includes(uniqueKey)) {
-            return prevCheckedItems;
-          } else {
-            return [...prevCheckedItems, uniqueKey];
-          }
-        });
+        setPriceObj((prev) => ({ ...prev, [uniqueKey]: numericPrice }));
+        setCheckedItems((prev) => [...new Set([...prev, uniqueKey])]);
       });
     }
   };
@@ -265,44 +205,28 @@ const CartProducts = ({}) => {
     itemID,
     productId
   ) => {
-    // Chuyển đổi giá trị price thành số nếu cần
     const numericPrice =
       typeof price === "string"
         ? parseFloat(price.replace(/[^\d,.-]/g, "").replace(",", "."))
         : price;
     const imageUrl = images.props.src;
-    // Tạo một key duy nhất cho sản phẩm dựa trên id, size và color
     const uniqueKey = `${id}-${size}-${color}`;
 
-    // Cập nhật danh sách productId (chọn hoặc bỏ chọn productId)
-    setProductId((prev) => {
-      if (prev.includes(productId)) {
-        return prev.filter((item) => item !== productId);
-      } else {
-        return [...prev, productId];
-      }
-    });
-
+    setProductId((prev) =>
+      prev.includes(productId)
+        ? prev.filter((item) => item !== productId)
+        : [...prev, productId]
+    );
     setCartId(itemID);
-
-    // Cập nhật danh sách sản phẩm
     setProducts((prevState) => {
-      if (!Array.isArray(prevState)) {
-        prevState = [];
-      }
-
-      // Kiểm tra sản phẩm dựa trên key duy nhất
       const existingProductIndex = prevState.findIndex(
-        (product) =>
-          product.id === id && product.size === size && product.color === color
+        (p) => p.id === id && p.size === size && p.color === color
       );
-
       if (existingProductIndex !== -1) {
-        // Nếu sản phẩm đã tồn tại, cập nhật thông tin
-        return prevState.map((product, index) =>
+        return prevState.map((p, index) =>
           index === existingProductIndex
             ? {
-                ...product,
+                ...p,
                 name,
                 size,
                 quantity,
@@ -310,28 +234,16 @@ const CartProducts = ({}) => {
                 price: numericPrice,
                 imageUrl,
               }
-            : product
+            : p
         );
       }
-
-      // Nếu sản phẩm chưa tồn tại, thêm mới
       return [
         ...prevState,
-        {
-          id,
-          name,
-          quantity,
-          size,
-          color,
-          price: numericPrice,
-          imageUrl,
-        },
+        { id, name, quantity, size, color, price: numericPrice, imageUrl },
       ];
     });
-
-    // Cập nhật giá trị totalItemPrice
-    setPriceObj((prevPriceObj) => {
-      const newPriceObj = { ...prevPriceObj };
+    setPriceObj((prev) => {
+      const newPriceObj = { ...prev };
       if (newPriceObj[uniqueKey]) {
         delete newPriceObj[uniqueKey];
       } else {
@@ -339,67 +251,50 @@ const CartProducts = ({}) => {
       }
       return newPriceObj;
     });
-
-    // Cập nhật danh sách sản phẩm đã chọn
-    setCheckedItems((prevCheckedItems) => {
-      if (prevCheckedItems.includes(uniqueKey)) {
-        // Nếu sản phẩm đã chọn, bỏ chọn
-        return prevCheckedItems.filter((itemKey) => itemKey !== uniqueKey);
-      } else {
-        // Nếu sản phẩm chưa chọn, thêm vào
-        return [...prevCheckedItems, uniqueKey];
-      }
-    });
+    setCheckedItems((prev) =>
+      prev.includes(uniqueKey)
+        ? prev.filter((item) => item !== uniqueKey)
+        : [...prev, uniqueKey]
+    );
   };
 
-  const onChangediscountValue = (value, idDiscount, content) => {
-    setDiscountValue(value);
-    setidDiscount(idDiscount);
-    setContentvoucher(content);
+  // Hàm xử lý chọn/bỏ chọn voucher
+
+  const handleVoucherChange = (discountValue, voucherId, content) => {
+    console.log("Trước khi thay đổi:", { selectedVouCher, voucherId });
+    if (selectedVouCher === voucherId) {
+      // Bỏ chọn voucher
+      setSelectedVoucher(null);
+      setDiscountValue(0);
+      setContentvoucher("");
+      setidDiscount("");
+    } else {
+      // Chọn voucher mới
+      setSelectedVoucher(voucherId);
+      setDiscountValue(discountValue);
+      setContentvoucher(content);
+      setidDiscount(voucherId);
+    }
   };
 
-  const totalCheckedPrice = checkedItems.reduce((total, itemId) => {
-    return total + (priceObj[itemId] || 0);
-  }, 0);
+  // Debug state thay đổi
 
-  const discountAmount = (discountValue / 100) * totalCheckedPrice;
+  const totalCheckedPrice = checkedItems.reduce(
+    (total, itemId) => total + (priceObj[itemId] || 0),
+    0
+  );
+  const discountAmount =
+    discountValue > 0 ? (discountValue / 100) * totalCheckedPrice : 0;
   const finalPrice = totalCheckedPrice - discountAmount;
+
   const columns = [
-    {
-      title: "Hình Ảnh",
-      dataIndex: "images",
-      key: "images",
-    },
-    {
-      title: "Tên Sản Phẩm",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Màu",
-      dataIndex: "color",
-      key: "color",
-    },
-    {
-      title: "Số Lượng",
-      dataIndex: "quantity",
-      key: "quantity",
-    },
-    {
-      title: "Size",
-      dataIndex: "size",
-      key: "size",
-    },
-    {
-      title: "Giá từng sản phẩm",
-      dataIndex: "price",
-      key: "price",
-    },
-    {
-      title: "Tổng tiền",
-      dataIndex: "totalItemPrice",
-      key: "totalItemPrice",
-    },
+    { title: "Hình Ảnh", dataIndex: "images", key: "images" },
+    { title: "Tên Sản Phẩm", dataIndex: "name", key: "name" },
+    { title: "Màu", dataIndex: "color", key: "color" },
+    { title: "Số Lượng", dataIndex: "quantity", key: "quantity" },
+    { title: "Size", dataIndex: "size", key: "size" },
+    { title: "Giá từng sản phẩm", dataIndex: "price", key: "price" },
+    { title: "Tổng tiền", dataIndex: "totalItemPrice", key: "totalItemPrice" },
     {
       title: (
         <input
@@ -442,13 +337,10 @@ const CartProducts = ({}) => {
   const handleOrder = async () => {
     try {
       setLoadingSpin(true);
-      // Ensure each item has productId
       const formattedItems = Products.map((item) => ({
         ...item,
-        productId: item.id, // Assuming `id` is the field that should be mapped to `productId`
+        productId: item.id,
       }));
-
-      console.log(formattedItems);
       if (
         !Name ||
         !email ||
@@ -468,7 +360,7 @@ const CartProducts = ({}) => {
         user._id,
         Name,
         number,
-        formattedItems, // Pass items with productId
+        formattedItems,
         fullAddress,
         city,
         districtName,
@@ -480,30 +372,19 @@ const CartProducts = ({}) => {
         discountValue,
         idDiscount
       );
-
       if (res && res.data.EC === 0) {
         await CartListProductsUser();
-        console.log("xx", res.data.data);
-
         setTimeout(() => {
           setLoadingSpin(false);
           api.open({
             message: "Đặt Hàng",
             description: "Chúc mừng quý khách đã đặt hàng thành công tại shop",
-            icon: (
-              <SmileOutlined
-                style={{
-                  color: "#108ee9",
-                }}
-              />
-            ),
+            icon: <SmileOutlined style={{ color: "#108ee9" }} />,
           });
-          console.log("xx", res.data);
-          res.data.orderUrl ? (window.location.href = res.data.orderUrl) : null;
-          res.data.vnpUrl ? (window.location.href = res.data.vnpUrl) : null;
-          res.data.data.shortLink
-            ? (window.location.href = res.data.data.payUrl)
-            : null;
+          if (res.data.orderUrl) window.location.href = res.data.orderUrl;
+          else if (res.data.vnpUrl) window.location.href = res.data.vnpUrl;
+          else if (res.data.data.shortLink)
+            window.location.href = res.data.data.payUrl;
         }, 3000);
       }
     } catch (error) {
@@ -515,7 +396,6 @@ const CartProducts = ({}) => {
   const fetchApiVoucher = async () => {
     try {
       let res = await getVoucherAPI();
-
       if (res.data && res.data.EC === 0) {
         setVoucher(res.data.data);
       }
@@ -523,14 +403,15 @@ const CartProducts = ({}) => {
       console.log(error);
     }
   };
+
   useEffect(() => {
     fetchApiVoucher();
   }, []);
 
-  const [selectedVouCher, setSelectedVoucher] = useState(null);
-  const onChangeVoucher = (id) => {
-    setSelectedVoucher((prve) => (prve === id ? null : id));
-  };
+  function formatMoney(amount) {
+    return (amount / 1000).toLocaleString() + "k";
+  }
+
   return (
     <div className="min-h-screen w-full mt-28">
       <div className="cart flex justify-between">
@@ -557,97 +438,68 @@ const CartProducts = ({}) => {
               />
             </div>
           </div>
-          <div className="mt-2 ">
-            <div className="">
-              <label className="text-sm">Emai</label>
-              <Input
-                placeholder="Nhập email của bạn"
-                onChange={(e) => setEmail(e.target.value)}
-                value={email}
-                status={!email && "error"}
+          <div className="mt-2">
+            <label className="text-sm">Email</label>
+            <Input
+              placeholder="Nhập email của bạn"
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+              status={!email && "error"}
+            />
+          </div>
+          <div className="mt-2">
+            <label className="text-sm">Địa chỉ</label>
+            <Input
+              placeholder="Nhập địa chỉ của bạn"
+              onChange={(e) => setFullAddress(e.target.value)}
+              value={fullAddress}
+              status={!fullAddress && "error"}
+            />
+            <div className="mt-2 flex gap-2">
+              <Select
+                placeholder="Chọn Tỉnh/Thành Phố"
+                status={!id && "error"}
+                value={id}
+                style={{ flex: 1 }}
+                options={[
+                  { value: "", label: "Chọn Tỉnh/Thành Phố", disabled: true },
+                  ...provine.map((item) => ({
+                    value: item.id,
+                    label: item.name,
+                  })),
+                ]}
+                onChange={handleProvinceChange}
+              />
+              <Select
+                placeholder="Chọn Quận/Huyện"
+                style={{ flex: 1 }}
+                value={selectedDistrict}
+                status={!selectedDistrict && "error"}
+                options={[
+                  { value: "", label: "Chọn Quận/Huyện", disabled: true },
+                  ...district.map((item) => ({
+                    value: item.id,
+                    label: item.name,
+                  })),
+                ]}
+                onChange={handleDistrictChange}
+              />
+              <Select
+                placeholder="Chọn Phường/Xã"
+                style={{ flex: 1 }}
+                value={WarnDistrict}
+                status={!WarnDistrict && "error"}
+                options={[
+                  { value: "", label: "Chọn Phường/Xã", disabled: true },
+                  ...warn.map((item) => ({ value: item.id, label: item.name })),
+                ]}
+                onChange={(value, name) => {
+                  setSelectedWarnDistrict(value);
+                  setWardName(name.label);
+                }}
               />
             </div>
           </div>
-          <div className="mt-2 ">
-            <div className="">
-              <label className="text-sm">Địa chỉ</label>
-              <Input
-                placeholder="Nhập địa chỉ của bạn"
-                onChange={(e) => setFullAddress(e.target.value)}
-                value={fullAddress}
-                status={!fullAddress && "error"}
-              />
-              <div className="mt-2">
-                <div className="flex gap-2">
-                  <Select
-                    placeholder="Chọn Tỉnh/Thành Phố"
-                    status={!id && "error"}
-                    value={id}
-                    style={{
-                      flex: 1,
-                    }}
-                    // Đặt giá trị quận/huyện đã chọn
-                    options={[
-                      {
-                        value: "",
-                        label: "Chọn Tỉnh/Thành Phố",
-                        disabled: true,
-                      },
-                      ...provine.map((item) => ({
-                        value: item.id,
-                        label: item.name,
-                      })),
-                    ]}
-                    onChange={handleProvinceChange}
-                  />
-                  <Select
-                    placeholder="Chọn Quận/Huyện"
-                    style={{
-                      flex: 1,
-                    }}
-                    value={selectedDistrict} // Đặt giá trị quận/huyện đã chọn
-                    status={!selectedDistrict && "error"}
-                    options={[
-                      {
-                        value: "",
-                        label: "Chọn Quận/Huyện",
-                        disabled: true,
-                      },
-                      ...district.map((item) => ({
-                        value: item.id,
-                        label: item.name,
-                      })),
-                    ]}
-                    onChange={handleDistrictChange}
-                  />
-                  <Select
-                    placeholder="Chọn Phường/Xã"
-                    style={{
-                      flex: 1,
-                    }}
-                    value={WarnDistrict}
-                    status={!WarnDistrict && "error"}
-                    options={[
-                      {
-                        value: "",
-                        label: "Chọn Phường/Xã",
-                        disabled: true,
-                      },
-                      ...warn.map((item) => ({
-                        value: item.id,
-                        label: item.name,
-                      })),
-                    ]}
-                    onChange={(value, name) => {
-                      setSelectedWarnDistrict(value);
-                      setWardName(name.label);
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
           <div className="mt-5">
             <h1 className="text-3xl font-semibold">Hình thức thanh toán</h1>
             <div className="mt-3">
@@ -657,10 +509,10 @@ const CartProducts = ({}) => {
                     <div className="flex gap-3">
                       <img
                         src="https://mcdn.coolmate.me/image/October2024/mceclip3_6.png"
-                        alt="lõi"
+                        alt="ZaloPay"
                         className="w-11 h-full"
                       />
-                      <div className="">
+                      <div>
                         <p className="font-bold text-sm">
                           Thanh toán qua ZaloPay
                         </p>
@@ -668,7 +520,7 @@ const CartProducts = ({}) => {
                           Hỗ trợ mọi hình thức thanh toán
                           <img
                             src="https://mcdn.coolmate.me/image/October2024/mceclip0_27.png"
-                            alt="lỗi"
+                            alt="Payment methods"
                             className="w-64"
                           />
                         </span>
@@ -681,11 +533,10 @@ const CartProducts = ({}) => {
                     <div className="flex gap-3 items-center">
                       <img
                         src="https://mcdn.coolmate.me/image/October2024/mceclip2_42.png"
-                        alt="lõi"
+                        alt="COD"
                         className="w-11 h-full"
                       />
-
-                      <p className="font-bold text-sm ">
+                      <p className="font-bold text-sm">
                         Thanh toán khi nhận hàng
                       </p>
                     </div>
@@ -696,26 +547,25 @@ const CartProducts = ({}) => {
                     <div className="flex gap-3 items-center">
                       <img
                         src="https://mcdn.coolmate.me/image/October2024/mceclip1_171.png"
-                        alt="lõi"
+                        alt="MoMo"
                         className="w-11 h-full"
                       />
-
-                      <p className="font-bold text-sm ">Ví MoMo</p>
+                      <p className="font-bold text-sm">Ví MoMo</p>
                     </div>
                   </Radio>
                 </div>
                 <div className="h-50 pay">
-                  <Radio value={"vnpay"} onChange={onChange}>
+                  <Radio value={"vnpay"}>
                     <div className="flex gap-3">
                       <img
                         src="https://mcdn.coolmate.me/image/October2024/mceclip0_81.png"
-                        alt="lõi"
+                        alt="VNPay"
                         className="w-11 h-full"
                       />
-                      <div className="">
-                        <p className="font-bold text-sm">Ví điện tủ VNPAY</p>
+                      <div>
+                        <p className="font-bold text-sm">Ví điện tử VNPAY</p>
                         <span className="flex w-full gap-3 text-[#737373]">
-                          Quét QZ để thanh toán
+                          Quét QR để thanh toán
                         </span>
                       </div>
                     </div>
@@ -726,8 +576,8 @@ const CartProducts = ({}) => {
           </div>
         </div>
         {loadingSpin && (
-          <div className="overlay1 fixed flex items-center justify-center ">
-            <ClipLoader className="" />
+          <div className="overlay1 fixed flex items-center justify-center">
+            <ClipLoader />
           </div>
         )}
         <div className="w-1/2 h-full">
@@ -743,58 +593,93 @@ const CartProducts = ({}) => {
               className: "pagination-custom",
             }}
           />
-
-          <div className="voucher relative top-70 right-0 mr-6 flex gap-2 overflow-x-auto whitespace-nowrap">
+          <div className="voucher relative top-70 right-0 flex gap-2 overflow-x-auto whitespace-nowrap">
             {voucher &&
               voucher.length > 0 &&
-              voucher.map((voucher, index) => {
-                console.log(voucher);
-
-                return (
-                  <label
-                    key={index + 1}
-                    className="flex items-center justify-between w-80 h-32 bg-[#f1f1f1] shrink-0 border border-gray-300 rounded-md px-3 cursor-pointer"
-                    onClick={() => onChangeVoucher(voucher._id)}
-                    htmlFor="voucher"
-                  >
-                    <div className="flex-1 py-5">
-                      <span className="font-bold text-sm">{voucher.code}</span>
-                      <i className="text-sm font-medium">
-                        (Còn {voucher.usageLimit})
-                      </i>
-                      <div>
-                        <span className="whitespace-pre-wrap text-sm">
-                          {voucher.content}
-                        </span>
-                      </div>
-                      <div className="flex justify-between mt-4">
-                        <span className="text-sm">
-                          HSD : {moment(voucher.endDate).format("DD-MM-YYYY")}
-                        </span>
-                        <span className="text-sm">Điều kiện</span>
-                      </div>
+              voucher.map((voucher, index) => (
+                <label
+                  key={index + 1}
+                  className="flex items-center justify-between w-80 h-32 bg-[#f1f1f1] shrink-0 border border-gray-300 rounded-md px-3 cursor-pointer"
+                  htmlFor={`voucher-${voucher._id}`}
+                >
+                  <div className="flex-1 py-5">
+                    <span className="font-bold text-sm">{voucher.code}</span>
+                    <i className="text-sm font-medium">
+                      {" "}
+                      (Còn {voucher.usageLimit})
+                    </i>
+                    <div>
+                      <span className="whitespace-pre-wrap text-sm">
+                        {voucher.content}
+                      </span>
                     </div>
-                    <input
-                      type="radio"
-                      name="voucher"
-                      className="w-5 h-5"
-                      checked={selectedVouCher === voucher._id}
-                      readOnly
-                      onChange={() =>
-                        onChangediscountValue(
-                          voucher.discountValue,
-                          voucher._id,
-                          voucher.content
-                        )
-                      }
-                    />
-                  </label>
-                );
-              })}
+                    <div className="flex justify-between mt-4">
+                      <span className="text-sm">
+                        HSD: {moment(voucher.endDate).format("DD-MM-YYYY")}
+                      </span>
+                      <span className="text-sm">Điều kiện</span>
+                    </div>
+                  </div>
+                  <input
+                    type="radio"
+                    name="voucher"
+                    id={`voucher-${voucher._id}`}
+                    className="w-5 h-5"
+                    checked={selectedVouCher === voucher._id}
+                    onClick={() =>
+                      handleVoucherChange(
+                        voucher.discountValue,
+                        voucher._id,
+                        voucher.content
+                      )
+                    }
+                  />
+                </label>
+              ))}
+          </div>
+
+          <div className="voucher_item_price border-t-2">
+            <div className=" voucher_item_price_1 flex justify-between items-center ">
+              <span className="text-sm font-bold">Tạm tính</span>
+              <div className="">
+                <p className="text-right text-sm font-bold">
+                  {checkedItems.length > 0
+                    ? formatPrice(finalPrice)
+                    : formatPrice(0)}{" "}
+                </p>
+                <i>
+                  (tiết kiệm{" "}
+                  <span className="text-[#2f5acf] text-sm">
+                    {formatMoney(discountAmount)})
+                  </span>
+                </i>
+              </div>
+            </div>
+            <div className="voucher_item_price_1 flex justify-between items-center">
+              <span className="text-sm font-bold">Giảm giá</span>
+              <span className="text-sm ">{formatPrice(discountAmount)}</span>
+            </div>
+            <div className="voucher_item_price_1 flex justify-between items-center border-b-2 py-3">
+              <span className="text-sm font-bold">Phí giao hàng</span>
+              <span className="text-sm ">Miễn phí</span>
+            </div>
+            <div className="voucher_item_price_1 flex justify-between items-center">
+              <span className="text-sm font-bold">Tổng</span>
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-right">
+                  {" "}
+                  {checkedItems.length > 0
+                    ? formatPrice(finalPrice)
+                    : formatPrice(0)}{" "}
+                </span>{" "}
+                <i className="block text-red-500 text-xs">
+                  (Đã giảm 961.000đ trên giá gốc)
+                </i>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
       <div className="footer w-full flex">
         <div className="flex flex-1 cart_1 justify-between items-center">
           <div className="flex items-center justify-center flex-1 border-r-2 border-r-[#333]">
@@ -805,7 +690,7 @@ const CartProducts = ({}) => {
                     return (
                       <img
                         src="https://mcdn.coolmate.me/image/October2024/mceclip3_6.png"
-                        alt="lõi"
+                        alt="ZaloPay"
                         className="w-11 h-full"
                       />
                     );
@@ -814,11 +699,10 @@ const CartProducts = ({}) => {
                       <div className="flex gap-3 items-center">
                         <img
                           src="https://mcdn.coolmate.me/image/October2024/mceclip2_42.png"
-                          alt="lõi"
+                          alt="COD"
                           className="w-11 h-full"
                         />
-
-                        <p className="font-bold text-sm  text-[#2F5ACF]">
+                        <p className="font-bold text-sm text-[#2F5ACF]">
                           COD thanh toán khi nhận hàng
                         </p>
                       </div>
@@ -827,7 +711,7 @@ const CartProducts = ({}) => {
                     return (
                       <img
                         src="https://mcdn.coolmate.me/image/October2024/mceclip1_171.png"
-                        alt="lõi"
+                        alt="MoMo"
                         className="w-11 h-full"
                       />
                     );
@@ -835,32 +719,38 @@ const CartProducts = ({}) => {
                     return (
                       <img
                         src="https://mcdn.coolmate.me/image/October2024/mceclip0_81.png"
-                        alt="lõi"
+                        alt="VNPay"
                         className="w-11 h-full"
                       />
                     );
                   default:
-                    return "The value is unknown";
+                    return "Chọn phương thức thanh toán";
                 }
               })()}
             </span>
           </div>
-          <div className="flex flex-1 justify-center w-full ">
+          <div className="flex flex-1 justify-center w-full">
             <span className="text-center text-[#2F5ACF] font-bold">
-              {discountValue > 0 ? contentVoucher : " Chưa dùng voucher"}
+              {discountValue > 0 ? contentVoucher : "Chưa dùng voucher"}
             </span>
           </div>
         </div>
         <div className="flex flex-1 cart_2 justify-center items-center gap-3">
           <div>
             <span>Thành tiền </span>
-            <span className="text-xl text-[#2F5ACF] font-bold">
+
+            <span className="text-xl text-[#2F5ACF] font-bold ml-2">
               {checkedItems.length > 0
-                ? discountValue > 0
-                  ? formatPrice(finalPrice)
-                  : formatPrice(totalCheckedPrice)
+                ? formatPrice(finalPrice)
                 : formatPrice(0)}
             </span>
+            {discountValue > 0 && (
+              <div className="text-center">
+                <span className="text-sm text-green-500">
+                  Đã giảm: {formatPrice(discountAmount)}
+                </span>
+              </div>
+            )}
           </div>
           <div>
             <Button

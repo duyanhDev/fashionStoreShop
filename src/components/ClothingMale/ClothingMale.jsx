@@ -243,6 +243,19 @@ const ClothingMale = () => {
     </Card>
   );
 
+  const OptionGender = (gender) => {
+    switch (gender) {
+      case "male":
+        return "Nam";
+      case "female":
+        return "Nữ";
+      case "unisex":
+        return "Unisex";
+      default:
+        return "Không có giới tinh";
+    }
+  };
+
   return (
     <section>
       <SliderComponent />
@@ -408,13 +421,15 @@ const ClothingMale = () => {
               </Link>
               /
               <Link>
-                <h1 className="text-[#a3a3a3]">Đồ {param.gender}</h1>
+                <h1 className="text-[#a3a3a3]">
+                  Đồ {OptionGender(param.gender)}
+                </h1>
               </Link>
             </div>
             <div className="flex items-center gap-3">
               <Link>
                 <h1 className="text-[#333] text-xl font-bold">
-                  Đồ {param.gender}
+                  Đồ {OptionGender(param.gender)}
                 </h1>
               </Link>
               /

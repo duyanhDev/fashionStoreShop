@@ -70,7 +70,13 @@ const Register = ({ modal2Open, setModal2Open }) => {
 
   const HandleRegister = async () => {
     try {
-      let res = await RegisterUser(username, email, password, selectedImage);
+      let res = await RegisterUser(
+        username,
+        email,
+        password,
+        selectedImage,
+        false
+      );
       if (res) {
         console.log(res);
       }

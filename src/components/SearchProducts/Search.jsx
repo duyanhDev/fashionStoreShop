@@ -84,7 +84,7 @@ const Search = ({
               </div>
             )}
 
-            <div className="m-10">
+            <div className="m-10 ">
               <span className="text-black font-bold">Sản phẩm</span>
               <div className="mt-2 flex flex-wrap items-center gap-10 ">
                 {data && data.length > 0 ? (

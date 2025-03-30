@@ -6,16 +6,12 @@ import {
   IoCartOutline,
 } from "react-icons/io5";
 import Avatar from "antd/es/avatar/avatar";
-import { Dropdown, Button, Drawer } from "antd";
-import {
-  CloseCircleOutlined,
-  LogoutOutlined,
-  SettingOutlined,
-} from "@ant-design/icons";
+import { Dropdown, Button, Drawer, Modal } from "antd";
+import { LogoutOutlined, SettingOutlined } from "@ant-design/icons";
 import { useDispatch } from "react-redux";
 import { logout, Search as SearchAction } from "../../redux/actions/Auth";
 import { useEffect, useState } from "react";
-import { RemoveCartOnePorduct } from "../../service/Cart";
+import { RemoveCartOnePorduct, UpdateCartQuantity } from "../../service/Cart";
 import ClipLoader from "react-spinners/ClipLoader";
 import {
   FetcDataNocatifions,
@@ -23,7 +19,10 @@ import {
 } from "../../service/ApiNocatifions";
 import Search from "../SearchProducts/Search";
 import { searchProductsByNameAPI } from "../../service/ApiProduct";
-
+import { HiShoppingBag } from "react-icons/hi";
+import { MdDeleteForever } from "react-icons/md";
+import { debounce } from "lodash";
+import { FaCartArrowDown } from "react-icons/fa";
 const Header = ({ user, ListCart, CartListProductsUser }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -39,6 +38,7 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
   const [DataNotifications, setDataNotifications] = useState([]);
   const [keywordSearch, setKeywordSearch] = useState("");
   const [totalPage, setTotalPage] = useState("");
+
   const handleLogOut = () => {
     dispatch(logout());
     navigate("/login");
@@ -252,6 +252,48 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
       item.read === false && item.isCheck === false && item.isAdmin === false
   );
 
+  const handleMinus = (cartId, currentQuantity) => {
+    if (currentQuantity > 1) {
+      const newQuantity = currentQuantity - 1;
+      debouncedUpdate(cartId, newQuantity);
+    }
+  };
+
+  const handlePlus = (cartId, currentQuantity) => {
+    const newQuantity = currentQuantity + 1;
+    debouncedUpdate(cartId, newQuantity);
+  };
+
+  const handleUpdateQuantity = async (cartId, newQuantity) => {
+    try {
+      setLoadingSpin(true);
+      const res = await UpdateCartQuantity(
+        ListCart._id,
+        cartId,
+        user._id,
+        newQuantity
+      );
+
+      if (res.data && res.data.EC === 0) {
+        // Kiểm tra response từ API
+        // Không cần setTimeout, cập nhật ngay sau khi API thành công
+        CartListProductsUser(); // Refresh giỏ hàng
+        setLoadingSpin(false);
+      } else {
+        throw new Error(res.data?.message || "Update failed");
+      }
+    } catch (error) {
+      setLoadingSpin(false);
+      console.error("Error updating quantity:", error);
+      // Có thể thêm thông báo lỗi cho người dùng
+      // message.error('Cập nhật số lượng thất bại');
+    }
+  };
+  const debouncedUpdate = debounce(handleUpdateQuantity, 500, {
+    leading: false, // Không gọi ngay lần đầu
+    trailing: true, // Chỉ gọi sau khi ngừng click 500ms
+  });
+
   return (
     <div className="w-full flex justify-between items-center h-full m-auto">
       <div className="flex items-center doin_image">
@@ -351,90 +393,123 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
             )}
           </li>
         </ul>
-        <Drawer
-          closable
-          destroyOnClose
-          title={<p>Giỏ Hàng Của Bạn </p>}
+        <Modal
+          title={
+            <div className="flex items-center gap-2">
+              <HiShoppingBag className="cart_color_item text-green-600" />
+              <span>
+                Hiện đang có{" "}
+                {ListCart && ListCart.items ? (
+                  <span className="">{ListCart.items.length}</span>
+                ) : (
+                  <span className="">0</span>
+                )}{" "}
+                sản phẩm trong giỏ hàng
+              </span>
+            </div>
+          }
           placement="right"
           open={open}
+          centered
           loading={loading}
-          onClose={() => setOpen(false)}
-          className="relative"
+          onCancel={() => setOpen(false)}
+          className="relative cart_products_item"
         >
-          {/* <Button
-            type="primary"
-            style={{
-              marginBottom: 16,
-            }}
-            onClick={showLoading}
-          >
-            Reload
-          </Button> */}
+          <div className="item_list_cart_products">
+            <span className=" ">Hình ảnh</span>
+            <span className=" ">Sản phẩm</span>
+            <span className="text-center">Số lượng</span>
+            <span className="">Thành tiền</span>
+          </div>
           {ListCart && ListCart.items && ListCart.items.length > 0 ? (
             ListCart.items.map((cart, index) => {
+              console.log(cart);
+
               return (
-                <div className="">
-                  <div
-                    className="flex gap-3 w-full border-b-2 items-center "
-                    key={index}
-                  >
-                    <div>
-                      <img
-                        src={cart.productId.variants[0]?.images[0]?.url}
-                        alt={cart.productId.name}
-                        width={100}
+                <div
+                  className="item_list_cart_total flex items-center"
+                  key={index}
+                >
+                  <div>
+                    <img
+                      src={cart.productId.variants[0]?.images[0]?.url}
+                      alt={cart.productId.name}
+                      width={100}
+                    />
+                  </div>
+                  <div className="">
+                    <span className="whitespace-nowrap">
+                      {cart.productId.name}
+                    </span>
+                    <p className="uppercase">
+                      {cart.color} - {cart.size}
+                    </p>
+
+                    <div className="flex items-center gap-5">
+                      <span className="border-r-2 pr-4">
+                        {formatPrice(cart.price)}
+                      </span>
+
+                      <MdDeleteForever
+                        className="cursor-pointer"
+                        size={20}
+                        color=""
+                        style={{ color: "rgb(242, 153, 74)" }}
+                        onClick={() => handleRemoveCartProduct(cart._id)}
                       />
                     </div>
-                    <div className="cart_dosi ml-2 flex-1">
-                      <div>
-                        <p className="text-base font-bold ">
-                          {cart.productId.name}
-                        </p>
-                      </div>
-                      <div className="mt-2">
-                        <span>Số lượng : {cart.quantity}</span>
-                      </div>
-                      <div className="mt-2">
-                        <span>Size : {cart.size}</span>
-                      </div>
-                      <div className="mt-2">
-                        <span>Màu : {cart.color}</span>
-                      </div>
-                      <div className="mt-2 whitespace-nowrap">
-                        <span>
-                          Tổng giá : {formatPrice(cart.totalItemPrice)}
-                        </span>
-                      </div>
-                    </div>
-                    <div
-                      className="mt-1 self-start"
-                      onClick={() => handleRemoveCartProduct(cart._id)}
-                    >
-                      <CloseCircleOutlined />
+                  </div>
+                  <div className="flex justify-center">
+                    <div className="flex justify-center items-center border border-gray-400 rounded-lg overflow-hidden w-4/5">
+                      <button
+                        className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-lg font-bold"
+                        onClick={() => handleMinus(cart._id, cart.quantity)}
+                        disabled={loadingSpin}
+                      >
+                        −
+                      </button>
+                      <input
+                        type="number"
+                        className="w-10 h-8 text-center text-lg font-semibold text-gray-900 bg-transparent border-x border-gray-300 outline-none appearance-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        value={cart.quantity}
+                        min={1}
+                        readOnly
+                      />
+                      <button
+                        className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-lg font-bold"
+                        onClick={() => handlePlus(cart._id, cart.quantity)}
+                        disabled={loadingSpin}
+                      >
+                        +
+                      </button>
                     </div>
                   </div>
+                  <div className="">{formatPrice(cart.totalItemPrice)}</div>
                 </div>
               );
             })
           ) : (
-            <span>Giỏ hàng chưa có gì :(, chọn mua đồ bạn nhé)</span>
+            <div className="h-96 flex justify-center items-center gap-3">
+              <FaCartArrowDown className="cart-icon" size={120} />
+              <span>Giỏ hàng chưa có gì :(, chọn mua đồ bạn nhé)</span>
+            </div>
           )}
           {ListCart && ListCart.items && ListCart.items.length > 0 ? (
-            <>
+            <div className="flex justify-between items-center">
               <p className="font-semibold text-base ml-5 mt-2 whitespace-nowrap">
-                Tổng giá tiền tất cả sản phẩm :{" "}
+                Tổng tiền :{" "}
                 {ListCart && ListCart.totalPrice !== undefined
                   ? formatPrice(ListCart.totalPrice)
                   : "0đ"}
               </p>
               <Button
-                className="flex justify-center w-3/4 items-center ml-14 mt-1"
+                className="flex justify-center w-32 items-center ml-14 mt-1"
                 type="primary"
                 onClick={() => handlePay()}
               >
-                Thanh Toán
+                Đặt Hàng
               </Button>
-            </>
+            </div>
           ) : (
             <div></div>
           )}
@@ -443,7 +518,7 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
               <ClipLoader className="" />
             </div>
           )}
-        </Drawer>
+        </Modal>
 
         <Drawer
           closable

@@ -78,7 +78,7 @@ const Forgotpassword = async (email) => {
   });
 };
 
-const RegisterUser = async (name, email, password, avatar) => {
+const RegisterUser = async (name, email, password, avatar, isAdmin) => {
   const data = new FormData();
 
   data.append("name", name);
@@ -88,6 +88,7 @@ const RegisterUser = async (name, email, password, avatar) => {
     // If avatar is a file, append it
     data.append("avatar", avatar);
   }
+  data.append("isAdmin", isAdmin);
   return await axios.post("api/v1/register", data, {
     headers: {
       "Content-Type": "multipart/form-data", // Ensure it's set to handle file uploads

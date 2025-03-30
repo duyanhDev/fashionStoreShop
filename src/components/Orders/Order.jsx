@@ -88,10 +88,35 @@ const Order = () => {
     }
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
   };
+
+  // "Processing", // Chờ xác nhận
+  // "Delivered", // duyêt đơn giao hàng (another state)
+  // "Shipping", // Giao hàng thanh công cho bên vận chyuyeenr
+  // "Completed", // Đã xong
+
+  const replaceOrderStatus = (value) => {
+    switch (value) {
+      case "Processing":
+        return "Chờ xác nhận";
+      case "Delivered":
+        return "Chờ giao hàng";
+      case "Shipping":
+        return "Đang giao hàng";
+      case "Completed":
+        return "Giao hàng thành công";
+      default:
+        return "Trạng thái không hợp lệ";
+    }
+  };
+
+  console.log();
+
   const dataSource =
     OrderProducts &&
     OrderProducts.length > 0 &&
     OrderProducts.map((item, index) => {
+      console.log(item);
+
       return {
         key: index + 1,
         index: index + 1,
@@ -109,10 +134,7 @@ const Order = () => {
           item.paymentStatus && item.paymentStatus === "Completed"
             ? "Đã thanh toán"
             : "Chờ thanh toán",
-        orderStatus:
-          item.orderStatus && item.orderStatus === "Delivered"
-            ? "Chờ giao hàng"
-            : "Đang giao",
+        orderStatus: item.orderStatus && replaceOrderStatus(item.orderStatus),
         totalAmount: formatPrice(item.totalAmount),
         createdAt: moment(item.createdAt).format("DD/MM/YYYY"),
         Check: (
