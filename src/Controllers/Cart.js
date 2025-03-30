@@ -171,4 +171,81 @@ const RemoveCartProductfirst = async (req, res) => {
   }
 };
 
-module.exports = { addToCart, getCartProduct, RemoveCartProductfirst };
+const UpdateCartQuantity = async (req, res) => {
+  try {
+    const { itemId, cartId } = req.params;
+    const { userId, quantity } = req.body;
+    console.log("x", quantity);
+    console.log(itemId);
+    console.log(cartId);
+    // Tìm giỏ hàng của user
+    const userCart = await Cart.findOne({ userId: userId });
+
+    if (!userCart) {
+      return res.status(400).json({
+        EC: -1,
+        message: "User's cart not found",
+      });
+    }
+
+    // Kiểm tra cartId
+    if (String(userCart._id) !== cartId) {
+      return res.status(400).json({
+        EC: -1,
+        message: "Provided cartId does not match the user's cart",
+      });
+    }
+
+    // Cập nhật số lượng của item cụ thể
+    const updatedCart = await Cart.findOneAndUpdate(
+      {
+        _id: cartId,
+        "items._id": itemId, // Sử dụng dot notation để tìm item trong array
+      },
+      {
+        $set: {
+          "items.$.quantity": quantity, // Cập nhật quantity của item khớp
+          "items.$.totalItemPrice":
+            quantity *
+            userCart.items.find((item) => String(item._id) === itemId).price,
+        },
+      },
+      { new: true }
+    );
+
+    if (!updatedCart) {
+      return res.status(404).json({
+        EC: -1,
+        message: "Cart or item not found",
+      });
+    }
+
+    // Tính lại tổng giá
+    const updatedTotalPrice = updatedCart.items.reduce(
+      (total, item) => total + item.totalItemPrice,
+      0
+    );
+    updatedCart.totalPrice = updatedTotalPrice;
+    await updatedCart.save();
+
+    return res.status(200).json({
+      EC: 0,
+      message: "Cập nhật số lượng thành công",
+      data: updatedCart,
+    });
+  } catch (error) {
+    console.error("Error updating cart quantity:", error);
+    return res.status(400).json({
+      EC: -1,
+      message: "Error updating cart quantity",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = {
+  addToCart,
+  getCartProduct,
+  RemoveCartProductfirst,
+  UpdateCartQuantity,
+};

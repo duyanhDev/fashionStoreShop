@@ -33,6 +33,7 @@ router.get("/user", authMiddleware, (req, res) => {
     _id: req.userId,
     name: req.user.name,
     email: req.user.email,
+    isAdmin: req.user.isAdmin,
     avatar: req.user.avatar, // Trả về avatar
   });
 });

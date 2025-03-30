@@ -34,6 +34,7 @@ const {
   addToCart,
   getCartProduct,
   RemoveCartProductfirst,
+  UpdateCartQuantity,
 } = require("./../Controllers/Cart");
 const {
   CreateOrder,
@@ -117,7 +118,7 @@ RouterAPI.post("/forgetpassword", Forgotpassword);
 RouterAPI.post("/cart", addToCart);
 RouterAPI.get("/cart/:userId", getCartProduct);
 RouterAPI.put("/cart/:cartId/:itemId", RemoveCartProductfirst);
-
+RouterAPI.put("/cart-update/:cartId/:itemId", UpdateCartQuantity);
 // oders
 RouterAPI.post("/order", CreateOrder);
 RouterAPI.get("/order/:userId", listOderUserId);

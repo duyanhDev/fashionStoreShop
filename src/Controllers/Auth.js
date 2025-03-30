@@ -15,16 +15,24 @@ const RegisterUserAPI = async (req, res) => {
     console.log("check name", name);
     console.log("check emal", email);
     console.log("check pas", password);
-    console.log("check", isAdmin);
 
     let avatarUrl = ""; // Thay đổi từ 'const' sang 'let'
 
     if (req.files && req.files.avatar) {
       const files = req.files.avatar;
+
+      console.log(files);
+
       let result = await uploadFileToCloudinary(files);
-      avatarUrl = result.secure_url; // Gán giá trị mới cho 'avatarUrl'
-      console.log(avatarUrl);
+      if (result && result.length > 0) {
+        avatarUrl = result[0].secure_url; // Lấy secure_url từ object đầu tiên
+        console.log("Avatar URL:", avatarUrl);
+      } else {
+        throw new Error("No result from Cloudinary");
+      }
     }
+
+    console.log(avatarUrl);
 
     const dataUser = await RegisterUser(
       name,
@@ -130,7 +138,7 @@ const UpDateProfileUserAPI = async (req, res) => {
     if (avatar) {
       try {
         const result = await uploadFileToCloudinary(avatar);
-        updatedData.avatar = result.secure_url;
+        updatedData.avatar = result[0].secure_url;
       } catch (err) {
         return res.status(500).json({ error: "Tải ảnh lên thất bại" });
       }

@@ -734,7 +734,6 @@ const UpDateCompleted = async (req, res) => {
     const idVoucher = order.idDiscount;
 
     // Lấy voucher hiện tại để lấy usageLimit
-    const voucher = await Voucher.findById(idVoucher);
 
     if (idVoucher) {
       try {
@@ -757,7 +756,6 @@ const UpDateCompleted = async (req, res) => {
         console.error("Lỗi khi cập nhật voucher:", error);
       }
     }
-    console.log(voucherProduct);
 
     // Lấy danh sách sản phẩm từ đơn hàng
     const productIdItem = order.items.map((item) => item.productId);

@@ -13,6 +13,8 @@ const configurePassport = (passport) => {
         callbackURL: process.env.CALLBACK_URL,
       },
       async (accessToken, refreshToken, profile, done) => {
+        console.log(profile);
+
         try {
           let user = await Users.findOne({ email: profile.emails[0].value });
           if (!user) {
