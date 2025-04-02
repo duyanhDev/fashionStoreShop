@@ -236,7 +236,6 @@ const Details = () => {
     feedback?.reduce((acc, current) => {
       return acc + current.rating;
     }, 0);
-  console.log(TotalRatings);
 
   const hanldetoggleLikeRatingAPI = async (ratings) => {
     if (!user) {
@@ -555,8 +554,6 @@ const Details = () => {
             [...currentFeedback]
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .map((item) => {
-                console.log(item);
-
                 return (
                   <div className="comment_users" key={item._id}>
                     <div className="w-full m-4 flex items-center gap-3">
