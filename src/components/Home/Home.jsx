@@ -16,10 +16,20 @@ import logo from "./../../assets/Image/Home/Dosin.png";
 import Unisex from "./../../assets/Image/Home/Unisex.png";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import ProductCart from "../ProductCart/ProductCart";
+
 const Home = () => {
   const { ListProducts } = useOutletContext();
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const desc = ["terrible", "bad", "normal", "good", "wonderful"];
+  const [ratings, setRatings] = useState({});
+  const [modalCartOpen, setModalCartOpen] = useState(false);
+  const [IdProduct, setIdProducts] = useState("");
+  const [listItems, setListItems] = useState();
+  const [price, setPrice] = useState(0);
+  const [costPrice, setCostPrice] = useState(0);
+
   const formatPrice = (price) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
   };
@@ -47,9 +57,14 @@ const Home = () => {
     navigate(`product/${id}`);
   };
 
-  const Image = ListProducts.map((item) => {
-    return item.variants.map((product) => product.images[0].url);
-  });
+  const handelModelProductCart = (id, items, price, costPrice) => {
+    setIdProducts(id);
+    setListItems(items);
+    setPrice(price);
+    setCostPrice(costPrice);
+    setModalCartOpen(true);
+  };
+
   useEffect(() => {
     AOS.init({
       duration: 1000, // Thời gian hiệu ứng (ms)
@@ -57,8 +72,6 @@ const Home = () => {
     });
   }, []);
 
-  const desc = ["terrible", "bad", "normal", "good", "wonderful"];
-  const [ratings, setRatings] = useState({});
   return (
     <>
       <SliderComponent />
@@ -182,15 +195,6 @@ const Home = () => {
         </div>
         <div className="m-3">
           <h1 className=" text-xl font-bold h1_main">SẢN PHẨM NỔI BẬT</h1>
-          {/* <div className="">
-          <ul className="flex items-center gap-4">
-            <li>ÁO</li>
-            <li>QUẦN</li>
-            <li>GIÀY</li>
-            <li>MŨ</li>
-            <li>DÉP</li>
-          </ul>
-        </div> */}
         </div>
         <div className="flex gap-5 mx-4 category_main">
           <Swiper
@@ -234,8 +238,6 @@ const Home = () => {
               : ListProducts &&
                 ListProducts.length > 0 &&
                 ListProducts.map((item) => {
-                  console.log(item);
-
                   return (
                     <SwiperSlide key={item._id} className="w-full">
                       <div className="product-card rounded-xl overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300">
@@ -270,7 +272,17 @@ const Home = () => {
                                 />
                               </svg>
                             </button>
-                            <button className="bg-white p-1.5 rounded-full shadow-md hover:bg-gray-100">
+                            <button
+                              className="bg-white p-1.5 rounded-full shadow-md hover:bg-gray-100"
+                              onClick={() =>
+                                handelModelProductCart(
+                                  item._id,
+                                  item.variants,
+                                  item.price,
+                                  item.costPrice
+                                )
+                              }
+                            >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 className="h-4 w-4 text-gray-600"
@@ -329,6 +341,14 @@ const Home = () => {
                   );
                 })}
           </Swiper>
+          <ProductCart
+            modalCartOpen={modalCartOpen}
+            setModalCartOpen={setModalCartOpen}
+            IdProduct={IdProduct}
+            listItems={listItems}
+            price={price}
+            costPrice={costPrice}
+          />
         </div>
         <div className=" mt-4">
           <h1 className="ml-4 mt-3 text-xl font-bold">TẤT CẢ SẢN PHẨM</h1>

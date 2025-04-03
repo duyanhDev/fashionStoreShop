@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import ProductCart from "../../ProductCart/ProductCart";
 
 export default function Clothing({ ListProducts }) {
   const desc = ["terrible", "bad", "normal", "good", "wonderful"];
@@ -11,6 +12,11 @@ export default function Clothing({ ListProducts }) {
   const [ratings, setRatings] = useState({});
   const navigate = useNavigate();
 
+  const [modalCartOpen, setModalCartOpen] = useState(false);
+  const [IdProduct, setIdProducts] = useState("");
+  const [listItems, setListItems] = useState();
+  const [price, setPrice] = useState(0);
+  const [costPrice, setCostPrice] = useState(0);
   const [visibleItems, setVisibleItems] = useState(20);
   const [visibleAoItems, setVisibleAoItems] = useState(20);
   const [visibleQuanItems, setVisibleQuanItems] = useState(20);
@@ -46,6 +52,14 @@ export default function Clothing({ ListProducts }) {
 
   const handleDetails = (id) => navigate(`product/${id}`);
 
+  const handelModelProductCart = (id, items, price, costPrice) => {
+    setIdProducts(id);
+    setListItems(items);
+    setPrice(price);
+    setCostPrice(costPrice);
+    setModalCartOpen(true);
+  };
+
   const ProductCard = ({ product }) => (
     <div className="product-card rounded-xl overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300">
       <div className="relative">
@@ -76,7 +90,17 @@ export default function Clothing({ ListProducts }) {
               />
             </svg>
           </button>
-          <button className="bg-white p-1.5 rounded-full shadow-md hover:bg-gray-100">
+          <button
+            className="bg-white p-1.5 rounded-full shadow-md hover:bg-gray-100"
+            onClick={() =>
+              handelModelProductCart(
+                product._id,
+                product.variants,
+                product.price,
+                product.costPrice
+              )
+            }
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-4 w-4 text-gray-600"
@@ -154,6 +178,14 @@ export default function Clothing({ ListProducts }) {
             </Button>
           </div>
         )}
+        <ProductCart
+          modalCartOpen={modalCartOpen}
+          setModalCartOpen={setModalCartOpen}
+          IdProduct={IdProduct}
+          listItems={listItems}
+          price={price}
+          costPrice={costPrice}
+        />
       </div>
     </section>
   );
