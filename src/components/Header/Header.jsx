@@ -5,7 +5,7 @@ import {
   IoNotificationsOutline,
   IoCartOutline,
 } from "react-icons/io5";
-import Avatar from "antd/es/avatar/avatar";
+
 import { Dropdown, Button, Drawer, Modal } from "antd";
 import { LogoutOutlined, SettingOutlined } from "@ant-design/icons";
 import { useDispatch } from "react-redux";
@@ -86,7 +86,7 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
     },
     user &&
       user.isAdmin === true && {
-        key: "4",
+        key: "5",
         label: "Admin",
         icon: <SettingOutlined />,
         extra: "⌘S",
@@ -389,12 +389,12 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
             <div className="flex items-center gap-2">
               <HiShoppingBag className="cart_color_item text-green-600" />
               <span>
-                Hiện đang có{" "}
+                Hiện đang có
                 {ListCart && ListCart.items ? (
                   <span className="">{ListCart.items.length}</span>
                 ) : (
                   <span className="">0</span>
-                )}{" "}
+                )}
                 sản phẩm trong giỏ hàng
               </span>
             </div>

@@ -13,10 +13,10 @@ export default function Clothing({ ListProducts }) {
 
   const [visibleItems, setVisibleItems] = useState(20);
   const [visibleAoItems, setVisibleAoItems] = useState(20);
-  const [visibleQuanItems, setVisibleQuanItems] = useState(10);
-  const [visibleGiayItems, setVisibleGiayItems] = useState(10);
+  const [visibleQuanItems, setVisibleQuanItems] = useState(20);
+  const [visibleGiayItems, setVisibleGiayItems] = useState(20);
 
-  const itemsPerLoad = 10;
+  const itemsPerLoad = 20;
 
   const aoProducts = ListProducts.filter((p) => p.category.name === "Áo");
   const quanProducts = ListProducts.filter((p) => p.category.name === "Quần");
@@ -136,7 +136,7 @@ export default function Clothing({ ListProducts }) {
           <span className="absolute bottom-0 left-0 w-12 h-1 bg-orange-500 rounded"></span>
         </h2>
         <div
-          className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 lg:gap-6"
+          className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-6"
           data-aos="fade-up"
         >
           {loading
@@ -167,7 +167,7 @@ export default function Clothing({ ListProducts }) {
       <section className="py-8">
         <div className="container mx-auto px-3 lg:px-8">
           <div
-            className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 lg:gap-6"
+            className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-6"
             data-aos="fade-up"
           >
             {loading
