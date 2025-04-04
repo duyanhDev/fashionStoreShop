@@ -45,6 +45,11 @@
   color: #facc15 !important;
 }
 
+@media (min-width: 320px) {
+  .container {
+    max-width: 480px;
+  }
+}
 /* Mobile (Điện thoại) */
 @media (max-width: 640px) {
   .product-card {

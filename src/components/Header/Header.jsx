@@ -396,13 +396,13 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
             <div className="flex items-center gap-2">
               <HiShoppingBag className="cart_color_item text-green-600" />
               <span>
-                Hiện đang có {""}
+                Hiện đang có
                 {ListCart && ListCart.items ? (
-                  <span className="">{ListCart.items.length}</span>
+                  <span className=""> {ListCart.items.length} </span>
                 ) : (
                   <span className="">0</span>
                 )}
-                {""} sản phẩm trong giỏ hàng
+                sản phẩm trong giỏ hàng
               </span>
             </div>
           }

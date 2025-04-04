@@ -102,7 +102,7 @@ const Details = () => {
         setName(res.data.data.name || "");
         setDescription(res.data.data.description);
         setBrand(res.data.data.brand || "");
-        setPrice(res.data.data.costPrice || "");
+        setPrice(res.data.data.price || "");
         setDisscount(res.data.data.discount || "");
         setPricedisscount(res.data.data.discountedPrice || "");
         setStock(res.data.data.stock || "");
@@ -343,9 +343,7 @@ const Details = () => {
             <div className="p-4">
               <div className=" flex items-center gap-2">
                 <h1 className=" text-3xl text-black">
-                  {pricediscount
-                    ? formatPrice(pricediscount)
-                    : formatPrice(price)}
+                  {formatPrice(pricediscount)}
                 </h1>
                 <span className="text-[#b3b3b3] font-normal text-sm">
                   {discount ? formatPrice(price) : ""}

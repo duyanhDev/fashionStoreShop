@@ -29,6 +29,8 @@ const Home = () => {
   const [listItems, setListItems] = useState();
   const [price, setPrice] = useState(0);
   const [costPrice, setCostPrice] = useState(0);
+  const [productname, setProductname] = useState("");
+  const [discount, setDiscount] = useState(0);
 
   const formatPrice = (price) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
@@ -57,12 +59,21 @@ const Home = () => {
     navigate(`product/${id}`);
   };
 
-  const handelModelProductCart = (id, items, price, costPrice) => {
+  const handelModelProductCart = (
+    id,
+    items,
+    price,
+    costPrice,
+    name,
+    discount
+  ) => {
     setIdProducts(id);
     setListItems(items);
     setPrice(price);
     setCostPrice(costPrice);
     setModalCartOpen(true);
+    setProductname(name);
+    setDiscount(discount);
   };
 
   useEffect(() => {
@@ -240,8 +251,8 @@ const Home = () => {
                 ListProducts.map((item) => {
                   return (
                     <SwiperSlide key={item._id} className="w-full">
-                      <div className="product-card rounded-xl overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300">
-                        <div className="relative">
+                      <div className="product-card rounded-xl overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300 ">
+                        <div className="relative max-w-full sm:max-w-[480px] md:max-w-[768px] lg:max-w-[1024px] xl:max-w-[1280px] 2xl:max-w-[1536px] mx-auto px-4">
                           <img
                             className="w-full h-48 object-cover transition-transform duration-500 hover:scale-105"
                             src={
@@ -279,7 +290,9 @@ const Home = () => {
                                   item._id,
                                   item.variants,
                                   item.price,
-                                  item.costPrice
+                                  item.discountedPrice,
+                                  item.name,
+                                  item.discount
                                 )
                               }
                             >
@@ -348,6 +361,8 @@ const Home = () => {
             listItems={listItems}
             price={price}
             costPrice={costPrice}
+            productname={productname}
+            discount={discount}
           />
         </div>
         <div className=" mt-4">
