@@ -1,6 +1,6 @@
+require("dotenv").config(); // Fix: gọi config() để load env
 const jwt = require("jsonwebtoken");
 const Users = require("../Model/User");
-require("dotenv").config(); // Fix: gọi config() để load env
 
 const authMiddleware = async (req, res, next) => {
   console.log("JWT_SECRET từ env:", process.env.JWT_SECRET);

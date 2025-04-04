@@ -33,6 +33,8 @@ const CreateOrder = async (req, res) => {
       idDiscount,
     } = req.body;
 
+    console.log(items);
+
     if (!userId || !items || !paymentMethod || !shippingAddress) {
       return res
         .status(400)
