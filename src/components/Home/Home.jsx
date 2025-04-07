@@ -251,8 +251,8 @@ const Home = () => {
                 ListProducts.map((item) => {
                   return (
                     <SwiperSlide key={item._id} className="w-full">
-                      <div className="product-card rounded-xl overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300 ">
-                        <div className="relative max-w-full sm:max-w-[480px] md:max-w-[768px] lg:max-w-[1024px] xl:max-w-[1280px] 2xl:max-w-[1536px] mx-auto px-4">
+                      <div className="product-card rounded-xl overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300">
+                        <div className="relative">
                           <img
                             className="w-full h-48 object-cover transition-transform duration-500 hover:scale-105"
                             src={
