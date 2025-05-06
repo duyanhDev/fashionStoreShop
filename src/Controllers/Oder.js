@@ -213,7 +213,7 @@ const CreateOrder = async (req, res) => {
         ", "
       )}`,
     });
-    const admins = await Users.find({ isAdmin: true });
+    const admins = await Users.find({ role: "admin" });
 
     if (!admins.length) {
       return;
@@ -306,6 +306,9 @@ const CreateOrder = async (req, res) => {
         } else {
           console.log("Không có sản phẩm nào được xóa.");
         }
+
+        newOrder.paymentStatus = "Completed";
+        await newOrder.save();
         if (result.data.return_code === 1) {
           return res.status(200).json({
             EC: 0,
@@ -579,28 +582,23 @@ const UpDateOrder = async (req, res) => {
       const product = await Product.findById(item.productId);
 
       if (product) {
+        // Cập nhật tổng số lượng tồn kho và đã bán
         product.stock = Math.max(product.stock - item.quantity, 0);
-        product.sold += item.quantity;
+        product.sold = (product.sold || 0) + item.quantity;
 
-        if (product) {
-          // Cập nhật tổng số lượng tồn kho và số lượng đã bán
-          product.stock = Math.max(product.stock - item.quantity, 0);
-          product.sold = (product.sold || 0) + item.quantity;
-
-          for (const variant of product.variants) {
-            //
-            if (variant.color === item.color) {
-              for (const size of variant.sizes) {
-                if (size.size === item.size) {
-                  size.quantity = Math.max(size.quantity - item.quantity, 0);
-                  size.sold = (size.sold || 0) + item.quantity;
-                }
+        // Cập nhật theo biến thể (variant) và size
+        for (const variant of product.variants) {
+          if (variant.color === item.color) {
+            for (const size of variant.sizes) {
+              if (size.size === item.size) {
+                size.quantity = Math.max(size.quantity - item.quantity, 0);
+                size.sold = (size.sold || 0) + item.quantity;
               }
             }
           }
         }
 
-        // Lưu sản phẩm sau khi cập nhật
+        // Lưu lại sản phẩm đã cập nhật
         await product.save();
       } else {
         return res
@@ -631,8 +629,6 @@ const UpDateOrder = async (req, res) => {
 const UpDateDelivered = async (req, res) => {
   try {
     const { id } = req.body;
-
-    console.log(id);
 
     // Cập nhật trạng thái đơn hàng
     const order = await Order.findOneAndUpdate(
@@ -798,6 +794,8 @@ const UpDateCompleted = async (req, res) => {
   }
 };
 
+// tổng thu nhập
+
 const getTotalProductsSold = async (req, res) => {
   try {
     const orders = await Order.find();
@@ -868,7 +866,10 @@ const getOrderOneProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const data = await Order.findOne({ _id: id });
+    const data = await Order.findOne({ _id: id }).populate({
+      path: "items.productId",
+      select: "name variants.images discountedPrice",
+    });
     return res.status(200).json({
       EC: 0,
       data: data,

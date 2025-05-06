@@ -29,6 +29,7 @@ const {
   ChanglePasswordAPI,
   SendverifyFileOTPUser,
   verifyOTPUser,
+  DeleteUser,
 } = require("./../Controllers/Auth");
 const {
   addToCart,
@@ -68,6 +69,7 @@ const {
 } = require("./../Controllers/MessageChat");
 
 const { addVoucherAPI, listVoucherAPI } = require("../Controllers/Voucher");
+const { RefreshToken } = require("../services/Auth");
 
 //product
 
@@ -113,6 +115,8 @@ RouterAPI.get("/profile-users", ListOneUserAPI);
 RouterAPI.put("/updateProfile", UpDateProfileUserAPI);
 RouterAPI.put("/changel-passsword", ChanglePasswordAPI);
 RouterAPI.post("/forgetpassword", Forgotpassword);
+RouterAPI.post("/refresh-token", RefreshToken);
+RouterAPI.delete("/delete-user/:id", DeleteUser);
 
 // Cart
 RouterAPI.post("/cart", addToCart);
