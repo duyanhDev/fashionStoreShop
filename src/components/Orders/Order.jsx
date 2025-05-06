@@ -109,14 +109,10 @@ const Order = () => {
     }
   };
 
-  console.log();
-
   const dataSource =
     OrderProducts &&
     OrderProducts.length > 0 &&
     OrderProducts.map((item, index) => {
-      console.log(item);
-
       return {
         key: index + 1,
         index: index + 1,

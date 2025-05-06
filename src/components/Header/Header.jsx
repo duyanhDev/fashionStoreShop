@@ -85,7 +85,7 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
       icon: <SettingOutlined />,
       extra: "⌘S",
     },
-    ...(user && user.isAdmin
+    ...(user && user.role === "admin"
       ? [
           {
             key: "5",
@@ -296,7 +296,7 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
     if (keywordSearch.trim()) {
       FetchSearhProductsAPI();
     }
-  }, 300);
+  }, 500);
 
   useEffect(() => {
     debouncedFetchSearch();
@@ -324,7 +324,7 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
         <input
           type="text"
           placeholder="Tìm kiếm sản phẩm"
-          className="w-full outline-none"
+          className=" absolute w-full outline-none"
           onClick={handleSearchProducts}
           onChange={handleChangeInput}
           value={keywordSearch}
@@ -348,6 +348,10 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
           setKeywordSearch={setKeywordSearch}
           data={data}
           setData={setData}
+          onSearch={(keyword) => {
+            // 🟢 Gọi API tìm kiếm ở đây
+            FetchSearhProductsAPI(keyword); // bạn tự định nghĩa
+          }}
         />
       </div>
       <div className="w-3/12 flex justify-between doin_right px-5">

@@ -26,9 +26,15 @@ export default function Clothing({ ListProducts }) {
 
   const itemsPerLoad = 20;
 
-  const aoProducts = ListProducts.filter((p) => p.category.name === "Áo");
-  const quanProducts = ListProducts.filter((p) => p.category.name === "Quần");
-  const giayProducts = ListProducts.filter((p) => p.category.name === "Giày");
+  const aoProducts = ListProducts.filter(
+    (p) => p.category && p.category.name === "Áo"
+  );
+  const quanProducts = ListProducts.filter(
+    (p) => p.category && p.category.name === "Quần"
+  );
+  const giayProducts = ListProducts.filter(
+    (p) => p.category && p.category.name === "Giày"
+  );
 
   const formatPrice = (price) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";

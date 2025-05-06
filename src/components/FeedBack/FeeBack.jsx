@@ -12,7 +12,6 @@ const FeedBack = ({ modal2Open, setModal2Open, data, userid }) => {
   const [messageApi, contextHolder] = message.useMessage();
   const [fileList, setFileList] = useState([]);
   const [images, setImages] = useState([]);
-  console.log(value);
 
   const formatPrice = (price) => {
     // Nếu price là chuỗi, chuyển đổi nó thành một số

@@ -40,8 +40,6 @@ const OderStatus = () => {
       const res = await OrderStatusOneProduct(param.id);
 
       if (res && res.data && res.data.EC === 0) {
-        console.log(res.data.data);
-
         SetOrderStatus(res.data.data.orderStatus);
         setCreatedAt(res.data.data.createdAt);
         setData(res.data.data);
@@ -232,6 +230,10 @@ const OderStatus = () => {
                           <span>{item.name}</span>
                           <span className="text-xs block">
                             Màu: {item.color}
+                          </span>
+
+                          <span className="text-xs block">
+                            Kích thước: {item.size}
                           </span>
                           <span className="text-xs block">
                             Số lượng: {item.quantity}

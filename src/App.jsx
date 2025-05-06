@@ -12,8 +12,12 @@ import { CartListProduct } from "./service/Cart";
 import Footer from "./components/Footer/Footer";
 import { UpOutlined } from "@ant-design/icons";
 import Message from "./components/Messages/Message";
+
 function App() {
-  const { user } = useSelector((state) => state.auth);
+  const { user, token, refreshToken } = useSelector((state) => state.auth);
+
+  console.log("token", token);
+  console.log("refreshToken", refreshToken);
   const [isVisible, setIsVisible] = useState(false);
   const [ListProducts, setListProducts] = useState([]);
   const [ListCart, setListCard] = useState([]);
@@ -37,8 +41,6 @@ function App() {
     ListProducsData();
   }, []);
 
-  console.log(user);
-
   const CartListProductsUser = async () => {
     if (!user?._id) {
       // Handle the case where user._id is not available
@@ -55,7 +57,6 @@ function App() {
       }
     } catch (error) {
       console.log(error);
-      setError("An error occurred while fetching the cart");
     }
   };
 
@@ -63,8 +64,6 @@ function App() {
     useEffect(() => {
       CartListProductsUser();
     }, [user._id]);
-
-  console.log(ListCart);
 
   useEffect(() => {
     const navHeader = document.querySelector(".nav_header");
@@ -88,6 +87,8 @@ function App() {
       behavior: "smooth",
     });
   };
+
+  // tự động logout
 
   return (
     <div className="container_nav">
@@ -416,7 +417,7 @@ function App() {
         </button>
       </div>
 
-      {user?.isAdmin === false ? (
+      {user?.role === "customer" ? (
         <div className="fixed right-0 bottom-14 mb-24 chat_sp transition-opacity duration-300 z-10">
           <button
             className="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center text-white hover:bg-blue-800 transition-colors text-wrap"

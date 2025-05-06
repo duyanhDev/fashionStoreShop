@@ -32,8 +32,6 @@ import {
 import moment from "moment";
 
 const PersonalInfoForm = ({ id }) => {
-  console.log(id);
-
   const [form] = Form.useForm();
 
   const [currentPassword, setCurrentPassword] = useState("");
@@ -62,7 +60,6 @@ const PersonalInfoForm = ({ id }) => {
 
       // Call API
       const res = await ChanglePasswordAPI(id, currentPassword, newPassWord);
-      console.log(res);
 
       if (res && res.data.success === true) {
         api["success"]({
@@ -340,8 +337,6 @@ const Profile = () => {
     FetchDataProvince();
   }, []);
 
-  console.log(WarmData);
-
   useEffect(() => {
     FeachDataDistrict();
   }, [SeletectIdProvine]);
@@ -360,13 +355,9 @@ const Profile = () => {
     setdistrict(name.label);
   };
   const handleOnChangeWarm = (value, name) => {
-    console.log(name);
-
     SetSeletectIdWarm(value);
     setward(name.label);
   };
-
-  console.log(ward);
 
   const items = [
     {
@@ -715,7 +706,6 @@ const Profile = () => {
         selectedImage
       );
       if (res) {
-        console.log(res);
         message.success("Profile updated successfully");
       }
     } catch (error) {

@@ -7,6 +7,7 @@ import CartProducts from "../components/CartProducts/CartProducts";
 import Category from "../components/Category/Category";
 import ClothingMale from "../components/ClothingMale/ClothingMale";
 import Details from "../components/Details/Details";
+import EditCustom from "../components/EditCustom/EditCustom";
 import ForgetPassword from "../components/ForgetPassword/ForgetPassword";
 import Home from "../components/Home/Home";
 import DeliveryMap from "../components/Map/Map";
@@ -21,6 +22,7 @@ import ViewSearch from "../components/Sumsearch/ViewSearch";
 import ChatSp from "../components/SupportChat/ChatSp";
 import UpLoad from "../components/UpLoadProducts/UpLoad";
 import UserStatsCard from "../components/UserChar/UserChart";
+import UsersCustom from "../components/users/usercustom";
 import VNpay from "../components/VNpay/VNpay";
 import Voucher from "../components/Voucher/Voucher";
 import View from "../components/VỉewProducts/View";
@@ -95,6 +97,14 @@ export const RouterAdmin = [
       { path: "order", element: <OrderAdmin /> },
       { path: "support-chat", element: <ChatSp /> },
       { path: "voucher", element: <Voucher /> },
+      {
+        path: "usercustom",
+        element: <UsersCustom />,
+      },
+      {
+        path: "usercustom/:id",
+        element: <EditCustom />,
+      },
     ],
   },
 ];

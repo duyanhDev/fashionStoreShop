@@ -125,7 +125,6 @@ const OrderAdmin = () => {
         params.sortOrder = tableParams.sortOrder;
       }
       const res = await ListOderProductsAll(params);
-      console.log(res);
 
       if (res) {
         const dataProduct = res.data.data.map((item, index) => {
@@ -256,7 +255,6 @@ const OrderAdmin = () => {
       setData([]);
     }
   };
-  console.log(data);
 
   const handleCheckOrder = async (id) => {
     try {
