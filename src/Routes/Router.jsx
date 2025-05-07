@@ -22,7 +22,7 @@ import ViewSearch from "../components/Sumsearch/ViewSearch";
 import ChatSp from "../components/SupportChat/ChatSp";
 import UpLoad from "../components/UpLoadProducts/UpLoad";
 import UserStatsCard from "../components/UserChar/UserChart";
-import UsersCustom from "../components/users/usercustom";
+import UsersCustom from "../components/Users/usercustom";
 import VNpay from "../components/VNpay/VNpay";
 import Voucher from "../components/Voucher/Voucher";
 import View from "../components/VỉewProducts/View";
