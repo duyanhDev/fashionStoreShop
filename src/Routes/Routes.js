@@ -47,6 +47,8 @@ const {
   getOrderOneProduct,
   UpDateDelivered,
   UpDateCompleted,
+  UpDateOrderStatus,
+  filterOrdersByStatus,
 } = require("../Controllers/Oder");
 
 const { searchProductsByNameAPI } = require("../Controllers/SearchProductsAPI");
@@ -70,6 +72,11 @@ const {
 
 const { addVoucherAPI, listVoucherAPI } = require("../Controllers/Voucher");
 const { RefreshToken } = require("../services/Auth");
+const {
+  addToWishlist,
+  getWishlist,
+  RemoveToWishList,
+} = require("../Controllers/WishList");
 
 //product
 
@@ -131,10 +138,15 @@ RouterAPI.get("/get-total-products-sold", getTotalProductsSoldByType);
 RouterAPI.get("/get-quantity-all", getTotalProductsSold);
 RouterAPI.post("/check-orderShipping", UpDateDelivered);
 RouterAPI.post("/check-orderCompleted", UpDateCompleted);
+RouterAPI.put("/update-order/:id", UpDateOrderStatus); // cập nhật trạng thái đơn hàng
 // all hóa đơn thanh toán order
 RouterAPI.get("/get-order-all", ListOderProducts);
 RouterAPI.get("/get-order-one/:id", getOrderOneProduct);
 RouterAPI.post("/ChatAI", BotChatAPI);
+
+// lọc oder theo trạng thái
+
+RouterAPI.post("/filter-order/:status", filterOrdersByStatus);
 
 // notifications
 
@@ -163,4 +175,10 @@ RouterAPI.get("/voucher", listVoucherAPI);
 
 RouterAPI.post("/otp", SendverifyFileOTPUser);
 RouterAPI.put("/veryfy-otp", verifyOTPUser);
+
+// danh sách yêu thích
+
+RouterAPI.post("/add-wishlist", addToWishlist);
+RouterAPI.get("/get-wishlist/:userId", getWishlist);
+RouterAPI.post("/remove-wishlist", RemoveToWishList);
 module.exports = RouterAPI;

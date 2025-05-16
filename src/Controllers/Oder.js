@@ -879,6 +879,78 @@ const getOrderOneProduct = async (req, res) => {
   }
 };
 
+// cập nhật trạng thái đơn hàng (hủy đơn hàng)
+const UpDateOrderStatus = async (req, res) => {
+  try {
+    let { id } = req.params;
+
+    let orderStatus = req.body.orderStatus;
+
+    if (!id || !orderStatus) {
+      return res
+        .status(400)
+        .json({ message: "All required fields must be provided." });
+    }
+
+    if (!orderStatus) {
+      return res.status(400).json({
+        message: "Invalid order status. Only 'Cancelled' is allowed.",
+      });
+    }
+
+    // socker
+
+    const io = req.app.get("io");
+    io.emit(`order-update-${id}`, {
+      orderId: id,
+      status: orderStatus,
+      message: `Đơn hàng của bạn đã bị hủy`,
+    });
+    const order = await Order.findOneAndUpdate(
+      { _id: id },
+      { orderStatus: orderStatus },
+      { new: true } // Chỉ định trả về đối tượng đã cập nhật
+    );
+
+    return res.status(200).json({
+      EC: 0,
+      message: "Order status updated successfully",
+      data: order,
+    });
+  } catch (error) {}
+};
+
+// lọc theo trạng thái đơn hàng
+
+const filterOrdersByStatus = async (req, res) => {
+  try {
+    const { status } = req.params; // Lấy trạng thái từ tham số URL
+    console.log(status);
+
+    // Kiểm tra xem trạng thái có hợp lệ không
+    const validStatuses = [
+      "Processing", // Chờ xác nhận
+      "Delivered", // duyêt đơn giao hàng (another state)
+      "Shipping", // Giao hàng thanh công cho bên vận chyuyeenr
+      "Completed", // Đã xong
+      "Cancelled",
+    ];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid order status" });
+    }
+
+    // Tìm kiếm đơn hàng theo trạng thái
+    const orders = await Order.find({ orderStatus: status });
+
+    return res.status(200).json({
+      EC: 0,
+      data: orders,
+    });
+  } catch (error) {
+    console.error("Error filtering orders by status:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 module.exports = {
   CreateOrder,
   listOderUserId,
@@ -889,4 +961,6 @@ module.exports = {
   getOrderOneProduct,
   UpDateDelivered,
   UpDateCompleted,
+  UpDateOrderStatus,
+  filterOrdersByStatus,
 };
