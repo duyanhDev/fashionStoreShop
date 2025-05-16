@@ -22,10 +22,11 @@ import ViewSearch from "../components/Sumsearch/ViewSearch";
 import ChatSp from "../components/SupportChat/ChatSp";
 import UpLoad from "../components/UpLoadProducts/UpLoad";
 import UserStatsCard from "../components/UserChar/UserChart";
-import UsersCustom from "../components/Users/usercustom";
+import UsersCustom from "../components/Users/Usercustom";
 import VNpay from "../components/VNpay/VNpay";
 import Voucher from "../components/Voucher/Voucher";
-import View from "../components/VỉewProducts/View";
+import View from "../components/ViewProducts/View";
+import FavoritesList from "../components/FavoritesList/FavoritesList";
 
 export const RouterLayout = [
   {
@@ -80,6 +81,10 @@ export const RouterLayout = [
   {
     path: "/blog",
     element: <Blog />,
+  },
+  {
+    path: "/wishlist",
+    element: <FavoritesList />,
   },
 ];
 

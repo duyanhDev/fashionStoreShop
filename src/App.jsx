@@ -16,8 +16,6 @@ import Message from "./components/Messages/Message";
 function App() {
   const { user, token, refreshToken } = useSelector((state) => state.auth);
 
-  console.log("token", token);
-  console.log("refreshToken", refreshToken);
   const [isVisible, setIsVisible] = useState(false);
   const [ListProducts, setListProducts] = useState([]);
   const [ListCart, setListCard] = useState([]);
@@ -25,6 +23,7 @@ function App() {
   const Navigate = useNavigate();
   const location = useLocation();
   const hideFooter = location.pathname === "/cart";
+
   const ListProducsData = async () => {
     try {
       let res = await getListProductsAPI();
