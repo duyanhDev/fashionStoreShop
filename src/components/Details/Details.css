@@ -58,8 +58,8 @@
   .Details_main
   .swiper.swiper-initialized.swiper-horizontal.swiper-free-mode.swiper-watch-progress.swiper-backface-hidden.mySwiper
   img {
-  width: 50px;
-  height: 250px !important;
+  width: 100px;
+  height: 100px !important;
 }
 
 .Details .Details_main .swiper-button-prev {

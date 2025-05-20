@@ -516,6 +516,8 @@ const CartProducts = ({}) => {
     return (amount / 1000).toLocaleString() + "k";
   }
 
+  console.log("selectedVouCher", selectedVouCher);
+
   return (
     <div className="min-h-screen w-full mt-28">
       <div className="cart flex justify-between">
