@@ -16,6 +16,9 @@ const passport = require("passport");
 const configurePassport = require("./Config/passport");
 const authRoutes = require("./Routes/auth");
 const session = require("express-session");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./Config/swagger");
+
 // Cấu hình CORS cho Socket.IO
 const io = new Server(server, {
   cors: {
@@ -35,6 +38,8 @@ app.use(
 );
 
 app.use(express.json());
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(
   session({
