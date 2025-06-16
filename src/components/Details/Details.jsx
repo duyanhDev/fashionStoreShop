@@ -263,10 +263,10 @@ const Details = () => {
     .reduce((acc, total) => acc + total, 0);
 
   return (
-    <div className="Details w-full">
+    <div className="Details ">
       {contextHolder}
-      <div className="Details_main flex">
-        <div className="w-1/2">
+      <div className="Details_main flex flex-col md:flex-row gap-4 md:gap-8">
+        <div className="sm:w-full md:w-1/2">
           <Swiper
             loop={true}
             spaceBetween={10}
@@ -325,7 +325,7 @@ const Details = () => {
               })}
           </Swiper>
         </div>
-        <div className="w-1/2 doisi_detail__main">
+        <div className="w-full md:w-1/2 doisi_detail__main">
           <div className="border border-b-2 ">
             <div className="p-4">
               <span className="text-[#484848] font-normal text-sm">

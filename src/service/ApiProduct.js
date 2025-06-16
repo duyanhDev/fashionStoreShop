@@ -113,6 +113,18 @@ const PutFeedbackProductAPI = async (id, userId, rating, review) => {
   });
 };
 
+// phản hồi đánh giá admin
+
+const toggleLikeReplyAPI = async (productId, ratingId, userId, content) => {
+  return await axios.post(
+    `api/1/products/${productId}/ratings/${ratingId}/replies`,
+    {
+      userId,
+      content,
+    }
+  );
+};
+
 const toggleLikeRatingAPI = async (productId, ratingId, userId) => {
   return await axios.post("api/v1/like", {
     productId,
@@ -202,4 +214,5 @@ export {
   toggleLikeRatingAPI,
   searchProductsByNameAPI,
   feeckacksProductsAPI,
+  toggleLikeReplyAPI,
 };

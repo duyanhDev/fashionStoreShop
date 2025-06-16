@@ -21,12 +21,14 @@ import {
   PolarRadiusAxis,
   Radar,
   ComposedChart,
+  LabelList,
 } from "recharts";
 import { UserAuth } from "../../service/Auth";
 import { getListProductsAPI } from "../../service/ApiProduct";
 import { ListCategoryAPI } from "../../service/ApiCategory";
 import { ListAllSumProduct, ListOderProductsAll } from "../../service/Oder";
 import moment from "moment";
+import "./UserChart.css";
 
 // Sample data for charts
 
@@ -227,28 +229,37 @@ export default function DashboardStats() {
 
   const totalProfit = sumTotal - priceTotalProduct;
 
+  console.log(priceTotalProduct);
+
   // Data for pie chart
   const pieData = [
     { name: "Chi phí nhập hàng", value: priceTotalProduct },
-    { name: "Lợi nhuận", value: totalProfit > 0 ? totalProfit : 0 },
+    { name: "Lợi nhuận", value: totalProfit },
   ];
-
+  const pieColors = ["#4caf50", "#f44336"]; // xanh cho chi phí, đỏ cho lợi nhuận (âm)
   // Generate data for product categories
-  const categoryProductData = category.slice(0, 10).map((cat, index) => ({
-    name: cat.name || `Danh mục ${index + 1}`,
-    products: Math.floor(Math.random() * 50) + 10,
-    revenue: Math.floor(Math.random() * 5000000) + 1000000,
-    profit: Math.floor(Math.random() * 2000000) + 500000,
-  }));
+  const categoryProductData = category?.map((cat) => {
+    return {
+      name: cat.name,
+      products: products.filter((product) => product.category.name === cat.name)
+        .length,
+      revenue: products.filter((product) => product.category === cat.name),
+
+      profit: products.filter((product) => product.categoryId === cat.name),
+    };
+  });
 
   // Generate data for top selling products
-  const topSellingProducts = (products || [])
+  const topSellingProducts = products
+    ?.filter((product) => product.sold > 2000)
     .slice(0, 5)
-    .map((product, index) => ({
-      name: product.name || `Sản phẩm ${index + 1}`,
-      sold: Math.floor(Math.random() * 100) + 50,
-      revenue: Math.floor(Math.random() * 10000000) + 5000000,
-    }));
+    .map((product) => {
+      return {
+        name: product.name || `Sản phẩm ${index + 1}`,
+        sold: product.sold,
+        revenue: Math.floor(Math.random() * 10000000) + 5000000,
+      };
+    });
 
   // Sample data for payment methods
   const paymentMethodData = [
@@ -330,12 +341,10 @@ export default function DashboardStats() {
   const chartData = Object.values(monthlyDataChart).map((item) => ({
     name: item.name,
     users: item.usersSet.size,
-    sales: item.sales,
-    profit: item.profit,
-    totalCost: item.totalCost,
+    sales: item.sales, //doanh thu
+    profit: item.profit, // lợi nhuận
+    totalCost: item.totalCost, // chi phí nhập hàng
   }));
-
-  console.log(chartData);
 
   // Icon components
   const UserIcon = () => (
@@ -663,34 +672,43 @@ export default function DashboardStats() {
               </h2>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                      nameKey="name"
-                      label={({ name, percent }) =>
-                        `${name}: ${(percent * 100).toFixed(0)}%`
+                  <BarChart
+                    data={pieData}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis
+                      tickFormatter={(value) =>
+                        new Intl.NumberFormat("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                          maximumFractionDigits: 0,
+                        }).format(value)
                       }
-                    >
+                    />
+                    <Tooltip
+                      formatter={(value) =>
+                        `${new Intl.NumberFormat("vi-VN").format(value)} VND`
+                      }
+                    />
+                    <Legend />
+                    <Bar dataKey="value">
+                      <LabelList
+                        dataKey="value"
+                        position="top"
+                        formatter={(value) =>
+                          new Intl.NumberFormat("vi-VN").format(value)
+                        }
+                      />
                       {pieData.map((entry, index) => (
                         <Cell
                           key={`cell-${index}`}
                           fill={pieColors[index % pieColors.length]}
                         />
                       ))}
-                    </Pie>
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend
-                      layout="vertical"
-                      verticalAlign="middle"
-                      align="right"
-                    />
-                  </PieChart>
+                    </Bar>
+                  </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
@@ -746,6 +764,14 @@ export default function DashboardStats() {
                     <YAxis tick={{ fill: "#6b7280" }} />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend wrapperStyle={{ paddingTop: 10 }} />
+                    <Line
+                      type="monotone"
+                      dataKey="totalCost"
+                      stackId="1"
+                      stroke="#7C3AED"
+                      fill="#C4B5FD"
+                      name="Tổng chi phí nhập hàng"
+                    />
                     <Bar
                       dataKey="sales"
                       name="Doanh số"

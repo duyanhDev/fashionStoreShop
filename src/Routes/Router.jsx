@@ -27,6 +27,7 @@ import VNpay from "../components/VNpay/VNpay";
 import Voucher from "../components/Voucher/Voucher";
 import View from "../components/ViewProducts/View";
 import FavoritesList from "../components/FavoritesList/FavoritesList";
+import ProductReviewAdmin from "../components/ProductReviewAdmin/ProductReviewAdmin";
 
 export const RouterLayout = [
   {
@@ -109,6 +110,10 @@ export const RouterAdmin = [
       {
         path: "usercustom/:id",
         element: <EditCustom />,
+      },
+      {
+        path: "review",
+        element: <ProductReviewAdmin />,
       },
     ],
   },

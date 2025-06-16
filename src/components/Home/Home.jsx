@@ -1,9 +1,19 @@
-import { Button, Card, Flex, notification, Rate, Skeleton } from "antd";
+import {
+  Button,
+  Card,
+  Flex,
+  notification,
+  Rate,
+  Skeleton,
+  Avatar,
+  Input,
+  Form,
+} from "antd";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "./Home.css";
 // Import Swiper styles
 import "swiper/css";
-import { Pagination } from "swiper/modules";
+import { Pagination, Autoplay } from "swiper/modules";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import Clothing from "./Clothing/Clothing";
 import { useState, useEffect } from "react";
@@ -23,6 +33,16 @@ import {
   RemoveToWishListAPI,
 } from "../../service/WishList";
 import { useSelector } from "react-redux";
+import {
+  TruckIcon,
+  ShieldCheckIcon,
+  CreditCardIcon,
+  PhoneIcon,
+  StarIcon,
+  UserIcon,
+  MapPinIcon,
+  CalendarIcon,
+} from "@heroicons/react/24/outline";
 
 const Home = () => {
   const { ListProducts } = useOutletContext();
@@ -40,16 +60,145 @@ const Home = () => {
   const [productname, setProductname] = useState("");
   const [discount, setDiscount] = useState(0);
   const [WishList, setWishList] = useState([]);
+  const [form] = Form.useForm();
+
+  // Sample data for new sections
+  const testimonials = [
+    {
+      id: 1,
+      name: "Nguyễn Minh Anh",
+      location: "Hà Nội",
+      rating: 5,
+      comment:
+        "Chất lượng sản phẩm rất tốt, giao hàng nhanh chóng. Tôi rất hài lòng với dịch vụ của DOSIN!",
+      avatar: "https://randomuser.me/api/portraits/women/1.jpg",
+      date: "2024-12-15",
+    },
+    {
+      id: 2,
+      name: "Trần Văn Nam",
+      location: "TP.HCM",
+      rating: 5,
+      comment:
+        "Thiết kế đẹp, chất liệu tốt, giá cả hợp lý. Sẽ tiếp tục ủng hộ shop!",
+      avatar: "https://randomuser.me/api/portraits/men/2.jpg",
+      date: "2024-12-10",
+    },
+    {
+      id: 3,
+      name: "Lê Thị Hương",
+      location: "Đà Nẵng",
+      rating: 5,
+      comment:
+        "Shop phục vụ tận tình, tư vấn nhiệt tình. Quần áo đẹp và chất lượng cao!",
+      avatar: "https://randomuser.me/api/portraits/women/3.jpg",
+      date: "2024-12-08",
+    },
+  ];
+
+  const blogPosts = [
+    {
+      id: 1,
+      title: "Xu hướng thời trang Thu Đông 2024",
+      excerpt:
+        "Khám phá những xu hướng thời trang hot nhất mùa Thu Đông năm nay với DOSIN",
+      image:
+        "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=250&fit=crop",
+      date: "2024-12-01",
+      category: "Xu hướng",
+    },
+    {
+      id: 2,
+      title: "Cách phối đồ công sở chuyên nghiệp",
+      excerpt:
+        "Hướng dẫn phối đồ công sở thanh lịch và chuyên nghiệp cho cả nam và nữ",
+      image:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=250&fit=crop",
+      date: "2024-11-28",
+      category: "Style Tips",
+    },
+    {
+      id: 3,
+      title: "Chăm sóc và bảo quản quần áo",
+      excerpt:
+        "Những mẹo hay giúp quần áo luôn như mới và bền đẹp theo thời gian",
+      image:
+        "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=400&h=250&fit=crop",
+      date: "2024-11-25",
+      category: "Chăm sóc",
+    },
+  ];
+
+  const brands = [
+    {
+      name: "Nike",
+      logo: "https://logos-world.net/wp-content/uploads/2020/04/Nike-Logo.png",
+    },
+    {
+      name: "Adidas",
+      logo: "https://logos-world.net/wp-content/uploads/2020/04/Adidas-Logo.png",
+    },
+    {
+      name: "Zara",
+      logo: "https://logos-world.net/wp-content/uploads/2020/07/Zara-Logo.png",
+    },
+    {
+      name: "H&M",
+      logo: "https://logos-world.net/wp-content/uploads/2020/04/HM-Logo.png",
+    },
+    {
+      name: "Uniqlo",
+      logo: "https://logos-world.net/wp-content/uploads/2020/09/Uniqlo-Logo.png",
+    },
+  ];
+
+  const services = [
+    {
+      icon: <TruckIcon className="w-8 h-8" />,
+      title: "Miễn phí vận chuyển",
+      description: "Miễn phí ship toàn quốc cho đơn hàng từ 299K",
+    },
+    {
+      icon: <ShieldCheckIcon className="w-8 h-8" />,
+      title: "Bảo hành chất lượng",
+      description: "Đổi trả trong 30 ngày nếu có lỗi từ nhà sản xuất",
+    },
+    {
+      icon: <CreditCardIcon className="w-8 h-8" />,
+      title: "Thanh toán an toàn",
+      description: "Hỗ trợ nhiều hình thức thanh toán bảo mật",
+    },
+    {
+      icon: <PhoneIcon className="w-8 h-8" />,
+      title: "Hỗ trợ 24/7",
+      description: "Tư vấn và hỗ trợ khách hàng mọi lúc mọi nơi",
+    },
+  ];
 
   const formatPrice = (price) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
   };
+
+  const handleRate = (productId, value) => {
+    setRatings((prev) => ({
+      ...prev,
+      [productId]: value,
+    }));
+  };
+
+  const handleNewsletterSubmit = (values) => {
+    api.success({
+      message: "Đăng ký thành công!",
+      description:
+        "Cảm ơn bạn đã đăng ký nhận tin từ DOSIN. Chúng tôi sẽ gửi những ưu đãi tốt nhất đến bạn!",
+    });
+    form.resetFields();
+  };
+
   useEffect(() => {
-    // Simulate loading delay
     const timer = setTimeout(() => {
       setLoading(false);
     }, 3000);
-
     return () => clearTimeout(timer);
   }, []);
 
@@ -87,15 +236,14 @@ const Home = () => {
 
   useEffect(() => {
     AOS.init({
-      duration: 1000, // Thời gian hiệu ứng (ms)
-      once: true, // Hiệu ứng chỉ chạy một lần khi scroll
+      duration: 1000,
+      once: true,
     });
   }, []);
 
   const handlAddWishList = async (productId) => {
     try {
       const res = await addToWishlistAPI(user?._id, productId);
-      console.log(res);
       if (res && res.data && res.data.EC === 0) {
         api["success"]({
           message: "Đã thêm vào danh sách yêu thích",
@@ -123,10 +271,8 @@ const Home = () => {
   };
 
   const handleRemoveWishList = async (productId) => {
-    console.log("productId", productId);
     try {
       const res = await RemoveToWishListAPI(user?._id, productId);
-
       if (res && res.data && res.data.EC === 0) {
         api["success"]({
           message: "Đã xóa khỏi danh sách yêu thích",
@@ -140,11 +286,10 @@ const Home = () => {
       });
     }
   };
+
   useEffect(() => {
     fetchListWishList();
   }, [user?._id]);
-
-  // đổi màu buton thêm vào danh sách yêu thích
 
   const isProductInWishlist = WishList?.map((item) => item.product._id);
 
@@ -152,158 +297,114 @@ const Home = () => {
     <>
       <SliderComponent />
       {contextHolder}
-      <div className="m-auto  home_doisin">
-        <div className="flex justify-center m-auto items-center mt-8 ">
-          <div className="title_line relative w-10  "></div>
+
+      <div className="m-auto home_doisin">
+        {/* Category Section */}
+        <div className="flex justify-center m-auto items-center mt-8">
+          <div className="title_line relative w-10"></div>
           <h1 className="text-2xl font-bold" data-aos="fade-down-right">
             BẠN ĐANG TÌM KIẾM?
           </h1>
-          <div className="title_line relative w-10  "></div>
+          <div className="title_line relative w-10"></div>
         </div>
-        <div className="dosin_home_hc flex flex-wrap  items-center gap-2 mt-4">
-          <div
-            className="doisin_hc_item flex flex-col items-center justify-center cursor-pointer"
-            data-aos="zoom-in-up"
-          >
-            <Link className="text-center hc_item">
-              <img
-                className="max-w-full h-auto text-center m-auto"
-                src={Aokhoac}
-                alt="Aokhoac"
-              />
 
-              <span className="">
-                <span className="block font-semibold text-[#003644] ">
-                  ÁO KHOÁC
+        <div className="dosin_home_hc flex flex-wrap items-center gap-2 mt-4">
+          {[
+            {
+              img: Aokhoac,
+              title: "ÁO KHOÁC",
+              desc: "Áo khoác thời trang Nam/Nữ",
+            },
+            {
+              img: Ao,
+              title: "ĐỒ NAM",
+              desc: "Áo thun, sơ mi, quần dài, sort...",
+            },
+            {
+              img: Quan,
+              title: "ĐỒ NỮ",
+              desc: "Áo quần, chân váy, đầm, yếm...",
+            },
+            {
+              img: Unisex,
+              title: "ĐỒ UNISEX",
+              desc: "Áo thun, sơ mi, áo khoác UNISEX",
+            },
+            {
+              img: Phukien,
+              title: "PHỤ KIỆN",
+              desc: "Balo, túi xách, nón, thắt lưng, ví...",
+            },
+            {
+              img: logo,
+              title: "#DOSIN",
+              desc: "Sản phẩm được TOTODAY đề xuất",
+            },
+          ].map((item, index) => (
+            <div
+              key={index}
+              className="doisin_hc_item flex flex-col items-center justify-center cursor-pointer"
+              data-aos="zoom-in-up"
+            >
+              <Link className="text-center hc_item">
+                <img
+                  className="max-w-full h-auto text-center m-auto"
+                  src={item.img}
+                  alt={item.title}
+                />
+                <span>
+                  <span className="block font-semibold text-[#003644]">
+                    {item.title}
+                  </span>
+                  <span>{item.desc}</span>
                 </span>
-                <span className="">Áo khoác thời trang Nam/Nữ</span>
-              </span>
-            </Link>
-          </div>
-          <div
-            className="doisin_hc_item flex flex-col items-center justify-center"
-            data-aos="zoom-in-up"
-          >
-            <Link className="text-center hc_item">
-              <img className="max-w-full h-auto text-center m-auto" src={Ao} />
-              <span className="">
-                <span className="block font-semibold text-[#003644]">
-                  ĐỒ NAM
-                </span>
-                <span className="">Áo thun, sơ mi, quần dài, sort...</span>
-              </span>
-            </Link>
-          </div>
-          <div
-            className="doisin_hc_item flex flex-col items-center justify-center"
-            data-aos="zoom-in-up"
-          >
-            <Link className="text-center hc_item">
-              <img
-                className="max-w-full h-auto text-center m-auto"
-                src={Quan}
-                alt="Quần"
-              />
-              <span className="">
-                <span className="block font-semibold text-[#003644]">
-                  ĐỒ NỮ
-                </span>
-                <span className="">Áo quần, chân váy, đầm, yếm...</span>
-              </span>
-            </Link>
-          </div>
-          <div
-            className="doisin_hc_item flex flex-col items-center justify-center"
-            data-aos="zoom-in-up"
-          >
-            <Link className="text-center hc_item">
-              <img
-                className="max-w-full h-auto text-center m-auto"
-                src={Unisex}
-                alt="Unisex"
-              />
-              <span className="">
-                <span className="block font-semibold text-[#003644]">
-                  ĐỒ UNISEX
-                </span>
-                <span className="">Áo thun, sơ mi, áo khoác UNISEX</span>
-              </span>
-            </Link>
-          </div>
-          <div
-            className="doisin_hc_item flex flex-col items-center justify-center"
-            data-aos="zoom-in-up"
-          >
-            <Link className="text-center hc_item">
-              <img
-                className="max-w-full h-auto text-center m-auto"
-                src={Phukien}
-                alt="Unisex"
-              />
-              <span className="">
-                <span className="block font-semibold text-[#003644]">
-                  PHỤ KIỆN
-                </span>
-                <span className="">Balo, túi xách, nón, thắt lưng, ví...</span>
-              </span>
-            </Link>
-          </div>
-          <div
-            className="doisin_hc_item flex flex-col items-center justify-center"
-            data-aos="zoom-in-up"
-          >
-            <Link className="text-center hc_item">
-              <img
-                className="max-w-full h-auto text-center m-auto"
-                src={logo}
-                alt="Unisex"
-              />
-              <span className="">
-                <span className="block font-semibold text-[#003644]">
-                  #DOSIN
-                </span>
-                <span className="">
-                  <span className="hc-desc">Sản phẩm được TOTODAY đề xuất</span>
-                  .
-                </span>
-              </span>
-            </Link>
+              </Link>
+            </div>
+          ))}
+        </div>
+
+        {/* Services Section */}
+        <div className="my-16 px-4" data-aos="fade-up">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-2xl font-bold text-center mb-12">
+              DỊCH VỤ CUA CHÚNG TÔI
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {services.map((service, index) => (
+                <div
+                  key={index}
+                  className="text-center p-6 rounded-lg hover:shadow-lg transition-shadow"
+                >
+                  <div className="text-blue-600 mb-4 flex justify-center">
+                    {service.icon}
+                  </div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    {service.title}
+                  </h3>
+                  <p className="text-gray-600 text-sm">{service.description}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
+
+        {/* Featured Products */}
         <div className="m-3">
-          <h1 className=" text-xl font-bold h1_main">SẢN PHẨM NỔI BẬT</h1>
+          <h1 className="text-xl font-bold h1_main">SẢN PHẨM NỔI BẬT</h1>
         </div>
+
         <div className="flex gap-5 mx-4 category_main">
           <Swiper
             modules={[Pagination]}
-            pagination={{
-              clickable: true,
-            }}
+            pagination={{ clickable: true }}
             className="mySwiper"
-            // Default configuration for larger screens
             slidesPerView={5}
             spaceBetween={30}
             breakpoints={{
-              // Default is for largest screen
-              1024: {
-                slidesPerView: 5,
-                spaceBetween: 30,
-              },
-              // Tablet
-              768: {
-                slidesPerView: 3,
-                spaceBetween: 20,
-              },
-              // Mobile landscape
-              576: {
-                slidesPerView: 2,
-                spaceBetween: 5,
-              },
-              // Mobile portrait
-              320: {
-                slidesPerView: 2,
-                spaceBetween: 5,
-              },
+              1024: { slidesPerView: 5, spaceBetween: 30 },
+              768: { slidesPerView: 3, spaceBetween: 20 },
+              576: { slidesPerView: 2, spaceBetween: 5 },
+              320: { slidesPerView: 2, spaceBetween: 5 },
             }}
           >
             {loading
@@ -315,6 +416,8 @@ const Home = () => {
               : ListProducts &&
                 ListProducts.length > 0 &&
                 ListProducts.map((item) => {
+                  console.log("item", item);
+
                   return (
                     <SwiperSlide key={item._id} className="w-full">
                       <div className="product-card rounded-xl overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300">
@@ -332,29 +435,27 @@ const Home = () => {
                               -{item.discount || 0}%
                             </span>
                           )}
-                          <div className="absolute bottom-2 right-2 flex gap-2 ">
+                          <div className="absolute bottom-2 right-2 flex gap-2">
                             {isProductInWishlist.includes(item._id) ? (
-                              <>
-                                <button
-                                  className="p-1.5 rounded-full shadow-md "
-                                  onClick={() => handleRemoveWishList(item._id)}
+                              <button
+                                className="p-1.5 rounded-full shadow-md"
+                                onClick={() => handleRemoveWishList(item._id)}
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-4 w-4 text-red-700"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
                                 >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-4 w-4  text-red-700 "
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                                    />
-                                  </svg>
-                                </button>
-                              </>
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                  />
+                                </svg>
+                              </button>
                             ) : (
                               <button
                                 className="bg-white p-1.5 rounded-full shadow-md hover:bg-gray-100"
@@ -425,9 +526,8 @@ const Home = () => {
                                     item.price
                                 )}
                               </span>
-
                               {item.discount > 0 && (
-                                <span className="text-xs  text-gray-500 line-through ml-2">
+                                <span className="text-xs text-gray-500 line-through ml-2">
                                   {formatPrice(item.costPrice)}
                                 </span>
                               )}
@@ -447,22 +547,180 @@ const Home = () => {
                   );
                 })}
           </Swiper>
-          <ProductCart
-            modalCartOpen={modalCartOpen}
-            setModalCartOpen={setModalCartOpen}
-            IdProduct={IdProduct}
-            listItems={listItems}
-            price={price}
-            costPrice={costPrice}
-            productname={productname}
-            discount={discount}
-          />
         </div>
-        <div className=" mt-4">
+
+        {/* Customer Testimonials */}
+        <div className="my-16 px-4 bg-gray-50 py-16" data-aos="fade-up">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-2xl font-bold text-center mb-12">
+              KHÁCH HÀNG NÓI GÌ VỀ CHÚNG TÔI
+            </h2>
+            <Swiper
+              modules={[Pagination, Autoplay]}
+              pagination={{ clickable: true }}
+              autoplay={{ delay: 4000 }}
+              slidesPerView={1}
+              spaceBetween={30}
+              breakpoints={{
+                768: { slidesPerView: 2 },
+                1024: { slidesPerView: 3 },
+              }}
+            >
+              {testimonials.map((testimonial) => (
+                <SwiperSlide key={testimonial.id}>
+                  <Card className="h-full">
+                    <div className="flex items-center mb-4">
+                      <Avatar src={testimonial.avatar} size={50} />
+                      <div className="ml-3">
+                        <h4 className="font-semibold">{testimonial.name}</h4>
+                        <p className="text-sm text-gray-500 flex items-center">
+                          <MapPinIcon className="w-4 h-4 mr-1" />
+                          {testimonial.location}
+                        </p>
+                      </div>
+                    </div>
+                    <Rate
+                      disabled
+                      defaultValue={testimonial.rating}
+                      className="mb-3"
+                    />
+                    <p className="text-gray-700 mb-4">
+                      "{testimonial.comment}"
+                    </p>
+                    <p className="text-xs text-gray-500 flex items-center">
+                      <CalendarIcon className="w-4 h-4 mr-1" />
+                      {new Date(testimonial.date).toLocaleDateString("vi-VN")}
+                    </p>
+                  </Card>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+        </div>
+
+        {/* Blog Section */}
+        <div className="my-16 px-4" data-aos="fade-up">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-2xl font-bold">TIN TỨC & XU HƯỚNG</h2>
+              <Link to="/blog" className="text-blue-600 hover:text-blue-800">
+                Xem tất cả →
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {blogPosts.map((post) => (
+                <Card
+                  key={post.id}
+                  hoverable
+                  cover={
+                    <img
+                      alt={post.title}
+                      src={post.image}
+                      className="h-48 object-cover"
+                    />
+                  }
+                  className="h-full"
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                      {post.category}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {new Date(post.date).toLocaleDateString("vi-VN")}
+                    </span>
+                  </div>
+                  <h3 className="font-semibold text-lg mb-2">{post.title}</h3>
+                  <p className="text-gray-600 text-sm">{post.excerpt}</p>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Newsletter Section */}
+        <div
+          className="my-16 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16"
+          data-aos="fade-up"
+        >
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl font-bold mb-4">ĐĂNG KÝ NHẬN TIN</h2>
+            <p className="text-xl mb-8">
+              Nhận thông tin về sản phẩm mới, ưu đãi đặc biệt và xu hướng thời
+              trang
+            </p>
+            <Form
+              form={form}
+              onFinish={handleNewsletterSubmit}
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-md mx-auto"
+            >
+              <Form.Item
+                name="email"
+                rules={[
+                  { required: true, message: "Vui lòng nhập email!" },
+                  { type: "email", message: "Email không hợp lệ!" },
+                ]}
+                className="flex-1 mb-0"
+              >
+                <Input
+                  placeholder="Nhập email của bạn"
+                  size="large"
+                  className="rounded-full"
+                />
+              </Form.Item>
+              <Form.Item className="mb-0">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  size="large"
+                  className="bg-white text-blue-600 border-white hover:bg-gray-100 rounded-full px-8"
+                >
+                  Đăng ký
+                </Button>
+              </Form.Item>
+            </Form>
+          </div>
+        </div>
+
+        {/* Brand Partners */}
+        <div className="my-16 px-4" data-aos="fade-up">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-2xl font-bold text-center mb-12">
+              THƯƠNG HIỆU ĐỐI TÁC
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 items-center">
+              {brands.map((brand, index) => (
+                <div
+                  key={index}
+                  className="flex justify-center items-center p-4 grayscale hover:grayscale-0 transition-all duration-300"
+                >
+                  <img
+                    src={brand.logo}
+                    alt={brand.name}
+                    className="max-h-12 object-contain"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* All Products */}
+        <div className="mt-4">
           <h1 className="ml-4 mt-3 text-xl font-bold">TẤT CẢ SẢN PHẨM</h1>
           <Clothing ListProducts={ListProducts} />
         </div>
       </div>
+
+      <ProductCart
+        modalCartOpen={modalCartOpen}
+        setModalCartOpen={setModalCartOpen}
+        IdProduct={IdProduct}
+        listItems={listItems}
+        price={price}
+        costPrice={costPrice}
+        productname={productname}
+        discount={discount}
+      />
     </>
   );
 };

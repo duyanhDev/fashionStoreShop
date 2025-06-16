@@ -13,7 +13,7 @@ import { FaOpencart } from "react-icons/fa";
 import { FaSquarePollVertical } from "react-icons/fa6";
 import { AiTwotoneAppstore } from "react-icons/ai";
 import { RiBillLine } from "react-icons/ri";
-
+import { FcFeedback } from "react-icons/fc";
 const menuItems = [
   { icon: <FiHome />, label: "Thống kê ", to: "" },
   {
@@ -31,7 +31,12 @@ const menuItems = [
     label: "Trò chuyện",
     to: "/admin/support-chat",
   },
-  { icon: <GiftFilled />, label: "Voucher", to: "/admin/voucher" },
+  { icon: <GiftFilled />, label: "Mã giảm giá", to: "/admin/voucher" },
+  {
+    icon: <FcFeedback />,
+    label: "Phản hồi",
+    to: "/admin/review",
+  },
 ];
 
 const Admin = () => {
