@@ -357,17 +357,14 @@ const GoogleMapsStyleDelivery = () => {
 
         try {
           const url = service.getUrl(start, end, transportMode);
-          console.log(`Trying ${service.name} with URL:`, url);
 
           const response = await fetch(url);
 
           if (!response.ok) {
-            console.log(`${service.name} failed with status:`, response.status);
             continue;
           }
 
           const data = await response.json();
-          console.log(`${service.name} response:`, data);
 
           let coordinates, distance, duration;
 
@@ -428,9 +425,6 @@ const GoogleMapsStyleDelivery = () => {
 
       // Nếu không tìm được route từ API nào, tạo đường thẳng ước tính
       if (!routeFound) {
-        console.log(
-          "All routing services failed, creating straight line estimate"
-        );
         setRoutingStatus("Tạo tuyến đường ước tính...");
         createStraightLineRoute(startLocation, selectedOrder.coords);
         setRoutingStatus("Tuyến đường ước tính (đường thẳng)");

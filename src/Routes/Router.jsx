@@ -28,6 +28,8 @@ import Voucher from "../components/Voucher/Voucher";
 import View from "../components/ViewProducts/View";
 import FavoritesList from "../components/FavoritesList/FavoritesList";
 import ProductReviewAdmin from "../components/ProductReviewAdmin/ProductReviewAdmin";
+import LoginForm from "../components/Login/Login";
+import RegisterForm from "../components/Register/Register";
 
 export const RouterLayout = [
   {
@@ -86,6 +88,14 @@ export const RouterLayout = [
   {
     path: "/wishlist",
     element: <FavoritesList />,
+  },
+  {
+    path: "/login",
+    element: <LoginForm />,
+  },
+  {
+    path: "/Register",
+    element: <RegisterForm />,
   },
 ];
 

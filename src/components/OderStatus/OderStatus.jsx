@@ -94,8 +94,6 @@ const OderStatus = () => {
     try {
       let res = await updateShippingCancelled(param.id, orderStatus);
 
-      console.log(res);
-
       if (res && res.data && res.data.EC === 0) {
         setData(res.data.data);
         api.open({
@@ -250,8 +248,6 @@ const OderStatus = () => {
               {data.items &&
                 data.items.length > 0 &&
                 data.items.map((item) => {
-                  console.log(item);
-
                   return (
                     <div
                       className="flex justify-between mt-2 items-center border-b-2"

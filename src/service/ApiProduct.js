@@ -146,7 +146,6 @@ const searchProductsByNameAPI = async (keyword, page = 1) => {
 const feeckacksProductsAPI = async (ids, userId, rating, review, images) => {
   try {
     const formData = new FormData();
-    console.log("IDs gửi lên:", ids);
 
     // Kiểm tra ids hợp lệ
     if (!ids || (Array.isArray(ids) && ids.length === 0)) {

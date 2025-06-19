@@ -87,7 +87,7 @@ export default function Clothing({ ListProducts }) {
   const handlAddWishList = async (productId) => {
     try {
       const res = await addToWishlistAPI(user?._id, productId);
-      console.log(res);
+
       if (res && res.data && res.data.EC === 0) {
         api["success"]({
           message: "Đã thêm vào danh sách yêu thích",
@@ -115,7 +115,6 @@ export default function Clothing({ ListProducts }) {
   };
 
   const handleRemoveWishList = async (productId) => {
-    console.log("productId", productId);
     try {
       const res = await RemoveToWishListAPI(user?._id, productId);
 
@@ -146,7 +145,7 @@ export default function Clothing({ ListProducts }) {
           alt={product.name}
         />
         {typeof product.discount !== "undefined" && (
-          <span className="absolute top-2 right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+          <span className="absolute top-3 right-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
             -{product.discount || 0}%
           </span>
         )}
@@ -225,20 +224,19 @@ export default function Clothing({ ListProducts }) {
         </div>
       </div>
       <div className="p-3" onClick={() => handleDetails(product._id)}>
-        <p className="text-xs text-gray-600 uppercase tracking-wider font-medium">
+        <p className="text-sm text-green-600 uppercase tracking-wider font-medium mb-2">
           {product.brand}
         </p>
-        <h3 className="text-sm font-semibold text-gray-900 line-clamp-1 mt-1">
+        <h3 className="clothing-male-title font-semibold text-gray-900 line-clamp-2 mb-3 cursor-pointer hover:text-green-600">
           {product.name}
         </h3>
-        <div className="mt-2 flex items-center justify-between">
+        <div className="flex items-center justify-between mb-2">
           <div>
-            <span className="text-base font-bold text-red-600">
+            <span className="clothing-male-price font-bold text-green-600">
               {formatPrice(product.discountedPrice)}
             </span>
-
             {product.discount > 0 && (
-              <span className="text-xs  text-gray-500 line-through ml-2">
+              <span className="clothing-male-original-price text-gray-500 line-through ml-2">
                 {formatPrice(product.price)}
               </span>
             )}

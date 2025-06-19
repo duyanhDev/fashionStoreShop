@@ -64,9 +64,7 @@ const Details = () => {
     setCurrentPage(selected);
   };
 
-  const onChange = (value) => {
-    console.log("changed", value);
-  };
+  const onChange = (value) => {};
   const [count, setCount] = useState(1);
 
   const handleIncrment = (value) => {

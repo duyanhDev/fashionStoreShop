@@ -93,7 +93,7 @@ const FavoritesList = () => {
       alert("Không có sản phẩm nào còn hàng để thêm vào giỏ!");
       return;
     }
-    console.log(inStockItems);
+
     const res = await addMultipleToCart(user._id, inStockItems);
 
     if (res) {

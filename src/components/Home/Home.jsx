@@ -416,8 +416,6 @@ const Home = () => {
               : ListProducts &&
                 ListProducts.length > 0 &&
                 ListProducts.map((item) => {
-                  console.log("item", item);
-
                   return (
                     <SwiperSlide key={item._id} className="w-full">
                       <div className="product-card rounded-xl overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300">

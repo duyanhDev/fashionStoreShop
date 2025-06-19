@@ -39,7 +39,6 @@ const UsersCustom = () => {
 
   useEffect(() => {
     socket.on("userDeleted", ({ userId }) => {
-      console.log("Đã xóa user có ID:", userId);
       // Gọi hàm fetch lại danh sách hoặc cập nhật UI
       fetchAPIUser(); // giả sử đây là hàm bạn viết để lấy lại danh sách user
     });
@@ -79,17 +78,13 @@ const UsersCustom = () => {
   ];
 
   const handleEdit = (record) => {
-    console.log(record);
-
     navigate(`/admin/usercustom/${record.id}`);
   };
 
   const handleDelete = async (record) => {
     try {
-      console.log(record);
-
       const res = await DeleteUserAPI(record.id);
-      console.log(res);
+
       if (res && res.data.EC === 0) {
         api["success"]({
           message: "Xóa tài khoản",
@@ -105,7 +100,6 @@ const UsersCustom = () => {
   };
 
   const handleAdd = (record) => {
-    console.log("Add related to:", record);
     // Ví dụ: thêm mới đơn hàng hoặc thao tác liên quan
   };
 

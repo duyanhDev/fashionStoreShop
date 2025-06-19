@@ -142,7 +142,7 @@
   }
 
   .grid {
-    grid-template-columns: repeat(5, 1fr); /* 5 cột trên PC */
+    grid-template-columns: repeat(4, 1fr); /* 5 cột trên PC */
     gap: 24px;
   }
 
@@ -177,20 +177,5 @@
 
   h2 {
     font-size: 2rem !important;
-  }
-}
-
-/* Ultra-wide screens */
-@media (min-width: 1440px) {
-  .container {
-    max-width: 1400px;
-  }
-
-  .grid {
-    gap: 32px;
-  }
-
-  .product-card img {
-    height: 300px;
   }
 }

@@ -108,8 +108,6 @@ const ChatSp = () => {
     }
   };
 
-  console.log(data);
-
   useEffect(() => {
     socket.on("connect", () => {
       console.log("Socket connected");

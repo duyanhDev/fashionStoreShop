@@ -97,7 +97,6 @@ const CartProducts = ({}) => {
         headers: { Token: "6501032d-0b70-11ef-b1d4-92b443b7a897" },
       });
       if (res.data && res.data.data) {
-        console.log("Wards in District 1442 (Quận 1):", res.data.data);
         const data = res.data.data.map((item) => ({
           id: item.WardCode,
           name: item.WardName,
@@ -131,7 +130,6 @@ const CartProducts = ({}) => {
   };
 
   const handleDistrictChange = (value, name) => {
-    console.log(name);
     setSelectedDistrict(value);
     setDistrictName(name.label);
     setGhnDistrictId(value);
@@ -472,8 +470,6 @@ const CartProducts = ({}) => {
       );
 
       if (ghnResponse.data && ghnResponse.data.code === 200) {
-        console.log(ghnResponse.data);
-
         let res = await createOrder(
           user._id,
           Name,

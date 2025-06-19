@@ -229,8 +229,6 @@ export default function DashboardStats() {
 
   const totalProfit = sumTotal - priceTotalProduct;
 
-  console.log(priceTotalProduct);
-
   // Data for pie chart
   const pieData = [
     { name: "Chi phí nhập hàng", value: priceTotalProduct },
