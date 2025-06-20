@@ -1,5 +1,3 @@
-"use client";
-
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Radio,
@@ -10,6 +8,7 @@ import {
   Skeleton,
   Rate,
   Drawer,
+  notification,
 } from "antd";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,15 +18,21 @@ import { fetchProducts } from "../../redux/actions/filterAction";
 import SliderComponent from "../Slider/Slider";
 import ProductCart from "../ProductCart/ProductCart";
 import "./ClothingMale.css";
+import {
+  addToWishlistAPI,
+  getWishlistAPI,
+  RemoveToWishListAPI,
+} from "../../service/WishList";
 
 const ClothingMale = () => {
+  const { user } = useSelector((state) => state.auth);
   const param = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [modalCartOpen, setModalCartOpen] = useState(false);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
-
+  const [api, contextHolder] = notification.useNotification();
   const [IdProduct, setIdProducts] = useState("");
   const [listItems, setListItems] = useState();
   const [price, setPrice] = useState(0);
@@ -38,6 +43,7 @@ const ClothingMale = () => {
   const desc = ["terrible", "bad", "normal", "good", "wonderful"];
 
   const [ratings, setRatings] = useState({});
+  const [WishList, setWishList] = useState([]);
 
   const [hidden, setHidden] = useState(false);
   const [checkFilter, setCheckFilter] = useState(false);
@@ -303,6 +309,66 @@ const ClothingMale = () => {
     setRatings((prev) => ({ ...prev, [productId]: value }));
   };
 
+  const handlAddWishList = async (productId) => {
+    try {
+      const res = await addToWishlistAPI(user?._id, productId);
+
+      if (!user) {
+        api["error"]({
+          message: "Vui lòng đăng nhập",
+          description: "Khách hàng đăng nhập mới sử dụng được tính năng này",
+        });
+        return;
+      }
+      if (res && res.data && res.data.EC === 0) {
+        api["success"]({
+          message: "Đã thêm vào danh sách yêu thích",
+          description: res.data.message,
+        });
+        fetchListWishList();
+      }
+    } catch (error) {
+      api["error"]({
+        message: "Sản phẩm đã tồn tại danh sách yêu thích",
+        description: "Sản phẩm đã tồn tại danh sách yêu thích",
+      });
+    }
+  };
+
+  const fetchListWishList = async () => {
+    try {
+      const res = await getWishlistAPI(user?._id);
+      if (res && res.data && res.data.EC === 0) {
+        setWishList(res.data.data.products);
+      }
+    } catch (error) {
+      throw new Error("Lỗi lấy danh sách yêu thích");
+    }
+  };
+
+  const handleRemoveWishList = async (productId) => {
+    try {
+      const res = await RemoveToWishListAPI(user?._id, productId);
+
+      if (res && res.data && res.data.EC === 0) {
+        api["success"]({
+          message: "Đã xóa khỏi danh sách yêu thích",
+        });
+        fetchListWishList();
+      }
+    } catch (error) {
+      api["error"]({
+        message: "Lỗi khi xóa sản phẩm khỏi danh sách yêu thích",
+        description: "Lỗi khi xóa sản phẩm khỏi danh sách yêu thích",
+      });
+    }
+  };
+  useEffect(() => {
+    fetchListWishList();
+  }, [user?._id]);
+
+  const isProductInWishlist = WishList?.map((item) => item.product._id);
+
   // Filter Component
   const FilterContent = () => (
     <div className="space-y-6">
@@ -460,7 +526,7 @@ const ClothingMale = () => {
   return (
     <div className="min-h-screen bg-white">
       <SliderComponent />
-
+      {contextHolder}
       <div className="clothing-male-wrapper">
         <div className="clothing-male-layout-grid">
           {/* Desktop Sidebar Filters */}
@@ -581,21 +647,49 @@ const ClothingMale = () => {
                         </span>
                       )}
                       <div className="absolute bottom-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <button className="bg-white p-2 rounded-full shadow-lg hover:bg-gray-50 transition-colors">
-                          <svg
-                            className="w-4 h-4 text-gray-600"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
+                        {isProductInWishlist.includes(product._id) ? (
+                          <>
+                            <button
+                              className="bg-white p-2 rounded-full shadow-lg hover:bg-gray-50 transition-colors"
+                              onClick={() => handleRemoveWishList(product._id)}
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4 text-green-600"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                />
+                              </svg>
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            className="bg-white p-1.5 rounded-full shadow-md hover:bg-gray-100"
+                            onClick={() => handlAddWishList(product._id)}
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                            />
-                          </svg>
-                        </button>
+                            <svg
+                              className="w-4 h-4 text-gray-600"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                              />
+                            </svg>
+                          </button>
+                        )}
+
                         <button
                           onClick={() =>
                             handelModelProductCart(

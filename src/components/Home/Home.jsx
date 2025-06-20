@@ -38,8 +38,6 @@ import {
   ShieldCheckIcon,
   CreditCardIcon,
   PhoneIcon,
-  StarIcon,
-  UserIcon,
   MapPinIcon,
   CalendarIcon,
 } from "@heroicons/react/24/outline";
@@ -204,7 +202,7 @@ const Home = () => {
 
   const SkeletonCard = () => (
     <Card
-      style={{ width: 265.8 }}
+      style={{ width: "100%", maxWidth: 265.8 }}
       cover={
         <Skeleton.Image active={true} style={{ width: "100%", height: 200 }} />
       }
@@ -298,17 +296,15 @@ const Home = () => {
       <SliderComponent />
       {contextHolder}
 
-      <div className="m-auto home_doisin">
+      <div className="home_doisin">
         {/* Category Section */}
-        <div className="flex justify-center m-auto items-center mt-8">
-          <div className="title_line relative w-10"></div>
-          <h1 className="text-2xl font-bold" data-aos="fade-down-right">
+        <div className="flex justify-center items-center mt-8 mb-6">
+          <h1 className="responsive-title" data-aos="fade-down-right">
             BẠN ĐANG TÌM KIẾM?
           </h1>
-          <div className="title_line relative w-10"></div>
         </div>
 
-        <div className="dosin_home_hc flex flex-wrap items-center gap-2 mt-4">
+        <div className="dosin_home_hc">
           {[
             {
               img: Aokhoac,
@@ -343,19 +339,24 @@ const Home = () => {
           ].map((item, index) => (
             <div
               key={index}
-              className="doisin_hc_item flex flex-col items-center justify-center cursor-pointer"
+              className="doisin_hc_item fade-in"
               data-aos="zoom-in-up"
+              data-aos-delay={index * 100}
+              tabIndex={0}
+              role="button"
+              aria-label={`Xem ${item.title}`}
             >
-              <Link className="text-center hc_item">
+              <Link
+                className="hc_item"
+                to={`/category/${item.title.toLowerCase()}`}
+              >
                 <img
-                  className="max-w-full h-auto text-center m-auto"
-                  src={item.img}
+                  src={item.img || "/placeholder.svg"}
                   alt={item.title}
+                  loading="lazy"
                 />
                 <span>
-                  <span className="block font-semibold text-[#003644]">
-                    {item.title}
-                  </span>
+                  <span>{item.title}</span>
                   <span>{item.desc}</span>
                 </span>
               </Link>
@@ -364,16 +365,16 @@ const Home = () => {
         </div>
 
         {/* Services Section */}
-        <div className="my-16 px-4" data-aos="fade-up">
+        <div className="section-padding" data-aos="fade-up">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-2xl font-bold text-center mb-12">
-              DỊCH VỤ CUA CHÚNG TÔI
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <h2 className="responsive-title">DỊCH VỤ CỦA CHÚNG TÔI</h2>
+            <div className="services-grid">
               {services.map((service, index) => (
                 <div
                   key={index}
-                  className="text-center p-6 rounded-lg hover:shadow-lg transition-shadow"
+                  className="text-center p-6 rounded-lg hover:shadow-lg transition-all duration-300 bg-white"
+                  data-aos="fade-up"
+                  data-aos-delay={index * 100}
                 >
                   <div className="text-blue-600 mb-4 flex justify-center">
                     {service.icon}
@@ -389,75 +390,110 @@ const Home = () => {
         </div>
 
         {/* Featured Products */}
-        <div className="m-3">
-          <h1 className="text-xl font-bold h1_main">SẢN PHẨM NỔI BẬT</h1>
-        </div>
+        <div className="section-padding">
+          <h1 className="responsive-subtitle ml-4">SẢN PHẨM NỔI BẬT</h1>
 
-        <div className="flex gap-5 mx-4 category_main">
-          <Swiper
-            modules={[Pagination]}
-            pagination={{ clickable: true }}
-            className="mySwiper"
-            slidesPerView={5}
-            spaceBetween={30}
-            breakpoints={{
-              1024: { slidesPerView: 5, spaceBetween: 30 },
-              768: { slidesPerView: 3, spaceBetween: 20 },
-              576: { slidesPerView: 2, spaceBetween: 5 },
-              320: { slidesPerView: 2, spaceBetween: 5 },
-            }}
-          >
-            {loading
-              ? [...Array(5)].map((_, index) => (
-                  <SwiperSlide key={`skeleton-${index}`}>
-                    <SkeletonCard />
-                  </SwiperSlide>
-                ))
-              : ListProducts &&
-                ListProducts.length > 0 &&
-                ListProducts.map((item) => {
-                  return (
-                    <SwiperSlide key={item._id} className="w-full">
-                      <div className="product-card rounded-xl overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300">
-                        <div className="relative">
-                          <img
-                            className="w-full h-48 object-cover transition-transform duration-500 hover:scale-105"
-                            src={
-                              item.variants[0]?.images[0]?.url ||
-                              "/default-image.jpg"
-                            }
-                            alt={item.name}
-                          />
-                          {typeof item.discount !== "undefined" && (
-                            <span className="absolute top-2 right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
-                              -{item.discount || 0}%
-                            </span>
-                          )}
-                          <div className="absolute bottom-2 right-2 flex gap-2">
-                            {isProductInWishlist.includes(item._id) ? (
-                              <button
-                                className="p-1.5 rounded-full shadow-md"
-                                onClick={() => handleRemoveWishList(item._id)}
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4 text-red-700"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
+          <div className="category_main px-4">
+            <Swiper
+              modules={[Pagination]}
+              pagination={{ clickable: true }}
+              className="mySwiper"
+              slidesPerView={1}
+              spaceBetween={10}
+              breakpoints={{
+                320: { slidesPerView: 2, spaceBetween: 10 },
+                480: { slidesPerView: 2, spaceBetween: 15 },
+                768: { slidesPerView: 3, spaceBetween: 20 },
+                1024: { slidesPerView: 4, spaceBetween: 25 },
+                1200: { slidesPerView: 5, spaceBetween: 30 },
+              }}
+            >
+              {loading
+                ? [...Array(5)].map((_, index) => (
+                    <SwiperSlide key={`skeleton-${index}`}>
+                      <SkeletonCard />
+                    </SwiperSlide>
+                  ))
+                : ListProducts &&
+                  ListProducts.length > 0 &&
+                  ListProducts.map((item) => {
+                    return (
+                      <SwiperSlide key={item._id} className="w-full">
+                        <div className="product-card rounded-xl overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300">
+                          <div className="relative">
+                            <img
+                              className="w-full h-48 object-cover transition-transform duration-500 hover:scale-105"
+                              src={
+                                item.variants[0]?.images[0]?.url ||
+                                "/placeholder.svg?height=200&width=200" ||
+                                "/placeholder.svg"
+                              }
+                              alt={item.name}
+                              loading="lazy"
+                            />
+                            {typeof item.discount !== "undefined" &&
+                              item.discount > 0 && (
+                                <span className="absolute top-2 right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+                                  -{item.discount || 0}%
+                                </span>
+                              )}
+                            <div className="absolute bottom-2 right-2 flex gap-2">
+                              {isProductInWishlist.includes(item._id) ? (
+                                <button
+                                  className="p-1.5 rounded-full shadow-md bg-green-100"
+                                  onClick={() => handleRemoveWishList(item._id)}
+                                  aria-label="Xóa khỏi danh sách yêu thích"
                                 >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                                  />
-                                </svg>
-                              </button>
-                            ) : (
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 text-green-600"
+                                    fill="currentColor"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                    />
+                                  </svg>
+                                </button>
+                              ) : (
+                                <button
+                                  className="bg-white p-1.5 rounded-full shadow-md hover:bg-gray-100"
+                                  onClick={() => handlAddWishList(item._id)}
+                                  aria-label="Thêm vào danh sách yêu thích"
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 text-gray-600"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                    />
+                                  </svg>
+                                </button>
+                              )}
                               <button
                                 className="bg-white p-1.5 rounded-full shadow-md hover:bg-gray-100"
-                                onClick={() => handlAddWishList(item._id)}
+                                onClick={() =>
+                                  handelModelProductCart(
+                                    item._id,
+                                    item.variants,
+                                    item.price,
+                                    item.discountedPrice,
+                                    item.name,
+                                    item.discount
+                                  )
+                                }
+                                aria-label="Thêm vào giỏ hàng"
                               >
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -470,98 +506,71 @@ const Home = () => {
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
                                     strokeWidth={2}
-                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                                   />
                                 </svg>
                               </button>
-                            )}
-                            <button
-                              className="bg-white p-1.5 rounded-full shadow-md hover:bg-gray-100"
-                              onClick={() =>
-                                handelModelProductCart(
-                                  item._id,
-                                  item.variants,
-                                  item.price,
-                                  item.discountedPrice,
-                                  item.name,
-                                  item.discount
-                                )
-                              }
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4 text-gray-600"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                                />
-                              </svg>
-                            </button>
-                          </div>
-                        </div>
-                        <div
-                          className="p-3"
-                          onClick={() => handleDetails(item._id)}
-                        >
-                          <p className="text-xs text-gray-600 uppercase tracking-wider font-medium">
-                            {item.brand}
-                          </p>
-                          <h3 className="text-sm font-semibold text-gray-900 line-clamp-1 mt-1">
-                            {item.name}
-                          </h3>
-                          <div className="mt-2 flex items-center justify-between">
-                            <div>
-                              <span className="text-base font-bold text-red-600">
-                                {formatPrice(
-                                  item.discountedPrice ||
-                                    item.costPrice ||
-                                    item.price
-                                )}
-                              </span>
-                              {item.discount > 0 && (
-                                <span className="text-xs text-gray-500 line-through ml-2">
-                                  {formatPrice(item.costPrice)}
-                                </span>
-                              )}
                             </div>
                           </div>
-                          <Flex className="mt-2">
-                            <Rate
-                              tooltips={desc}
-                              onChange={(value) => handleRate(item._id, value)}
-                              value={ratings[item._id] || 0}
-                              className="text-yellow-400"
-                            />
-                          </Flex>
+                          <div
+                            className="p-3 cursor-pointer"
+                            onClick={() => handleDetails(item._id)}
+                          >
+                            <p className="text-xs text-gray-600 uppercase tracking-wider font-medium">
+                              {item.brand}
+                            </p>
+                            <h3 className="text-sm font-semibold text-gray-900 line-clamp-1 mt-1">
+                              {item.name}
+                            </h3>
+                            <div className="mt-2 flex items-center justify-between">
+                              <div>
+                                <span className="text-base font-bold text-red-600">
+                                  {formatPrice(
+                                    item.discountedPrice ||
+                                      item.costPrice ||
+                                      item.price
+                                  )}
+                                </span>
+                                {item.discount > 0 && (
+                                  <span className="text-xs text-gray-500 line-through ml-2">
+                                    {formatPrice(item.costPrice)}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <Flex className="mt-2">
+                              <Rate
+                                tooltips={desc}
+                                onChange={(value) =>
+                                  handleRate(item._id, value)
+                                }
+                                value={ratings[item._id] || 0}
+                                className="text-yellow-400"
+                                size="small"
+                              />
+                            </Flex>
+                          </div>
                         </div>
-                      </div>
-                    </SwiperSlide>
-                  );
-                })}
-          </Swiper>
+                      </SwiperSlide>
+                    );
+                  })}
+            </Swiper>
+          </div>
         </div>
 
         {/* Customer Testimonials */}
-        <div className="my-16 px-4 bg-gray-50 py-16" data-aos="fade-up">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-2xl font-bold text-center mb-12">
-              KHÁCH HÀNG NÓI GÌ VỀ CHÚNG TÔI
-            </h2>
+        <div className="section-padding bg-gray-50" data-aos="fade-up">
+          <div className="max-w-6xl mx-auto px-4">
+            <h2 className="responsive-title">KHÁCH HÀNG NÓI GÌ VỀ CHÚNG TÔI</h2>
             <Swiper
               modules={[Pagination, Autoplay]}
               pagination={{ clickable: true }}
               autoplay={{ delay: 4000 }}
               slidesPerView={1}
-              spaceBetween={30}
+              spaceBetween={20}
               breakpoints={{
-                768: { slidesPerView: 2 },
-                1024: { slidesPerView: 3 },
+                768: { slidesPerView: 2, spaceBetween: 25 },
+                1024: { slidesPerView: 3, spaceBetween: 30 },
               }}
             >
               {testimonials.map((testimonial) => (
@@ -581,6 +590,7 @@ const Home = () => {
                       disabled
                       defaultValue={testimonial.rating}
                       className="mb-3"
+                      size="small"
                     />
                     <p className="text-gray-700 mb-4">
                       "{testimonial.comment}"
@@ -597,15 +607,18 @@ const Home = () => {
         </div>
 
         {/* Blog Section */}
-        <div className="my-16 px-4" data-aos="fade-up">
-          <div className="max-w-6xl mx-auto">
+        <div className="section-padding" data-aos="fade-up">
+          <div className="max-w-6xl mx-auto px-4">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-bold">TIN TỨC & XU HƯỚNG</h2>
-              <Link to="/blog" className="text-blue-600 hover:text-blue-800">
+              <h2 className="responsive-subtitle">TIN TỨC & XU HƯỚNG</h2>
+              <Link
+                to="/blog"
+                className="text-blue-600 hover:text-blue-800 text-sm md:text-base"
+              >
                 Xem tất cả →
               </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
               {blogPosts.map((post) => (
                 <Card
                   key={post.id}
@@ -613,8 +626,9 @@ const Home = () => {
                   cover={
                     <img
                       alt={post.title}
-                      src={post.image}
+                      src={post.image || "/placeholder.svg"}
                       className="h-48 object-cover"
+                      loading="lazy"
                     />
                   }
                   className="h-full"
@@ -627,8 +641,12 @@ const Home = () => {
                       {new Date(post.date).toLocaleDateString("vi-VN")}
                     </span>
                   </div>
-                  <h3 className="font-semibold text-lg mb-2">{post.title}</h3>
-                  <p className="text-gray-600 text-sm">{post.excerpt}</p>
+                  <h3 className="font-semibold text-lg mb-2 line-clamp-2">
+                    {post.title}
+                  </h3>
+                  <p className="text-gray-600 text-sm line-clamp-3">
+                    {post.excerpt}
+                  </p>
                 </Card>
               ))}
             </div>
@@ -637,19 +655,21 @@ const Home = () => {
 
         {/* Newsletter Section */}
         <div
-          className="my-16 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16"
+          className="section-padding bg-gradient-to-r from-blue-600 to-purple-600 text-white"
           data-aos="fade-up"
         >
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-4">ĐĂNG KÝ NHẬN TIN</h2>
-            <p className="text-xl mb-8">
+          <div className="max-w-4xl mx-auto text-center px-4">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+              ĐĂNG KÝ NHẬN TIN
+            </h2>
+            <p className="text-lg md:text-xl mb-8">
               Nhận thông tin về sản phẩm mới, ưu đãi đặc biệt và xu hướng thời
               trang
             </p>
             <Form
               form={form}
               onFinish={handleNewsletterSubmit}
-              className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-md mx-auto"
+              className="newsletter-form"
             >
               <Form.Item
                 name="email"
@@ -680,21 +700,20 @@ const Home = () => {
         </div>
 
         {/* Brand Partners */}
-        <div className="my-16 px-4" data-aos="fade-up">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-2xl font-bold text-center mb-12">
-              THƯƠNG HIỆU ĐỐI TÁC
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 items-center">
+        <div className="section-padding" data-aos="fade-up">
+          <div className="max-w-6xl mx-auto px-4">
+            <h2 className="responsive-title">THƯƠNG HIỆU ĐỐI TÁC</h2>
+            <div className="brands-grid">
               {brands.map((brand, index) => (
                 <div
                   key={index}
                   className="flex justify-center items-center p-4 grayscale hover:grayscale-0 transition-all duration-300"
                 >
                   <img
-                    src={brand.logo}
+                    src={brand.logo || "/placeholder.svg"}
                     alt={brand.name}
                     className="max-h-12 object-contain"
+                    loading="lazy"
                   />
                 </div>
               ))}
@@ -703,8 +722,8 @@ const Home = () => {
         </div>
 
         {/* All Products */}
-        <div className="mt-4">
-          <h1 className="ml-4 mt-3 text-xl font-bold">TẤT CẢ SẢN PHẨM</h1>
+        <div className="section-padding">
+          <h1 className="responsive-subtitle ml-4">TẤT CẢ SẢN PHẨM</h1>
           <Clothing ListProducts={ListProducts} />
         </div>
       </div>

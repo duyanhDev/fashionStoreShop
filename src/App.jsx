@@ -183,7 +183,7 @@ function App() {
           CartListProductsUser={CartListProductsUser}
         />
         <div className="nav_menu flex justify-center items-center gap-3">
-          <ul className="flex gap-10">
+          <ul className="flex gap-10 lg:mt-3">
             {/* product_hover */}
             <li className="">
               <Link to="/category/unisex" className="">

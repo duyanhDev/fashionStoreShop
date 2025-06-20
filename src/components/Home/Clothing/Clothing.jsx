@@ -158,8 +158,8 @@ export default function Clothing({ ListProducts }) {
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4  text-red-700 "
-                  fill="none"
+                  className="h-4 w-4 text-green-600"
+                  fill="currentColor"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
@@ -256,10 +256,10 @@ export default function Clothing({ ListProducts }) {
 
   const renderProductSection = (title, products, visibleCount, onLoadMore) => (
     <section className="py-8">
-      <div className="max-w-full sm:max-w-[480px] md:max-w-[768px] lg:max-w-[1024px] xl:max-w-[1280px] 2xl:max-w-[1536px] mx-auto px-4">
+      <div className="max-w-full  md:max-w-[768px] lg:max-w-[1024px] xl:max-w-[1280px] 2xl:max-w-[1536px] mx-auto px-4">
         <h2 className="text-2xl font-bold text-gray-800 mb-6 relative inline-block">
           {title}
-          <span className="absolute bottom-0 left-0 w-12 h-1 bg-orange-500 rounded"></span>
+          <span className="absolute bottom-0 left-0 w-full h-1 bg-orange-500 rounded"></span>
         </h2>
         <div
           className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-6"
@@ -302,7 +302,7 @@ export default function Clothing({ ListProducts }) {
     <div className="bg-gray-50 min-h-screen">
       {contextHolder}
       <section className="py-8">
-        <div className="max-w-full sm:max-w-[480px] md:max-w-[768px] lg:max-w-[1024px] xl:max-w-[1280px] 2xl:max-w-[1536px]  lg:px-8">
+        <div className="max-w-full md:max-w-[768px] lg:max-w-[1024px] xl:max-w-[1280px] 2xl:max-w-[1536px]  lg:px-8">
           <div
             className="grid grid-cols-2 sm:grid-cols-2 mx-3 md:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-6"
             data-aos="fade-up"
