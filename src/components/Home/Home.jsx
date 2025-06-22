@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+
 import {
   Button,
   Card,
@@ -16,7 +18,7 @@ import "swiper/css";
 import { Pagination, Autoplay } from "swiper/modules";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import Clothing from "./Clothing/Clothing";
-import { useState, useEffect } from "react";
+
 import SliderComponent from "../Slider/Slider";
 import Ao from "./../../assets/Image/Home/Ao.png";
 import Quan from "./../../assets/Image/Home/Quan.png";

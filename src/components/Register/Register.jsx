@@ -1,6 +1,6 @@
-import { Button, message } from "antd";
-import Input from "antd/es/input/Input";
 import { useState } from "react";
+import Input from "antd/es/input/Input";
+import { Button, message } from "antd";
 import { RegisterUser } from "../../service/Auth";
 import "./register-styles.css";
 const RegisterForm = () => {
