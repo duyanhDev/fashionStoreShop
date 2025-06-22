@@ -284,8 +284,8 @@ const ClothingMale = () => {
     }
   };
 
-  const handleDetails = (id) => {
-    navigate(`/product/${id}`);
+  const handleDetails = (slug) => {
+    navigate(`/product/${slug}`);
   };
 
   const handelModelProductCart = (
@@ -310,16 +310,16 @@ const ClothingMale = () => {
   };
 
   const handlAddWishList = async (productId) => {
+    if (!user) {
+      api["error"]({
+        message: "Vui lòng đăng nhập",
+        description: "Khách hàng đăng nhập mới sử dụng được tính năng này",
+      });
+      return;
+    }
     try {
       const res = await addToWishlistAPI(user?._id, productId);
 
-      if (!user) {
-        api["error"]({
-          message: "Vui lòng đăng nhập",
-          description: "Khách hàng đăng nhập mới sử dụng được tính năng này",
-        });
-        return;
-      }
       if (res && res.data && res.data.EC === 0) {
         api["success"]({
           message: "Đã thêm vào danh sách yêu thích",
@@ -721,7 +721,7 @@ const ClothingMale = () => {
                     </div>
                     <div
                       className="clothing-male-content"
-                      onClick={() => handleDetails(product._id)}
+                      onClick={() => handleDetails(product.slug)}
                     >
                       <p className="text-sm text-green-600 uppercase tracking-wider font-medium mb-2">
                         {product.brand}

@@ -16,12 +16,11 @@ import { getListProductsAPI } from "./service/ApiProduct";
 
 // import required modules
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { CartListProduct } from "./service/Cart";
 import Footer from "./components/Footer/Footer";
-import { UpOutlined } from "@ant-design/icons";
 import Message from "./components/Messages/Message";
 
 function App() {
@@ -35,6 +34,11 @@ function App() {
   const Navigate = useNavigate();
   const location = useLocation();
   const hideFooter = location.pathname === "/cart";
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" }); // scroll mượt
+  }, [pathname]);
 
   const ListProducsData = async () => {
     try {
@@ -471,10 +475,10 @@ function App() {
               <Link to="category/female">Nữ</Link>
             </li>
             <li>
-              <Link>Phụ kiện</Link>
+              <Link target="_top">Phụ kiện</Link>
             </li>
             <li className="name_product_app">
-              <Link>Thương hiệu</Link>
+              <Link target="_top">Thương hiệu</Link>
             </li>
             <li className="name_product_app">
               <Link to="/ranking">Xếp hạng</Link>

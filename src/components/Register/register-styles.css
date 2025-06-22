@@ -1,21 +1,21 @@
 /* Custom styles for Register form */
-.ant-input {
+.register .ant-input {
   border-radius: 12px !important;
   height: 48px !important;
   border-width: 2px !important;
   transition: all 0.2s ease !important;
 }
 
-.ant-input:hover {
+.register .ant-input:hover {
   border-color: #d1d5db !important;
 }
 
-.ant-input:focus {
+.register .ant-input:focus {
   border-color: #16a34a !important;
   box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2) !important;
 }
 
-.ant-btn {
+.register .ant-btn {
   border-radius: 12px !important;
   height: 48px !important;
   font-weight: 600 !important;

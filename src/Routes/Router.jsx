@@ -38,7 +38,7 @@ export const RouterLayout = [
     index: true,
   },
   {
-    path: "/product/:id",
+    path: "/product/:slug",
     element: <Details />,
   },
   {

@@ -1,6 +1,6 @@
 /* Trong file CSS */
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
-
+@import "highlight.js/styles/github.css";
 /* Sử dụng trong component */
 @tailwind base;
 @tailwind components;

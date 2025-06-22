@@ -66,7 +66,7 @@ export default function Clothing({ ListProducts }) {
     </Card>
   );
 
-  const handleDetails = (id) => navigate(`product/${id}`);
+  const handleDetails = (slug) => navigate(`product/${slug}`);
 
   const handelModelProductCart = (
     id,
@@ -85,6 +85,13 @@ export default function Clothing({ ListProducts }) {
     setDiscount(discount);
   };
   const handlAddWishList = async (productId) => {
+    if (!user) {
+      api["error"]({
+        message: "Vui lòng đăng nhập",
+        description: "Khách hàng đăng nhập mới sử dụng được tính năng này",
+      });
+      return;
+    }
     try {
       const res = await addToWishlistAPI(user?._id, productId);
 
@@ -223,7 +230,7 @@ export default function Clothing({ ListProducts }) {
           </button>
         </div>
       </div>
-      <div className="p-3" onClick={() => handleDetails(product._id)}>
+      <div className="p-3" onClick={() => handleDetails(product.slug)}>
         <p className="text-sm text-green-600 uppercase tracking-wider font-medium mb-2">
           {product.brand}
         </p>

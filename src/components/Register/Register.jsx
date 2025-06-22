@@ -111,7 +111,7 @@ const RegisterForm = () => {
   };
 
   return (
-    <div className="min-h-screen mt-32 bg-gradient-to-br from-gray-900 via-gray-800 to-green-900 flex items-center justify-center p-4">
+    <div className="register min-h-screen mt-32 bg-gradient-to-br from-gray-900 via-gray-800 to-green-900 flex items-center justify-center p-4">
       {/* Main Layout */}
       <div className="w-full max-w-2xl mx-auto">
         <div className="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden backdrop-blur-sm bg-white/95">

@@ -211,8 +211,8 @@ const Home = () => {
     </Card>
   );
 
-  const handleDetails = (id) => {
-    navigate(`product/${id}`);
+  const handleDetails = (slug) => {
+    navigate(`product/${slug}`);
   };
 
   const handelModelProductCart = (
@@ -240,6 +240,13 @@ const Home = () => {
   }, []);
 
   const handlAddWishList = async (productId) => {
+    if (!user) {
+      api["error"]({
+        message: "Vui lòng đăng nhập",
+        description: "Khách hàng đăng nhập mới sử dụng được tính năng này",
+      });
+      return;
+    }
     try {
       const res = await addToWishlistAPI(user?._id, productId);
       if (res && res.data && res.data.EC === 0) {
@@ -514,7 +521,7 @@ const Home = () => {
                           </div>
                           <div
                             className="p-3 cursor-pointer"
-                            onClick={() => handleDetails(item._id)}
+                            onClick={() => handleDetails(item.slug)}
                           >
                             <p className="text-xs text-gray-600 uppercase tracking-wider font-medium">
                               {item.brand}

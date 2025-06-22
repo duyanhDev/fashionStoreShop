@@ -8,39 +8,11 @@ const ListOneProductAPI = async (id) => {
   return await axios.get(`/api/v1/products/${id}`);
 };
 
-const createProductAPI = async (
-  name,
-  gender,
-  description,
-  category,
-  brand,
-  care,
-  price,
-  discount,
-  stock,
-  size,
-  color,
-  images = [],
-  costPrice
-) => {
-  const formData = new FormData();
+const ListSlugProductAPI = async (slug) => {
+  return await axios.get(`/api/v1/products-slug/${slug}`);
+};
 
-  formData.append("name", name);
-  formData.append("gender", gender);
-  formData.append("description", description);
-  formData.append("category", category);
-  formData.append("brand", brand);
-  formData.append("care", care);
-  formData.append("price", price);
-  formData.append("discount", discount);
-  formData.append("stock", stock);
-  formData.append("color", color);
-  formData.append("size", size);
-  images.forEach((file) => {
-    formData.append("images", file);
-  });
-  formData.append("costPrice", costPrice);
-
+const createProductAPI = async (formData) => {
   try {
     const response = await axios.post("api/v1/products", formData, {
       headers: {
@@ -214,4 +186,5 @@ export {
   searchProductsByNameAPI,
   feeckacksProductsAPI,
   toggleLikeReplyAPI,
+  ListSlugProductAPI,
 };

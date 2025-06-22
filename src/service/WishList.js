@@ -5,7 +5,7 @@ const addToWishlistAPI = async (userId, productId) => {
 };
 
 const getWishlistAPI = async (userId) => {
-  return await axios.get(`/api/v1//get-wishlist/${userId}`);
+  return await axios.get(`/api/v1/get-wishlist/${userId}`);
 };
 
 const RemoveToWishListAPI = async (userId, productId) => {
