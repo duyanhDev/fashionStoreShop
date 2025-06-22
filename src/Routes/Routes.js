@@ -11,6 +11,7 @@ const {
   CategoryGenderFitterAPI,
   toggleLikeRatingAPI,
   toggleLikeReply,
+  ListSlugProductAPI,
 } = require("./../Controllers/Products");
 const {
   CreateCategoryAPI,
@@ -83,6 +84,7 @@ const {
   createBlogController,
   updateBlogController,
 } = require("../Controllers/Blog");
+const { handleGeminiRequest } = require("../Controllers/Gemini");
 
 //product
 /**
@@ -128,6 +130,8 @@ RouterAPI.post("/products", AddProductsAPI);
  *         description: Thông tin sản phẩm
  */
 RouterAPI.get("/products/:id", ListOneProductAPI);
+
+RouterAPI.get("/products-slug/:slug", ListSlugProductAPI);
 
 /**
  * @swagger
@@ -245,7 +249,6 @@ RouterAPI.put("/update-order/:id", UpDateOrderStatus); // cập nhật trạng t
 // all hóa đơn thanh toán order
 RouterAPI.get("/get-order-all", ListOderProducts);
 RouterAPI.get("/get-order-one/:id", getOrderOneProduct);
-RouterAPI.post("/ChatAI", BotChatAPI);
 
 // lọc oder theo trạng thái
 
@@ -289,5 +292,8 @@ RouterAPI.post("/remove-wishlist", RemoveToWishList);
 
 RouterAPI.post("/create-blog", createBlogController);
 RouterAPI.put("/post-view/:slug", updateBlogController);
+
+RouterAPI.post("/ChatAI", BotChatAPI);
+RouterAPI.post("/genminiAi", handleGeminiRequest);
 
 module.exports = RouterAPI;
