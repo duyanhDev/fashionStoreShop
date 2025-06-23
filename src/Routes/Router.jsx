@@ -30,6 +30,8 @@ import FavoritesList from "../components/FavoritesList/FavoritesList";
 import ProductReviewAdmin from "../components/ProductReviewAdmin/ProductReviewAdmin";
 import LoginForm from "../components/Login/Login";
 import RegisterForm from "../components/Register/Register";
+import GeminiBlogGenerator from "../components/GeminiBlogGenerator/GeminiBlogGenerator";
+import AdminPostCreator from "../components/AdminPostCreator/AdminPostCreator";
 
 export const RouterLayout = [
   {
@@ -96,6 +98,10 @@ export const RouterLayout = [
   {
     path: "/Register",
     element: <RegisterForm />,
+  },
+  {
+    path: "/create/blog",
+    element: <AdminPostCreator />,
   },
 ];
 

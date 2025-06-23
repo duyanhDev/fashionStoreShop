@@ -630,11 +630,17 @@ const Details = () => {
                   </Button>
                   <input
                     type="number"
-                    disabled
-                    className="w-10 h-10 text-center "
                     min={1}
+                    max={TotalStock}
                     value={count}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value, 10);
+                      if (!isNaN(value) && value >= 1 && value <= TotalStock) {
+                        setCount(value);
+                      }
+                    }}
                   />
+
                   <Button
                     className="w-10 h-10 border-none outline-none "
                     style={{ background: "none", outline: "none" }}
@@ -643,24 +649,26 @@ const Details = () => {
                     <PlusOutlined className="mr-6" />
                   </Button>
                 </div>
-                <div className="w-3/4">
-                  <Flex
-                    vertical
-                    gap="small"
-                    style={{
-                      width: "100%",
-                    }}
-                  >
-                    <Button
-                      type="primary"
-                      block
-                      style={{ backgroundColor: "black", color: "white" }}
-                      onClick={handleAddProduct}
+                {TotalStock > 0 && (
+                  <div className="w-3/4">
+                    <Flex
+                      vertical
+                      gap="small"
+                      style={{
+                        width: "100%",
+                      }}
                     >
-                      Thêm vào giỏ hàng
-                    </Button>
-                  </Flex>
-                </div>
+                      <Button
+                        type="primary"
+                        block
+                        style={{ backgroundColor: "black", color: "white" }}
+                        onClick={handleAddProduct}
+                      >
+                        Thêm vào giỏ hàng
+                      </Button>
+                    </Flex>
+                  </div>
+                )}
               </div>
             </div>
           </div>

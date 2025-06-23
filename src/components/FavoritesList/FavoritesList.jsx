@@ -83,6 +83,7 @@ const FavoritesList = () => {
     inStock: "Còn hàng",
     outOfStock: "Hết hàng",
     "67242f4095a1d8ea4d6a9249": "Quần áo",
+    "6725c76b8e7bbe9af497f624": "Giày",
   };
 
   const handleAddAllToCart = async () => {
