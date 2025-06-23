@@ -14,6 +14,8 @@ const CreateBlog = async ({
     throw new Error("Không truyền đủ tham số");
   }
 
+  console.log("xxx", files);
+
   const randomSuffix = Math.floor(1000 + Math.random() * 9000); // ví dụ: 5765
   const slugTilte =
     slugify(slug, { lower: true, strict: true, locale: "vi" }) +
@@ -21,8 +23,10 @@ const CreateBlog = async ({
   let imageUrls = [];
 
   // Nếu có ảnh gửi lên
-  if (files && files.img) {
-    const imgFiles = Array.isArray(files.img) ? files.img : [files.img];
+  if (files) {
+    const imgFiles = Array.isArray(files) ? files : [files];
+
+    console.log(imgFiles);
 
     for (const file of imgFiles) {
       const results = await uploadFileToCloudinary(file); // <- Trả về mảng

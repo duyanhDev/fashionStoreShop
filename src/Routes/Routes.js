@@ -84,7 +84,10 @@ const {
   createBlogController,
   updateBlogController,
 } = require("../Controllers/Blog");
-const { handleGeminiRequest } = require("../Controllers/Gemini");
+const {
+  handleGeminiRequest,
+  generateBlogByGemini,
+} = require("../Controllers/Gemini");
 
 //product
 /**
@@ -295,5 +298,6 @@ RouterAPI.put("/post-view/:slug", updateBlogController);
 
 RouterAPI.post("/ChatAI", BotChatAPI);
 RouterAPI.post("/genminiAi", handleGeminiRequest);
+RouterAPI.post("/generate-ai-blog", generateBlogByGemini);
 
 module.exports = RouterAPI;
