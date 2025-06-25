@@ -566,7 +566,7 @@ Vui lòng thử lại với một trong những chủ đề trên!`,
       <div className="bg-white/90 backdrop-blur-sm border-t border-gray-200/50 shadow-lg">
         {/* Suggestion Buttons */}
         <div className="max-w-4xl mx-auto px-6 py-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-4 md:grid-cols-4 lg:md:grid-cols gap-3">
             {suggestionButtons.map((button) => (
               <button
                 key={button.id}
@@ -577,7 +577,9 @@ Vui lòng thử lại với một trong những chủ đề trên!`,
                 <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <span className="text-2xl relative z-10">{button.icon}</span>
                 <div className="text-center relative z-10">
-                  <div className="font-medium text-sm">{button.text}</div>
+                  <div className="hidden md:block font-medium text-sm">
+                    {button.text}
+                  </div>
                 </div>
               </button>
             ))}

@@ -40,7 +40,7 @@ const ClothingMale = () => {
   const [productname, setProductname] = useState("");
   const [discount, setDiscount] = useState(0);
 
-  const desc = ["terrible", "bad", "normal", "good", "wonderful"];
+  // const desc = ["terrible", "bad", "normal", "good", "wonderful"];
 
   const [ratings, setRatings] = useState({});
   const [WishList, setWishList] = useState([]);

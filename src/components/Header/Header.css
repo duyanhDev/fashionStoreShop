@@ -124,7 +124,9 @@
   max-height: 70vh;
   overflow-y: auto;
 }
-
+.cart_products_item .ant-modal-footer {
+  display: none;
+}
 .item_list_cart_products {
   display: none;
   grid-template-columns: 80px 1fr 100px 80px;
@@ -193,6 +195,7 @@
 
 /* Quantity Input Styles */
 input[type="number"] {
+  appearance: textfield;
   -moz-appearance: textfield;
 }
 
@@ -503,6 +506,7 @@ input[type="number"]::-webkit-inner-spin-button {
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

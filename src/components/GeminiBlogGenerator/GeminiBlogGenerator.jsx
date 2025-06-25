@@ -14,6 +14,10 @@ import {
   Col,
   Tag,
   Alert,
+  Image,
+  Tooltip,
+  Switch,
+  InputNumber,
 } from "antd";
 import {
   PlusOutlined,
@@ -23,6 +27,10 @@ import {
   SaveOutlined,
   EyeOutlined,
   LoadingOutlined,
+  DeleteOutlined,
+  PictureOutlined,
+  ClockCircleOutlined,
+  StarOutlined,
 } from "@ant-design/icons";
 import { generateBlogByGeminiAPi } from "../../service/ChatBot";
 import { CreateBlog } from "../../service/Blog";
@@ -31,7 +39,7 @@ const { TextArea } = Input;
 const { Title, Text } = Typography;
 
 const GeminiBlogGenerator = () => {
-  const [isModalVisible, setIsModalVisible] = useState(true);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
 
   const [topic, setTopic] = useState("");
@@ -46,6 +54,8 @@ const GeminiBlogGenerator = () => {
   const [saved, setSaved] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [fileList, setFileList] = useState([]);
+  const [readTime, setReadTime] = useState("");
+  const [featured, setFeatured] = useState(false);
 
   const showModal = () => setIsModalVisible(true);
 
@@ -63,6 +73,8 @@ const GeminiBlogGenerator = () => {
     setSaved(false);
     setFileList([]);
     setShowPreview(false);
+    setReadTime("");
+    setFeatured(false);
   };
 
   const handleGenerate = async () => {
@@ -91,6 +103,8 @@ const GeminiBlogGenerator = () => {
         tip: newTip,
         content: newContent,
         keywords: keywords,
+        readTime: readTime,
+        featured: featured,
       });
 
       message.success("🤖 AI đã tạo nội dung thành công!");
@@ -115,7 +129,9 @@ const GeminiBlogGenerator = () => {
       formData.append("content", values.content);
       formData.append("slug", values.title.toLowerCase().replace(/\s+/g, "-"));
       formData.append("regex", values.keywords || "");
-      formData.append("author", "685047211a43fd53e1936c34");
+      formData.append("userId", "673017dde4526bd79cc61fa6");
+      formData.append("readTime", values.readTime);
+      formData.append("featured", values.featured);
 
       if (images.length > 0) {
         images.forEach((img) => formData.append("img", img));
@@ -134,6 +150,21 @@ const GeminiBlogGenerator = () => {
     }
   };
 
+  const removeImage = (index) => {
+    const newFileList = [...fileList];
+    const newImages = [...images];
+    const newPreviews = [...imagePreviews];
+
+    newFileList.splice(index, 1);
+    newImages.splice(index, 1);
+    URL.revokeObjectURL(newPreviews[index]); // Clean up memory
+    newPreviews.splice(index, 1);
+
+    setFileList(newFileList);
+    setImages(newImages);
+    setImagePreviews(newPreviews);
+  };
+
   const uploadProps = {
     beforeUpload: (file) => {
       const isImage = file.type.startsWith("image/");
@@ -150,6 +181,7 @@ const GeminiBlogGenerator = () => {
     },
     multiple: true,
     fileList,
+    showUploadList: false, // Tắt danh sách mặc định để dùng UI tùy chỉnh
     onChange: ({ fileList: newFileList }) => {
       setFileList(newFileList);
 
@@ -162,7 +194,6 @@ const GeminiBlogGenerator = () => {
       const previews = selectedFiles.map((file) => URL.createObjectURL(file));
       setImagePreviews(previews);
     },
-    listType: "picture-card",
   };
 
   return (
@@ -252,7 +283,7 @@ const GeminiBlogGenerator = () => {
 
           <Form form={form} layout="vertical" onFinish={handleSave}>
             <Row gutter={16}>
-              <Col span={16}>
+              <Col span={12}>
                 <Form.Item
                   name="title"
                   label="Tiêu đề"
@@ -267,7 +298,7 @@ const GeminiBlogGenerator = () => {
                   />
                 </Form.Item>
               </Col>
-              <Col span={8}>
+              <Col span={6}>
                 <Form.Item name="keywords" label="Từ khóa">
                   <Input
                     value={keywords}
@@ -276,15 +307,61 @@ const GeminiBlogGenerator = () => {
                   />
                 </Form.Item>
               </Col>
+              <Col span={6}>
+                <Form.Item
+                  name="readTime"
+                  label={
+                    <div className="flex items-center space-x-1">
+                      <ClockCircleOutlined className="text-orange-500" />
+                      <span>Thời gian đọc (phút)</span>
+                    </div>
+                  }
+                >
+                  <Input
+                    value={readTime}
+                    onChange={(value) => setReadTime(value)}
+                    size="large"
+                    min={1}
+                    max={60}
+                    placeholder="5"
+                    className="w-full"
+                  />
+                </Form.Item>
+              </Col>
             </Row>
 
-            <Form.Item name="tip" label="Mẹo mở đầu">
-              <Input
-                value={tip}
-                onChange={(e) => setTip(e.target.value)}
-                size="large"
-              />
-            </Form.Item>
+            <Row gutter={16}>
+              <Col span={18}>
+                <Form.Item name="tip" label="Mẹo mở đầu">
+                  <Input
+                    value={tip}
+                    onChange={(e) => setTip(e.target.value)}
+                    size="large"
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item
+                  name="featured"
+                  label={
+                    <div className="flex items-center space-x-1">
+                      <StarOutlined className="text-yellow-500" />
+                      <span>Bài viết nổi bật</span>
+                    </div>
+                  }
+                  valuePropName="checked"
+                >
+                  <Switch
+                    checked={featured}
+                    onChange={(checked) => setFeatured(checked)}
+                    size="default"
+                    checkedChildren="Có"
+                    unCheckedChildren="Không"
+                    className="bg-gray-300"
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
 
             <Form.Item
               name="content"
@@ -300,25 +377,92 @@ const GeminiBlogGenerator = () => {
               />
             </Form.Item>
 
-            <Form.Item name="image" label="Ảnh bài viết">
-              <Upload {...uploadProps}>
-                <div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 transition-colors">
-                  <UploadOutlined className="text-2xl text-gray-400 mb-2" />
-                  <Text type="secondary">Tải lên ảnh (nhiều ảnh)</Text>
+            <Form.Item
+              name="image"
+              label={
+                <div className="flex items-center space-x-2">
+                  <PictureOutlined className="text-blue-500" />
+                  <span>Ảnh bài viết</span>
+                  {imagePreviews.length > 0 && (
+                    <Tag color="blue">{imagePreviews.length} ảnh</Tag>
+                  )}
                 </div>
-              </Upload>
-              {imagePreviews.length > 0 && (
-                <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {imagePreviews.map((preview, index) => (
-                    <img
-                      key={index}
-                      src={preview}
-                      alt={`Preview ${index}`}
-                      className="max-h-60 rounded-lg shadow-md object-cover w-full"
-                    />
-                  ))}
-                </div>
-              )}
+              }
+            >
+              <div className="space-y-4">
+                {/* Upload Area */}
+                <Upload {...uploadProps}>
+                  <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-blue-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all duration-300 cursor-pointer bg-gradient-to-br from-blue-50 to-indigo-50">
+                    <div className="bg-blue-100 p-4 rounded-full mb-3">
+                      <UploadOutlined className="text-3xl text-blue-600" />
+                    </div>
+                    <Text className="text-lg font-medium text-gray-700 mb-1">
+                      Tải lên ảnh cho bài viết
+                    </Text>
+                    <Text type="secondary" className="text-center">
+                      Kéo thả hoặc click để chọn nhiều ảnh
+                      <br />
+                      <span className="text-xs">
+                        Hỗ trợ: JPG, PNG, GIF (tối đa 5MB mỗi ảnh)
+                      </span>
+                    </Text>
+                  </div>
+                </Upload>
+
+                {/* Image Previews Grid */}
+                {imagePreviews.length > 0 && (
+                  <div className="bg-gray-50 p-4 rounded-xl">
+                    <div className="flex items-center justify-between mb-3">
+                      <Text strong className="text-gray-700">
+                        Ảnh đã chọn ({imagePreviews.length})
+                      </Text>
+                      <Text type="secondary" className="text-sm">
+                        Click vào ảnh để xem phóng to
+                      </Text>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {imagePreviews.map((preview, index) => (
+                        <div
+                          key={index}
+                          className="relative group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-200"
+                        >
+                          <div className="aspect-square overflow-hidden">
+                            <Image
+                              src={preview}
+                              alt={`Preview ${index + 1}`}
+                              className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
+                              preview={{
+                                mask: (
+                                  <div className="flex items-center justify-center">
+                                    <EyeOutlined className="text-white text-lg" />
+                                  </div>
+                                ),
+                              }}
+                            />
+                          </div>
+
+                          {/* Delete Button */}
+                          <Tooltip title="Xóa ảnh này">
+                            <Button
+                              type="text"
+                              danger
+                              size="small"
+                              icon={<DeleteOutlined />}
+                              onClick={() => removeImage(index)}
+                              className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center w-8 h-8 rounded-full shadow-lg"
+                            />
+                          </Tooltip>
+
+                          {/* Image Index */}
+                          <div className="absolute bottom-2 left-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded text-xs font-medium">
+                            #{index + 1}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </Form.Item>
 
             <Divider />
@@ -328,6 +472,7 @@ const GeminiBlogGenerator = () => {
                 type="default"
                 icon={<EyeOutlined />}
                 onClick={() => setShowPreview(!showPreview)}
+                className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300"
               >
                 {showPreview ? "Ẩn xem trước" : "Xem trước"}
               </Button>
@@ -357,31 +502,67 @@ const GeminiBlogGenerator = () => {
           )}
 
           {showPreview && (title || form.getFieldValue("title")) && (
-            <Card title="Xem trước bài viết">
-              <Title level={2}>{title}</Title>
-              {tip && <Alert message={tip} type="info" className="mb-3" />}
+            <Card
+              title={
+                <div className="flex items-center space-x-2">
+                  <EyeOutlined className="text-green-500" />
+                  <span>Xem trước bài viết</span>
+                </div>
+              }
+              className="border-green-200"
+            >
+              <Title level={2} className="text-gray-800">
+                {title}
+              </Title>
+              {tip && (
+                <Alert
+                  message={tip}
+                  type="info"
+                  className="mb-4 rounded-lg"
+                  showIcon
+                />
+              )}
               {keywords && (
-                <div className="mb-3">
-                  {keywords.split(",").map((k, i) => (
-                    <Tag color="blue" key={i}>
-                      {k.trim()}
-                    </Tag>
-                  ))}
+                <div className="mb-4">
+                  <Text type="secondary" className="block mb-2">
+                    Từ khóa:
+                  </Text>
+                  <div className="flex flex-wrap gap-1">
+                    {keywords.split(",").map((k, i) => (
+                      <Tag color="blue" key={i} className="mb-1">
+                        {k.trim()}
+                      </Tag>
+                    ))}
+                  </div>
                 </div>
               )}
               {imagePreviews.length > 0 && (
-                <div className="mb-4 grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {imagePreviews.map((src, i) => (
-                    <img
-                      key={i}
-                      src={src}
-                      alt={`Preview ${i}`}
-                      className="rounded-lg shadow-md w-full h-auto object-cover"
-                    />
-                  ))}
+                <div className="mb-4">
+                  <Text type="secondary" className="block mb-3">
+                    Ảnh bài viết ({imagePreviews.length}):
+                  </Text>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {imagePreviews.map((src, i) => (
+                      <div key={i} className="relative group">
+                        <Image
+                          src={src}
+                          alt={`Preview ${i + 1}`}
+                          className="rounded-lg shadow-md w-full object-cover"
+                          style={{ maxHeight: "200px" }}
+                        />
+                        <div className="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded text-xs">
+                          {i + 1}/{imagePreviews.length}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
-              <div className="whitespace-pre-wrap">{content}</div>
+              <div className="prose max-w-none">
+                <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                  {content}
+                </div>
+              </div>
             </Card>
           )}
         </div>
