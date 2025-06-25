@@ -1,5 +1,3 @@
-"use client";
-
 import { FcGoogle } from "react-icons/fc";
 import { Button, notification, Spin, Input } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
@@ -9,8 +7,9 @@ import { LoginAuth, SendverifyOTP, verifyOTP } from "../../service/Auth";
 import { login } from "../../redux/actions/Auth";
 import { useNavigate } from "react-router-dom";
 import ForgetPassword from "../ForgetPassword/ForgetPassword";
-import Register from "../Register/Register";
+
 import FacebookLogin from "../FacebookLogin/FacebookLogin";
+import "./Login.css";
 
 const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -196,8 +195,7 @@ const LoginForm = () => {
       {isLoading && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-8 shadow-2xl">
-            <Spin indicator={<LoadingOutlined spin />} size="large" />
-            <p className="mt-4 text-gray-600 text-center">Đang đăng nhập...</p>
+            <div class="loader"></div>
           </div>
         </div>
       )}

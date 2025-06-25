@@ -141,7 +141,7 @@
     max-width: 1280px;
   }
 
-  .grid {
+  .clothing_main_bg .grid {
     grid-template-columns: repeat(4, 1fr); /* 5 cột trên PC */
     gap: 24px;
   }
