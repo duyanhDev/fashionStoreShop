@@ -37,6 +37,7 @@ router.get("/user", authMiddleware, (req, res) => {
     email: req.user.email,
     isAdmin: req.user.isAdmin,
     role: req.user.role,
+    phone: req.user.phone,
     avatar: req.user.avatar, // Trả về avatar
   });
 });
