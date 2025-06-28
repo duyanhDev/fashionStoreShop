@@ -1,4 +1,4 @@
-import { Button, notification, Popover, Steps } from "antd";
+import { Button, notification } from "antd";
 
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./OderStaus.css";
@@ -17,8 +17,6 @@ import { FaTruck } from "react-icons/fa";
 
 import io from "socket.io-client";
 import FeedBack from "../FeedBack/FeeBack";
-
-import GoogleMapsStyleDelivery from "../Map/Map";
 
 const socket = io("http://localhost:9000", {
   withCredentials: true,
@@ -329,7 +327,7 @@ const OderStatus = () => {
           </div>
         </div>
       </div>
-      <GoogleMapsStyleDelivery />
+
       <div>
         <FeedBack
           modal2Open={modal2Open}

@@ -12,6 +12,7 @@ import moment from "moment";
 
 const CartProducts = ({}) => {
   const { ListCart, user, CartListProductsUser } = useOutletContext();
+  console.log(user);
 
   const [loadingSpin, setLoadingSpin] = useState(false);
   const [api, contextHolder] = notification.useNotification();
@@ -24,9 +25,9 @@ const CartProducts = ({}) => {
   const [WarnDistrict, setSelectedWarnDistrict] = useState("");
   const [priceObj, setPriceObj] = useState({});
   const [Products, setProducts] = useState([]);
-  const [Name, setName] = useState("");
-  const [number, setNumber] = useState("");
-  const [email, setEmail] = useState("");
+  const [Name, setName] = useState(user?.name || "");
+  const [number, setNumber] = useState(Number(user?.phone) || "");
+  const [email, setEmail] = useState(user?.email || "");
   const [city, setCity] = useState("");
   const [districtName, setDistrictName] = useState("");
   const [wardName, setWardName] = useState("");
@@ -39,6 +40,8 @@ const CartProducts = ({}) => {
   const [discountValue, setDiscountValue] = useState(0);
   const [selectedVouCher, setSelectedVoucher] = useState(null);
   const [checkedItems, setCheckedItems] = useState([]);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [idItems, setidItems] = useState([]);
 
   const [ghnDistrictId, setGhnDistrictId] = useState("");
   const [ghnWardCode, setGhnWardCode] = useState("");
@@ -47,8 +50,9 @@ const CartProducts = ({}) => {
   const formatPrice = (price) => {
     const numericPrice =
       typeof price === "string"
-        ? parseFloat(price.replace(/[^\d,.-]/g, "").replace(",", "."))
+        ? parseInt(price.replace(/[^\d]/g, ""), 10)
         : price;
+    if (!numericPrice) return "0đ";
     return numericPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
   };
 
@@ -120,6 +124,59 @@ const CartProducts = ({}) => {
     WarnData();
   }, [selectedDistrict]);
 
+  useEffect(() => {
+    if (
+      ListCart &&
+      ListCart.items &&
+      ListCart.items.length > 0 &&
+      !isInitialized
+    ) {
+      // Tự động chọn tất cả sản phẩm
+      const newCheckedItems = [];
+      const newPriceObj = {};
+      const newProductId = [];
+      const newItemsId = [];
+      const newProducts = [];
+
+      ListCart.items.forEach((item) => {
+        const { productId, name, size, quantity, color, totalItemPrice, _id } =
+          item;
+        const id = productId._id;
+        console.log("check id items", _id);
+
+        const imageUrl = productId.variants[0]?.images[0]?.url;
+        const numericPrice =
+          typeof totalItemPrice === "string"
+            ? parseInt(totalItemPrice.replace(/[^\d]/g, ""), 10)
+            : totalItemPrice;
+        const uniqueKey = `${id}-${size}-${color}`;
+
+        newCheckedItems.push(uniqueKey);
+        newPriceObj[uniqueKey] = numericPrice;
+        if (!newProductId.includes(id)) newProductId.push(id);
+        if (!newItemsId.includes(_id)) newItemsId.push(_id);
+        newProducts.push({
+          id,
+          name: productId.name,
+          quantity,
+          size,
+          color,
+          price: numericPrice,
+          imageUrl,
+          _id,
+        });
+      });
+
+      setCartId(ListCart._id);
+      setCheckedItems(newCheckedItems);
+      setPriceObj(newPriceObj);
+      setProductId(newProductId);
+      setidItems(newItemsId);
+      setProducts(newProducts);
+      setIsInitialized(true); // Đánh dấu đã khởi tạo
+    }
+  }, [ListCart, isInitialized]);
+
   const handleProvinceChange = (value, name) => {
     SetId(value);
     setDistrict([]);
@@ -156,59 +213,60 @@ const CartProducts = ({}) => {
           quantity: item.quantity,
           size: item.size,
           price: formatPrice(item.price),
-          totalItemPrice: item.totalItemPrice + "đ",
+          totalItemPrice: formatPrice(item.totalItemPrice),
+          _id: item._id,
         }))
       : [];
-
   const handleSelectAll = () => {
     const allSelected = checkedItems.length === data?.length;
+
     if (allSelected) {
+      // Bỏ chọn tất cả
       setCheckedItems([]);
       setPriceObj({});
       setProductId([]);
-      setCartId("");
+      setProducts([]);
     } else {
+      // Chọn tất cả
+      const newCheckedItems = [];
+      const newPriceObj = {};
+      const newProducts = [];
+
       data.forEach((product) => {
-        const { id, name, size, quantity, color, totalItemPrice, images } =
+        const { id, name, size, quantity, color, totalItemPrice, images, _id } =
           product;
+
         const imageUrl = images.props.src;
         const numericPrice =
           typeof totalItemPrice === "string"
-            ? parseFloat(
-                totalItemPrice.replace(/[^\d,.-]/g, "").replace(",", ".")
-              )
+            ? parseInt(totalItemPrice.replace(/[^\d]/g, ""), 10)
             : totalItemPrice;
         const uniqueKey = `${id}-${size}-${color}`;
 
-        setCartId(ListCart._id);
-        setProductId((prev) => [...new Set([...prev, id])]);
-        setProducts((prevState) => {
-          const existingProductIndex = prevState.findIndex(
-            (p) => p.id === id && p.size === size && p.color === color
-          );
-          if (existingProductIndex !== -1) {
-            return prevState.map((p, index) =>
-              index === existingProductIndex
-                ? {
-                    ...p,
-                    name,
-                    size,
-                    quantity,
-                    color,
-                    price: numericPrice,
-                    imageUrl,
-                  }
-                : p
-            );
-          }
-          return [
-            ...prevState,
-            { id, name, quantity, size, color, price: numericPrice, imageUrl },
-          ];
+        newCheckedItems.push(uniqueKey);
+        newPriceObj[uniqueKey] = numericPrice;
+        newProducts.push({
+          id,
+          name,
+          quantity,
+          size,
+          color,
+          price: numericPrice,
+          imageUrl,
+          _id,
         });
-        setPriceObj((prev) => ({ ...prev, [uniqueKey]: numericPrice }));
-        setCheckedItems((prev) => [...new Set([...prev, uniqueKey])]);
       });
+
+      // Tính lại productId từ danh sách sản phẩm đã chọn
+      const updatedProductId = [...new Set(newProducts.map((p) => p.id))];
+      const updatedItemCartId = [...new Set(newProducts.map((p) => p._id))];
+      console.log(updatedItemCartId);
+      setCartId(ListCart._id);
+      setCheckedItems(newCheckedItems);
+      setPriceObj(newPriceObj);
+      setProducts(newProducts);
+      setProductId(updatedProductId);
+      setidItems(updatedItemCartId);
     }
   };
 
@@ -221,45 +279,55 @@ const CartProducts = ({}) => {
     price,
     images,
     itemID,
-    productId
+    _id
   ) => {
     const numericPrice =
       typeof price === "string"
-        ? parseFloat(price.replace(/[^\d,.-]/g, "").replace(",", "."))
+        ? parseInt(price.replace(/[^\d]/g, ""), 10)
         : price;
     const imageUrl = images.props.src;
     const uniqueKey = `${id}-${size}-${color}`;
 
-    setProductId((prev) =>
-      prev.includes(productId)
-        ? prev.filter((item) => item !== productId)
-        : [...prev, productId]
-    );
     setCartId(itemID);
-    setProducts((prevState) => {
-      const existingProductIndex = prevState.findIndex(
-        (p) => p.id === id && p.size === size && p.color === color
-      );
-      if (existingProductIndex !== -1) {
-        return prevState.map((p, index) =>
-          index === existingProductIndex
-            ? {
-                ...p,
+
+    setCheckedItems((prev) => {
+      const isChecked = prev.includes(uniqueKey);
+
+      setProducts((prevProducts) => {
+        const updatedProducts = isChecked
+          ? prevProducts.filter(
+              (p) => `${p.id}-${p.size}-${p.color}` !== uniqueKey
+            )
+          : [
+              ...prevProducts,
+              {
+                id,
                 name,
-                size,
                 quantity,
+                size,
                 color,
                 price: numericPrice,
                 imageUrl,
-              }
-            : p
-        );
-      }
-      return [
-        ...prevState,
-        { id, name, quantity, size, color, price: numericPrice, imageUrl },
-      ];
+                _id,
+              },
+            ];
+
+        const updatedProductId = [...new Set(updatedProducts.map((p) => p.id))];
+        const updatedItemCartId = [
+          ...new Set(updatedProducts.map((p) => p._id)),
+        ];
+
+        setProductId(updatedProductId);
+        setidItems(updatedItemCartId);
+
+        return updatedProducts;
+      });
+
+      return isChecked
+        ? prev.filter((item) => item !== uniqueKey)
+        : [...prev, uniqueKey];
     });
+
     setPriceObj((prev) => {
       const newPriceObj = { ...prev };
       if (newPriceObj[uniqueKey]) {
@@ -269,11 +337,6 @@ const CartProducts = ({}) => {
       }
       return newPriceObj;
     });
-    setCheckedItems((prev) =>
-      prev.includes(uniqueKey)
-        ? prev.filter((item) => item !== uniqueKey)
-        : [...prev, uniqueKey]
-    );
   };
 
   const handleVoucherChange = (discountValue, voucherId, content) => {
@@ -296,7 +359,7 @@ const CartProducts = ({}) => {
   );
   const discountAmount =
     discountValue > 0 ? (discountValue / 100) * totalCheckedPrice : 0;
-  const finalPrice = totalCheckedPrice - discountAmount;
+  const finalPrice = Math.round(totalCheckedPrice - discountAmount);
 
   // Mobile columns - simplified
   const mobileColumns = [
@@ -321,7 +384,7 @@ const CartProducts = ({}) => {
                 record.totalItemPrice,
                 record.images,
                 ListCart._id,
-                record.id
+                record._id
               )
             }
             className="mt-1"
@@ -391,12 +454,31 @@ const CartProducts = ({}) => {
   ];
 
   const handleOrder = async () => {
+    if (Products.length === 0) {
+      notification.error({
+        message: "Lỗi đặt hàng",
+        description: "Vui lòng chọn ít nhất một sản phẩm để đặt hàng.",
+      });
+      return;
+    }
     try {
       setLoadingSpin(true);
+
       const formattedItems = Products.map((item) => ({
         ...item,
         productId: item.id,
       }));
+
+      const allProductIdsInCart = [...new Set(data.map((item) => item.id))];
+
+      const filteredProductIds = allProductIdsInCart.filter((id) => {
+        const hasSelected = Products.some((p) => p.id === id);
+        return hasSelected;
+      });
+
+      console.log("Products gửi GHN:", formattedItems);
+      console.log("ID sản phẩm cần gửi backend:", filteredProductIds);
+
       if (
         !Name ||
         !email ||
@@ -482,10 +564,11 @@ const CartProducts = ({}) => {
           value,
           email,
           CartId,
-          productId,
+          filteredProductIds,
           discountValue,
           idDiscount,
-          ghnResponse.data.data.order_code
+          ghnResponse.data.data.order_code,
+          idItems
         );
 
         if (res && res.data.EC === 0) {
