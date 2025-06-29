@@ -601,75 +601,120 @@ const Details = () => {
             </div>
           </div>
 
-          <div className="">
-            <div className="p-4">
-              <div className="flex items-center gap-1">
-                <h4 className="text-[#b3b3b3] font-normal text-sm">
-                  {`${
-                    TotalStock > 0
+          <div className="bg-white rounded-lg shadow-sm">
+            <div className="p-4 space-y-4">
+              {/* Product availability info */}
+              <div className="space-y-1">
+                <div className="flex items-center">
+                  <h4 className="text-gray-500 font-normal text-sm">
+                    {TotalStock > 0
                       ? `${TotalStock} sản phẩm có sẵn`
-                      : "Đã bán hết"
-                  } `}
-                </h4>
-              </div>
-
-              <div className="flex items-center gap-1">
-                <h4 className="text-[#b3b3b3] font-normal text-sm">
-                  {sumProducts} sản phẩm đã bán
-                </h4>
-              </div>
-
-              <div className=" flex items-center gap-1 -mt-2">
-                <div className="flex items-center m-3 number-input-group ">
-                  <Button
-                    className=" w-10 h-10  border-none outline-none"
-                    style={{ background: "none" }}
-                    onClick={() => handleDecrements()}
-                  >
-                    <MinusOutlined />
-                  </Button>
-                  <input
-                    type="number"
-                    min={1}
-                    max={TotalStock}
-                    value={count}
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value, 10);
-                      if (!isNaN(value) && value >= 1 && value <= TotalStock) {
-                        setCount(value);
-                      }
-                    }}
-                  />
-
-                  <Button
-                    className="w-10 h-10 border-none outline-none "
-                    style={{ background: "none", outline: "none" }}
-                    onClick={() => handleIncrment()}
-                  >
-                    <PlusOutlined className="mr-6" />
-                  </Button>
+                      : "Đã bán hết"}
+                  </h4>
                 </div>
-                {TotalStock > 0 && (
-                  <div className="w-3/4">
-                    <Flex
-                      vertical
-                      gap="small"
-                      style={{
-                        width: "100%",
-                      }}
-                    >
+
+                <div className="flex items-center">
+                  <h4 className="text-gray-500 font-normal text-sm">
+                    {sumProducts} sản phẩm đã bán
+                  </h4>
+                </div>
+              </div>
+
+              {/* Quantity selector and action buttons */}
+              {TotalStock > 0 && (
+                <div className="space-y-4">
+                  {/* Desktop layout: Horizontal */}
+                  <div className="block md:flex items-center gap-x-4">
+                    {/* Quantity selector */}
+                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden w-[140px]">
+                      <Button
+                        className="w-10 h-10 border-none flex items-center justify-center hover:bg-gray-50"
+                        style={{ background: "transparent" }}
+                        onClick={handleDecrements}
+                        disabled={count <= 1}
+                      >
+                        <MinusOutlined className="text-gray-600" />
+                      </Button>
+
+                      <input
+                        type="number"
+                        min={1}
+                        max={TotalStock}
+                        value={count}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value, 10);
+                          if (
+                            !isNaN(value) &&
+                            value >= 1 &&
+                            value <= TotalStock
+                          ) {
+                            setCount(value);
+                          } else if (e.target.value === "") {
+                            setCount("");
+                          }
+                        }}
+                        onBlur={() => {
+                          if (count === "" || isNaN(count)) setCount(1);
+                        }}
+                        className="w-12 h-10 text-center border-none outline-none focus:ring-0 border-x border-gray-300 text-base"
+                        style={{
+                          appearance: "textfield",
+                          MozAppearance: "textfield",
+                        }}
+                      />
+
+                      <Button
+                        className="w-10 h-10 border-none flex items-center justify-center hover:bg-gray-50"
+                        style={{ background: "transparent" }}
+                        onClick={handleIncrment}
+                        disabled={count >= TotalStock}
+                      >
+                        <PlusOutlined className="text-gray-600" />
+                      </Button>
+                    </div>
+
+                    {/* Action buttons - Desktop */}
+                    <div className="flex flex-1 gap-3 sm:mt-4 md:mt-0">
                       <Button
                         type="primary"
-                        block
-                        style={{ backgroundColor: "black", color: "white" }}
+                        size="large"
+                        className="flex-1 font-medium"
+                        style={{
+                          backgroundColor: "#000",
+                          borderColor: "#000",
+                          height: "40px",
+                        }}
+                        onClick={handleAddProduct}
+                      >
+                        Mua ngay
+                      </Button>
+
+                      <Button
+                        type="primary"
+                        size="large"
+                        className="flex-1 font-medium"
+                        style={{
+                          backgroundColor: "#000",
+                          borderColor: "#000",
+                          height: "40px",
+                        }}
                         onClick={handleAddProduct}
                       >
                         Thêm vào giỏ hàng
                       </Button>
-                    </Flex>
+                    </div>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
+
+              {/* Out of stock message */}
+              {TotalStock <= 0 && (
+                <div className="text-center py-4">
+                  <p className="text-red-500 font-medium">
+                    Sản phẩm hiện đã hết hàng
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
