@@ -39,6 +39,7 @@ router.get("/user", authMiddleware, (req, res) => {
     role: req.user.role,
     phone: req.user.phone,
     avatar: req.user.avatar, // Trả về avatar
+    permissions: req.user.permissions,
   });
 });
 
@@ -101,6 +102,7 @@ router.get("/user", authMiddleware, (req, res) => {
     email: req.user.email,
     isAdmin: req.user.isAdmin,
     role: req.user.role,
+    permissions: req.user.permissions,
     avatar: req.user.avatar,
   });
 });
