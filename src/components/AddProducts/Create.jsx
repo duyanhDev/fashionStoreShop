@@ -187,7 +187,6 @@ const Create = () => {
       formData.append("variantsInput", JSON.stringify(variantsInput));
 
       const res = await createProductAPI(formData);
-      console.log(res);
 
       if (res) {
         messageApi.success("Tạo sản phẩm thành công");

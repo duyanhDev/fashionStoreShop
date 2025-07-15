@@ -33,6 +33,7 @@ import RegisterForm from "../components/Register/Register";
 import GeminiBlogGenerator from "../components/GeminiBlogGenerator/GeminiBlogGenerator";
 import AdminPostCreator from "../components/AdminPostCreator/AdminPostCreator";
 import AccountAdmin from "../components/AccountAdmin/AccountAdmin";
+import AddVoucher from "../components/AddVoucher/AddVoucher";
 
 export const RouterLayout = [
   {
@@ -135,6 +136,10 @@ export const RouterAdmin = [
       {
         path: "review",
         element: <ProductReviewAdmin />,
+      },
+      {
+        path: "add-voucher",
+        element: <AddVoucher />,
       },
     ],
   },
