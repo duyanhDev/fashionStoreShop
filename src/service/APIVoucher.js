@@ -1,4 +1,4 @@
-import axios from "./../untils/axios";
+import axios from "../untils/axios";
 
 const getVoucherAPI = async () => {
   return await axios.get("api/v1/voucher");
@@ -17,4 +17,8 @@ const createVoucherAPI = async (formdata) => {
     content: formdata.description,
   });
 };
-export { getVoucherAPI, createVoucherAPI };
+
+const updateVoucherAPI = async (id, formdata) => {
+  return await axios.put(`api/v1/update-voucher/${id}`, { formdata });
+};
+export { getVoucherAPI, createVoucherAPI, updateVoucherAPI };

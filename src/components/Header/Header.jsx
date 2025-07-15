@@ -107,7 +107,7 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
         ]
       : []),
     { type: "divider" },
-    ...(user?.role === "admin"
+    ...(user?.role === "admin" || user?.permissions === "order_approval"
       ? [
           {
             key: "admin",
