@@ -10,6 +10,8 @@ const authMiddleware = async (req, res, next) => {
 
   const token = authHeader.split(" ")[1]; // Lấy token từ "Bearer <token>"
 
+  console.log(token);
+
   if (!token) {
     return res.status(401).json({ message: "Token bị thiếu" });
   }
