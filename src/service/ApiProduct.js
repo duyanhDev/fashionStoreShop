@@ -14,9 +14,11 @@ const ListSlugProductAPI = async (slug) => {
 
 const createProductAPI = async (formData) => {
   try {
+    const token = localStorage.getItem("token");
     const response = await axios.post("api/v1/products", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
       },
     });
     return response.data;
@@ -62,11 +64,13 @@ const UpdateProductAPI = async (
     formData.append("images", file);
   });
   formData.append("costPrice", costPrice);
+  const token = localStorage.getItem("token");
 
   try {
     const response = await axios.put(`api/v1/products/${id}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
       },
     });
     return response.data;
@@ -168,7 +172,6 @@ const feeckacksProductsAPI = async (ids, userId, rating, review, images) => {
       },
     });
 
-    console.log("Phản hồi từ server:", response.data);
     return response.data;
   } catch (error) {
     console.error("Lỗi gửi phản hồi sản phẩm:", error);

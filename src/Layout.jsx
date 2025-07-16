@@ -15,11 +15,9 @@ import LoginForm from "./components/Login/Login";
 
 function MainLayout() {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
-  console.log("user", user);
 
   const isAdmin =
-    isAuthenticated &&
-    (user?.role === "admin" || user?.permissions === "order_approval");
+    isAuthenticated && (user?.role === "admin" || user?.role === "staff");
 
   return (
     <Router>

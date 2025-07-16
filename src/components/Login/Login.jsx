@@ -66,6 +66,7 @@ const LoginForm = () => {
       if (res && res.data.EC === 0) {
         setTimeout(async () => {
           dispatch(login(res.data.data.token, res.data.data.user));
+          localStorage.setItem("token", res.data.data.token);
           setIsLoading(false);
           navigate("/");
         }, 5000);

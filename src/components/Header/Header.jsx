@@ -54,6 +54,7 @@ const Header = ({ user, ListCart, CartListProductsUser }) => {
   const [inputValue, setInputValue] = useState({}); // Local state for input values
 
   const handleLogOut = () => {
+    localStorage.removeItem("token");
     dispatch(logout());
     navigate("/login");
   };
