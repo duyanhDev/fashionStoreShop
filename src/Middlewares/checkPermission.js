@@ -1,7 +1,7 @@
 const CheckPermission = (permission) => {
   return (req, res, next) => {
     const user = req.user;
-    console.log("User in checkPermission:", req.user);
+
     // Admin được toàn quyền (tùy bạn muốn giữ hay không)
     if (user.role === "admin") {
       return next();
