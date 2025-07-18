@@ -42,15 +42,11 @@ const UpdateOneCatogryAPI = async (id, name, description) => {
 
 const DeleteOneCategoryAPI = async (id) => {
   const token = localStorage.getItem("token");
-  return await axios.delete(
-    `api/v1/category/${id}`,
-
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  return await axios.delete(`api/v1/category/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };
 const CategoryProductsGender = async (
   gender,

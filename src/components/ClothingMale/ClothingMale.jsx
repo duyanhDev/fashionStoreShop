@@ -159,8 +159,10 @@ const ClothingMale = () => {
     navigate(`${location.pathname}?${newParams.toString()}`);
   };
 
-  const formatPrice = (price) =>
-    price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
+  const formatPrice = (price) => {
+    if (price === null || price === undefined || isNaN(price)) return "0đ";
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
+  };
 
   const marks = { 0: "0", 500000: "500K", 1000000: "1M" };
 
