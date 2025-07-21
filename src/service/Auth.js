@@ -168,7 +168,6 @@ const verifyOTP = async (
   data.append("email", email);
   data.append("otp", otp);
   data.append("name", name);
-
   data.append("password", password);
   if (avatar) {
     // If avatar is a file, append it
