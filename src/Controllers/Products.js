@@ -10,6 +10,7 @@ const {
   CategoryGenderFitter,
   toggleLikeRating,
   ListOneSlugProducts,
+  updateProductView,
 } = require("./../services/Product");
 const XLSX = require("xlsx");
 const fs = require("fs");
@@ -37,6 +38,7 @@ const AddProductsAPI = async (req, res) => {
       price,
       discount,
       costPrice,
+      view,
     } = req.body;
 
     // Parse variants
@@ -92,11 +94,12 @@ const AddProductsAPI = async (req, res) => {
       price,
       discount,
       costPrice,
+      view,
       stock: totalStock,
       variants,
     };
 
-    const saved = await AddProducts(productData); // hoặc dùng Product.create(productData)
+    const saved = await AddProducts(productData);
 
     return res.status(200).json({
       EC: 0,
@@ -295,6 +298,7 @@ const UpdateProductsAPI = async (req, res) => {
       size,
       color,
       costPrice,
+      view,
     } = req.body;
     const { id } = req.params;
 
@@ -325,8 +329,6 @@ const UpdateProductsAPI = async (req, res) => {
 
     const sizeArray = parseArray(size);
     const colorArray = parseArray(color);
-
-    console.log("Parsed arrays:", { sizeArray, colorArray, stock });
 
     if (req.files?.images && colorArray.length > 0) {
       const filesCount = Array.isArray(req.files.images)
@@ -495,7 +497,7 @@ const UpdateProductsAPI = async (req, res) => {
     if (price !== undefined) updateFields.price = finalPrice;
     if (discount !== undefined) updateFields.discount = finalDiscount;
     if (costPrice !== undefined) updateFields.costPrice = Number(costPrice);
-
+    if (view !== undefined) updateFields.view = view;
     updateFields.stock = totalStock;
     updateFields.sold = sold !== undefined ? Number(sold) : totalSold;
     updateFields.discountedPrice = discountedPrice;
@@ -1047,6 +1049,18 @@ const AddProductsFromExcelAPI = async (req, res) => {
   }
 };
 
+const updateViewProductController = async (req, res) => {
+  try {
+    const { slug } = req.params;
+
+    const data = await updateProductView(slug);
+
+    return res.status(201).json({ view: "Tăng view thành công", EC: 0, data });
+  } catch (error) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
 module.exports = {
   AddProductsAPI,
   ListProductsAPI,
@@ -1060,4 +1074,5 @@ module.exports = {
   toggleLikeRatingAPI,
   toggleLikeReply,
   AddProductsFromExcelAPI,
+  updateViewProductController,
 };

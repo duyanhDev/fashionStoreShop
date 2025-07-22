@@ -1,6 +1,7 @@
 const { uploadFileToCloudinary } = require("./../services/Cloudinary");
 const { RegisterUser, LoginUser } = require("./../services/Auth");
 const Users = require("./../Model/User");
+const Product = require("./../Model/Product");
 const nodemailer = require("nodemailer");
 require("dotenv").config;
 
@@ -360,6 +361,9 @@ const DeleteUser = async (req, res) => {
     let { id } = req.params;
 
     const user = await Users.deleteOne({ _id: id });
+
+    await Product.updateMany({}, { $pull: { ratings: { userId: id } } });
+
     const io = req.app.get("io");
     io.emit("userDeleted", { userId: id }); // phát đến toàn bộ client
     return res.status(201).json({
