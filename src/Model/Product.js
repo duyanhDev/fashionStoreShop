@@ -44,6 +44,7 @@ const productSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  supplierId: { type: mongoose.Schema.Types.ObjectId, ref: "Supplier" },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
