@@ -3,7 +3,6 @@ const {
   AddProducts,
   ListProducts,
   ListOneProducts,
-  UpdateProducts,
   PutFeedbackProduct,
   PutFeedbackProducts,
   ProductFilter,
@@ -11,12 +10,14 @@ const {
   toggleLikeRating,
   ListOneSlugProducts,
   updateProductView,
+  DeleteRatingProduct,
 } = require("./../services/Product");
 const XLSX = require("xlsx");
 const fs = require("fs");
 const path = require("path");
 const Products = require("./../Model/Product");
 const { json } = require("express");
+
 const cloudinary = require("cloudinary").v2;
 require("dotenv").config();
 
@@ -308,8 +309,6 @@ const UpdateProductsAPI = async (req, res) => {
 
     const isAddStock = rawIsAddStock === "true" || rawIsAddStock === true;
 
-    console.log(stock);
-
     if (!id) {
       return res
         .status(400)
@@ -363,12 +362,6 @@ const UpdateProductsAPI = async (req, res) => {
             : Number(stockValue || 0);
         const existingSize = existingSizesMap.get(sizeName);
 
-        console.log(qty);
-
-        console.log(
-          `[updateVariantSizes] variant: ${variant.color}, size: ${sizeName}, qty: ${qty}, isAdd: ${isAdd}`
-        );
-        console.log(existingSize.quantity);
         if (existingSize) {
           existingSize.quantity = isAdd
             ? existingSize.quantity + qty
@@ -491,8 +484,6 @@ const UpdateProductsAPI = async (req, res) => {
     if (view !== undefined) updateFields.view = view;
     if (supplierId != undefined) updateFields.supplierId = supplierId;
 
-    console.log(updateFields);
-
     const updatedProduct = await Products.findOneAndUpdate(
       { _id: id },
       updateFields,
@@ -530,15 +521,11 @@ const PutFeedbackProductAPI = async (req, res) => {
     const imagesUrl = [];
 
     if (req.files && req.files.images) {
-      console.log(req.files.images);
-
       let result = req.files.images;
       let resultImage = await uploadFileToCloudinary(result);
-      console.log(resultImage);
 
       imagesUrl.push(resultImage.secure_url);
     }
-    console.log(imagesUrl);
 
     const data = await PutFeedbackProduct(
       id,
@@ -562,8 +549,6 @@ const PutFeedbackProductsAPI = async (req, res) => {
     const imagesUrl = [];
 
     if (req.files && req.files.images) {
-      console.log("Tệp nhận được trong API:", req.files.images);
-
       const resultImages = await uploadFileToCloudinary(req.files.images);
 
       resultImages.forEach((result) => {
@@ -572,8 +557,6 @@ const PutFeedbackProductsAPI = async (req, res) => {
         }
       });
     }
-
-    console.log("URL ảnh đã tải lên:", imagesUrl);
 
     const data = await PutFeedbackProducts(
       id,
@@ -609,6 +592,7 @@ const CategoryGenderAPI = async (req, res) => {
     care,
     size,
     color,
+    view,
   } = req.query;
 
   try {
@@ -625,6 +609,7 @@ const CategoryGenderAPI = async (req, res) => {
       size,
       color,
       page,
+      view,
     });
 
     return res.status(200).json({
@@ -695,8 +680,6 @@ const CategoryGenderFitterAPI = async (req, res) => {
 const toggleLikeReply = async (req, res) => {
   const { productId, ratingId, userId, content } = req.body;
 
-  console.log("check", userId, content);
-
   try {
     const product = await Products.findById(productId);
     if (!product) return res.status(404).json({ message: "Product not found" });
@@ -725,7 +708,6 @@ const toggleLikeReply = async (req, res) => {
 const AddProductsFromExcelAPI = async (req, res) => {
   try {
     const file = req.files.execl;
-    console.log(file);
 
     if (!file) {
       return res.status(400).json({ message: "Chưa upload file Excel." });
@@ -939,10 +921,6 @@ const AddProductsFromExcelAPI = async (req, res) => {
       }
     }
 
-    // Wait for all image uploads to complete
-    console.log(
-      `Uploading ${imageUploadPromises.length} images to Cloudinary...`
-    );
     const uploadResults = await Promise.all(imageUploadPromises);
 
     // Update products with Cloudinary URLs
@@ -1041,6 +1019,43 @@ const updateViewProductController = async (req, res) => {
   }
 };
 
+const DeleteRatingProductController = async (req, res) => {
+  try {
+    const { productId, ratingId } = req.query;
+
+    const data = await DeleteRatingProduct(productId, ratingId);
+
+    return res.status(200).json({
+      EC: 0,
+      data: data,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const deleteOneProduct = async (req, res) => {
+  try {
+    const { productId } = req.query;
+
+    const data = await Products.deleteOne({ _id: productId });
+
+    if (data.acknowledged === 0) {
+      throw new Error(
+        "Không tìm thấy đánh giá để xóa hoặc đánh giá đã bị xóa trước đó."
+      );
+    }
+
+    return res.status(200).json({
+      EC: 0,
+      data: data,
+      message: "Xóa thành công 1 sản phẩm",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   AddProductsAPI,
   ListProductsAPI,
@@ -1055,4 +1070,6 @@ module.exports = {
   toggleLikeReply,
   AddProductsFromExcelAPI,
   updateViewProductController,
+  DeleteRatingProductController,
+  deleteOneProduct,
 };
