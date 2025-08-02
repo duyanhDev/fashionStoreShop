@@ -39,8 +39,6 @@ const ProductReviewAdmin = () => {
   const { user } = useSelector((state) => state.auth);
 
   const transformReviews = (products) => {
-    console.log(products);
-
     if (!products || !Array.isArray(products)) return [];
 
     const transformed = products.flatMap((product) =>
@@ -157,8 +155,6 @@ const ProductReviewAdmin = () => {
   };
 
   const submitResponse = async (productId, id) => {
-    console.log("Submitting response for review:", productId, id, responseText);
-
     try {
       const res = await toggleLikeReplyAPI(
         productId,
@@ -261,8 +257,6 @@ const ProductReviewAdmin = () => {
   };
 
   const stats = getStatusStats();
-
-  console.log(selectedReview);
 
   return (
     <div className="min-h-screen bg-gray-50">
