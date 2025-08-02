@@ -135,24 +135,8 @@ const UpDateProfileUserAPI = async (req, res) => {
       role,
       permissions,
     } = req.body;
-    console.log(
-      id,
-      name,
-      city,
-      district,
-      ward,
-      phone,
-      gender,
-      dateOfBirth,
-      height,
-      weight,
-      role,
-      permissions
-    );
 
     const avatar = req.files?.avatar;
-
-    console.log("avtar", avatar);
 
     // Tìm người dùng
     const UpdateUser = await Users.findById(id);
@@ -161,6 +145,10 @@ const UpDateProfileUserAPI = async (req, res) => {
       return res.status(404).json({ error: "Người dùng không tồn tại" });
     }
 
+    let rolePermissions = UpdateUser.permissions;
+    if (role === "customer") {
+      rolePermissions = "";
+    }
     // Cập nhật dữ liệu
     const updatedData = {
       name: name || UpdateUser.name,
@@ -173,7 +161,10 @@ const UpDateProfileUserAPI = async (req, res) => {
       height: height || UpdateUser.height,
       weight: weight || UpdateUser.weight,
       role: role || UpdateUser.role,
-      permissions: permissions || UpdateUser.permissions || "",
+      permissions:
+        role === "customer"
+          ? rolePermissions
+          : permissions || UpdateUser.permissions || "",
     };
 
     // Nếu có avatar mới
