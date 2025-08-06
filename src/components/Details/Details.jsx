@@ -435,6 +435,8 @@ const Details = () => {
     }
   };
 
+  console.log(description);
+
   return (
     <div className="Details ">
       {contextHolder}
@@ -571,7 +573,10 @@ const Details = () => {
               <span className="text-pink-gradient uppercase">{brand}</span>
               <div>
                 <h1 className="text-[#484848] text-base">{name}</h1>
-                <h1 className="text-[#484848] text-base">{description}</h1>
+                <div
+                  className="text-[#484848] text-base"
+                  dangerouslySetInnerHTML={{ __html: description }}
+                />
               </div>
             </div>
           </div>

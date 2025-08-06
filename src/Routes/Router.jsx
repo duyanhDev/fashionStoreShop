@@ -36,6 +36,7 @@ import AccountAdmin from "../components/AccountAdmin/AccountAdmin";
 import AddVoucher from "../components/AddVoucher/AddVoucher";
 import ManageStore from "../components/ManageStore/ManageStore";
 import PermissionRoute from "../PermissionRoute/PermissionRoute ";
+import AdminAccountManagement from "../components/AdminAccountManagement/AdminAccountManagement";
 
 export const RouterLayout = [
   {
@@ -72,7 +73,7 @@ export const RouterLayout = [
     element: <BotChatAI />,
   },
   {
-    path: "/category/:gender",
+    path: "/:gender",
     element: <ClothingMale />,
   },
   {
@@ -123,6 +124,14 @@ export const RouterAdmin = [
         element: (
           <PermissionRoute allowedPermissions={["admin"]}>
             <Products />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "adminAccountManagement",
+        element: (
+          <PermissionRoute allowedPermissions={["admin"]}>
+            <AdminAccountManagement />
           </PermissionRoute>
         ),
       },
