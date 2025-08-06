@@ -185,45 +185,6 @@ io.on("connection", (socket) => {
     console.log(`User registered: ${userId} with socketId: ${socket.id}`);
   });
 
-  socket.on("call-user", ({ to, offer }) => {
-    const targetSocketId = userSocketMap.get(to);
-    if (targetSocketId) {
-      io.to(targetSocketId).emit("incoming-call", {
-        from: socket.userId,
-        offer,
-      });
-    }
-  });
-
-  socket.on("answer-call", ({ to, answer }) => {
-    const targetSocketId = userSocketMap.get(to);
-    if (targetSocketId) {
-      io.to(targetSocketId).emit("call-answered", {
-        from: socket.userId,
-        answer,
-      });
-    }
-  });
-
-  socket.on("ice-candidate", ({ to, candidate }) => {
-    const targetSocketId = userSocketMap.get(to);
-    if (targetSocketId) {
-      io.to(targetSocketId).emit("ice-candidate", {
-        from: socket.userId,
-        candidate,
-      });
-    }
-  });
-
-  socket.on("end-call", ({ to }) => {
-    const targetSocketId = userSocketMap.get(to);
-    if (targetSocketId) {
-      io.to(targetSocketId).emit("call-ended", {
-        from: socket.userId,
-      });
-    }
-  });
-
   socket.on("disconnect", () => {
     if (socket.userId) {
       userSocketMap.delete(socket.userId);
