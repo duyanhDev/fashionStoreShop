@@ -56,6 +56,8 @@ const Details = () => {
   const itemsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(0);
 
+  console.log(quantityProduct);
+
   const navigagte = useNavigate();
 
   const pageCount = Math.ceil(feedback.length / itemsPerPage);
@@ -117,6 +119,7 @@ const Details = () => {
         setSize(SizeMap || []);
         SetcolorCart(res.data.data.variants[0]?.color || "");
         setSelectedColor(res.data.data.variants[0]?.color || "");
+        SetquantityProduct(res.data.data.sold || 0);
       }
     } catch (error) {
       console.log(error);

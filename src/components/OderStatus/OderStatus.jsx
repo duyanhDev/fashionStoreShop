@@ -17,6 +17,7 @@ import { FaTruck } from "react-icons/fa";
 
 import io from "socket.io-client";
 import FeedBack from "../FeedBack/FeeBack";
+import OrderDetailModal from "../OrderDetailModal/OrderDetailModal";
 
 const socket = io("http://localhost:9000", {
   withCredentials: true,
@@ -37,7 +38,7 @@ const OderStatus = () => {
   const [data, setData] = useState([]);
   const { user } = useSelector((state) => state.auth);
   const [modal2Open, setModal2Open] = useState(false);
-
+  const [visible, setVisible] = useState(false);
   const [api, contextHolder] = notification.useNotification();
 
   const Navigate = useNavigate();
@@ -239,7 +240,7 @@ const OderStatus = () => {
                     }
                   })()}
                 </span>
-                <span>Xem chi tiết</span>
+                <span onClick={() => setVisible(true)}>Xem chi tiết</span>
               </div>
             </div>
             <div className="mt-3">
@@ -335,6 +336,7 @@ const OderStatus = () => {
           setData={setData}
         />
       </div>
+      <OrderDetailModal visible={visible} onClose={() => setVisible(false)} />
     </div>
   );
 };
