@@ -4,8 +4,6 @@ const streamifier = require("streamifier");
 
 const uploadFileToCloudinary = async (files) => {
   try {
-    console.log("Tệp nhận được trong Cloudinary:", files);
-
     cloudinary.config({
       cloud_name: process.env.CLOUD_NAME,
       api_key: process.env.API_KEY,
@@ -23,10 +21,6 @@ const uploadFileToCloudinary = async (files) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
             public_id: `uploads/shoes-${Date.now()}`,
-            transformation: [
-              { width: 800, height: 800, crop: "fill" },
-              { quality: "auto" },
-            ],
           },
           (error, result) => {
             if (error) reject(error);
