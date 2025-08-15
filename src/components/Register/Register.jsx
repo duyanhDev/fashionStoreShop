@@ -175,8 +175,6 @@ const RegisterForm = () => {
         false
       );
 
-      console.log(res);
-
       if (res?.data?.EC === 0) {
         setEmail("");
         setUsername("");
