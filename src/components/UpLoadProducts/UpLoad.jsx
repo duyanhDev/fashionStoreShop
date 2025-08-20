@@ -332,11 +332,6 @@ const UpLoad = () => {
         return;
       }
 
-      if (image.length > 0 && image.length !== color.length) {
-        messageApi.error("Số lượng ảnh phải khớp với số màu đã chọn");
-        return;
-      }
-
       const res = await UpdateProductAPI(
         param.id,
         name,

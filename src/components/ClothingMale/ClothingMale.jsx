@@ -134,9 +134,9 @@ const ClothingMale = () => {
     fetchListCategoryAndInitialize();
   }, []);
 
-  // Fetch products when URL changes or categories load
   useEffect(() => {
-    if (listCategory.length > 0) {
+    // Chỉ fetch khi đang ở đúng route
+    if (listCategory.length > 0 && location.pathname.includes(param.gender)) {
       const params = getFetchParams();
       dispatch(fetchProducts(params));
     }
