@@ -60,9 +60,9 @@ app.get("/", (req, res) => {
 });
 
 const config = {
-  app_id: "554",
-  key1: "8NdU5pG5R2spGHGhyO99HN1OhD8IQJBn",
-  key2: "uUfsWgfLkRLzq6W2uNXTCxrfxs51auny",
+  app_id: "2553",
+  key1: "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL",
+  key2: "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz",
   endpoint: "https://sb-openapi.zalopay.vn/v2/create",
 };
 app.post("/zalopay-callback", async (req, res) => {
@@ -174,9 +174,13 @@ app.set("io", io);
 // });
 
 const userSocketMap = new Map();
-
+let OnlineCount = 0;
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
+
+  OnlineCount++;
+
+  io.emit("updateOnlineCount", OnlineCount);
 
   socket.on("register", ({ userId }) => {
     socket.userId = userId;
@@ -186,6 +190,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
+    OnlineCount--;
+    io.emit("updateOnlineCount", OnlineCount);
     if (socket.userId) {
       userSocketMap.delete(socket.userId);
     }
