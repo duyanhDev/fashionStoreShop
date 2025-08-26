@@ -494,10 +494,10 @@ const Home = () => {
         >
           <div className="w-full mx-auto px-4 sm:px-2 lg:px-8">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
                 DỊCH VỤ CỦA CHÚNG TÔI
               </h2>
-              <p className="text-lg text-black-600 font-bold max-w-2xl mx-auto">
+              <p className="text-lg text-white font-bold max-w-2xl mx-auto">
                 Cam kết mang đến trải nghiệm mua sắm tuyệt vời nhất cho khách
                 hàng
               </p>
