@@ -9,7 +9,6 @@ import { SmileOutlined } from "@ant-design/icons";
 import ClipLoader from "react-spinners/ClipLoader";
 import { getVoucherAPI } from "../../service/APIVoucher.js";
 import moment from "moment";
-import socket from "../../socket.js";
 
 const CartProducts = ({}) => {
   const { ListCart, user, CartListProductsUser } = useOutletContext();
