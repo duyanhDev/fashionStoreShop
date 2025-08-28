@@ -1,7 +1,13 @@
-const { CreateBlog, updateBlogView, getAllBlog } = require("../services/Blog");
+const {
+  CreateBlog,
+  updateBlogView,
+  getAllBlog,
+  getDetailSlug,
+} = require("../services/Blog");
 
 const createBlogController = async (req, res) => {
   try {
+    console.log(res.body);
     const blog = await CreateBlog({
       title: req.body.title,
       tip: req.body.tip,
@@ -13,7 +19,6 @@ const createBlogController = async (req, res) => {
       readTime: req.body.readTime,
       featured: req.body.featured,
     });
-    console.log("check", blog);
 
     res.status(201).json({ message: "Tạo blog thành công", blog });
   } catch (err) {
@@ -45,8 +50,23 @@ const getAllBlogController = async (req, res) => {
     console.log(error);
   }
 };
+
+const getDetailSlugController = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const data = await getDetailSlug(slug);
+
+    return res.status(200).json({
+      EC: 0,
+      data: data,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
 module.exports = {
   createBlogController,
   updateBlogController,
   getAllBlogController,
+  getDetailSlugController,
 };

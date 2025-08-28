@@ -15,6 +15,12 @@ const getAllBlog = async () => {
   }
 };
 
+const getDetailSlug = async (slug) => {
+  const data = await BlogModel.findOne({ slug: slug }).populate("userId");
+
+  return data;
+};
+
 const CreateBlog = async ({
   title,
   tip,
@@ -92,4 +98,5 @@ module.exports = {
   CreateBlog,
   updateBlogView,
   getAllBlog,
+  getDetailSlug,
 };
