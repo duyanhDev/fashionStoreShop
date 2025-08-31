@@ -7,7 +7,6 @@ const {
 
 const createBlogController = async (req, res) => {
   try {
-    console.log(res.body);
     const blog = await CreateBlog({
       title: req.body.title,
       tip: req.body.tip,
