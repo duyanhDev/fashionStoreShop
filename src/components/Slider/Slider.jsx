@@ -37,10 +37,8 @@ const SliderComponent = () => {
     const fetchAPIBanner = async () => {
       try {
         const res = await getListBannerAPI();
-        console.log("API Response:", res);
 
         if (res && res.data && res.data.EC === 0) {
-          console.log("Slides data:", res.data.data);
           setSlides(res.data.data);
         }
       } catch (error) {
@@ -120,7 +118,6 @@ const SliderComponent = () => {
               className="w-full h-full object-cover"
               loading={index === 0 ? "eager" : "lazy"}
               onError={(e) => {
-                console.log("Image load error:", slide.imageUrl);
                 e.target.src = "/path/to/fallback-image.jpg"; // Fallback image
               }}
             />
@@ -205,53 +202,6 @@ const SliderComponent = () => {
           />
         ))}
       </div>
-
-      {/* Custom Styles */}
-      <style jsx>{`
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-fade-in {
-          animation: fade-in 0.8s ease-out;
-        }
-
-        .animate-fade-in-delay {
-          animation: fade-in 0.8s ease-out 0.2s both;
-        }
-
-        .animate-fade-in-delay-2 {
-          animation: fade-in 0.8s ease-out 0.4s both;
-        }
-
-        @media (max-width: 640px) {
-          @keyframes fade-in {
-            from {
-              opacity: 0;
-              transform: translateY(15px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-
-          .animate-fade-in {
-            animation: fade-in 0.6s ease-out;
-          }
-
-          .animate-fade-in-delay {
-            animation: fade-in 0.6s ease-out 0.15s both;
-          }
-        }
-      `}</style>
     </div>
   );
 };
