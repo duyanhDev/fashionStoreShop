@@ -39,6 +39,7 @@ const PersonalInfoForm = ({ id }) => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassWord, setNewPassword] = useState("");
   const [confirmPassWord, setConfirmPassword] = useState("");
+  console.log(user);
 
   const [api, contextHolder] = notification.useNotification();
 
@@ -661,6 +662,8 @@ const Profile = () => {
     },
   ];
 
+  console.log(selectedImage);
+
   const handleUpdateProfileUser = async () => {
     try {
       const res = await update_profileUser(
@@ -675,6 +678,7 @@ const Profile = () => {
         height,
         weight,
         user.role,
+        user.permissions,
         selectedImage
       );
       if (res) {

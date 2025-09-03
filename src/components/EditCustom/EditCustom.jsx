@@ -16,6 +16,7 @@ import { useParams } from "react-router-dom";
 import { get_profile_user, update_profileAdmin } from "../../service/Auth";
 import moment from "moment";
 import { useSelector } from "react-redux";
+import LogoMess from "../../assets/Image/Home/logo_mess.png";
 
 const { Option } = Select;
 
@@ -194,6 +195,7 @@ const EditCustom = () => {
       message.error("Bạn không có quyền chỉnh sửa thông tin này");
       return;
     }
+
     try {
       const res = await update_profileAdmin(
         id,
