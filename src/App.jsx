@@ -191,8 +191,6 @@ function App() {
     );
   }, [unread]);
 
-  console.log(unreadMessages);
-
   // Memoize menu items để tránh re-create mỗi lần render
   const menuItems = useMemo(() => {
     const baseItems = [
@@ -211,7 +209,7 @@ function App() {
         ? [
             {
               icon: (
-                <div className="relative" onClick={handleChatClick}>
+                <div className="relative">
                   <BsChatDots className="text-white text-xl" />
                   {unreadMessages && unreadMessages.length > 0 ? (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
@@ -225,7 +223,7 @@ function App() {
                 </div>
               ),
               label: "Chat Support",
-
+              onClick: () => handleChatClick(),
               color:
                 "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700",
               glow: "shadow-emerald-500/30",
@@ -581,10 +579,7 @@ function App() {
               <Link to="clothing/female">Nữ</Link>
             </li>
             <li>
-              <Link
-                to="/clothing/unisex?Category=Phụ+Kiện&currentPage=1"
-                target="_top"
-              >
+              <Link to="/clothing/unisex?Category=Phụ+Kiện&currentPage=1">
                 Phụ kiện
               </Link>
             </li>
@@ -607,7 +602,7 @@ function App() {
         <Outlet context={outletContext} />
       </div>
 
-      <div className="fixed right-6 bottom-6 z-50">
+      <div className="fixed right-0 bottom-6 mr-7  z-50">
         {/* Menu Items */}
         <div
           className={`absolute bottom-20 right-0 transition-all duration-500 ${

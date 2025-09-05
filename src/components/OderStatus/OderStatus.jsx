@@ -34,6 +34,8 @@ const OderStatus = () => {
     try {
       const res = await OrderStatusOneProduct(param.id);
 
+      console.log(res);
+
       if (res && res.data && res.data.EC === 0) {
         SetOrderStatus(res.data.data.orderStatus);
         setCreatedAt(res.data.data.createdAt);
@@ -346,7 +348,7 @@ const OderStatus = () => {
       </div>
       <OrderDetailModal
         visible={visible}
-        id={OrderId}
+        id={param.id}
         onClose={() => setVisible(false)}
       />
     </div>
