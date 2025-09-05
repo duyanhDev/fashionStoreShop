@@ -18,6 +18,7 @@ const authRoutes = require("./Routes/auth");
 const session = require("express-session");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./Config/swagger");
+const startCron = require("./Cron/cron"); // file chứa cron
 
 // Cấu hình CORS cho Socket.IO
 const io = new Server(server, {
@@ -203,6 +204,7 @@ io.on("connection", (socket) => {
 (async () => {
   try {
     await connectDB();
+    startCron();
     server.listen(port, () => {
       console.log(`Backend zero app listening on port ${port}`);
     });
