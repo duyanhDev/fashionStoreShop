@@ -39,6 +39,7 @@ router.get("/user", authMiddleware, (req, res) => {
     role: req.user.role,
     phone: req.user.phone,
     avatar: req.user.avatar, // Trả về avatar
+    token: req.user.token,
     permissions: req.user.permissions,
   });
 });
@@ -95,6 +96,8 @@ router.post("/facebook", async (req, res) => {
 
 // ========== USER INFO ==========
 router.get("/user", authMiddleware, (req, res) => {
+  console.log(req);
+
   res.json({
     message: "Đã xác thực thành công",
     _id: req.userId,
@@ -103,6 +106,7 @@ router.get("/user", authMiddleware, (req, res) => {
     isAdmin: req.user.isAdmin,
     role: req.user.role,
     permissions: req.user.permissions,
+    token: req.user.token,
     avatar: req.user.avatar,
   });
 });

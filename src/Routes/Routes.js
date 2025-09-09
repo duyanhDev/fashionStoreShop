@@ -42,6 +42,7 @@ const {
   changeUserPassword,
   getRandomAdminAPI,
   ResetPassword,
+  checkRestToken,
 } = require("./../Controllers/Auth");
 const {
   addToCart,
@@ -63,6 +64,7 @@ const {
   UpDateOrderStatus,
   filterOrdersByStatus,
   UpDateConfirmed,
+  createRepurchaseOrder,
 } = require("../Controllers/Oder");
 
 const { searchProductsByNameAPI } = require("../Controllers/SearchProductsAPI");
@@ -91,6 +93,7 @@ const {
   listVoucherAPI,
   getListOneVoucherAPI,
   updateVoucher,
+  getListVoucherByUserId,
 } = require("../Controllers/Voucher");
 const { RefreshToken } = require("../services/Auth");
 const {
@@ -314,6 +317,7 @@ RouterAPI.put(
 RouterAPI.put("/changel-passsword", ChanglePasswordAPI);
 RouterAPI.post("/forgetpassword", Forgotpassword);
 RouterAPI.post("/reset-password", ResetPassword);
+RouterAPI.get("/check-reset-token/:token", checkRestToken);
 RouterAPI.post("/refresh-token", RefreshToken);
 RouterAPI.put("/config-password", verifyToken, isAdmin, changeUserPassword);
 RouterAPI.delete("/delete-user/:id", verifyToken, isAdmin, DeleteUser);
@@ -375,6 +379,8 @@ RouterAPI.put(
 RouterAPI.get("/get-order-all", ListOderProducts);
 RouterAPI.get("/get-order-one/:id", getOrderOneProduct);
 
+RouterAPI.put("/update-order-repurchase/:id", createRepurchaseOrder);
+
 // lọc oder theo trạng thái
 
 RouterAPI.post("/filter-order/:status", filterOrdersByStatus);
@@ -409,6 +415,8 @@ RouterAPI.get("/get-list-sender/:sender", getMessagesSenderList);
 RouterAPI.post("/add-voucher", verifyToken, isAdmin, addVoucherAPI);
 RouterAPI.get("/voucher", listVoucherAPI);
 RouterAPI.get("/voucher/:id", getListOneVoucherAPI);
+RouterAPI.get("/voucher-user/:userId", getListVoucherByUserId);
+
 RouterAPI.put("/update-voucher/:id", verifyToken, isAdmin, updateVoucher);
 
 RouterAPI.post("/send-otp", sendOTP);

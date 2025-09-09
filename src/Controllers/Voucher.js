@@ -102,6 +102,22 @@ const getListOneVoucherAPI = async (req, res) => {
   }
 };
 
+// lấy danh sách voucher theo khách hàng
+
+const getListVoucherByUserId = async (req, res) => {
+  try {
+    const { UserId } = req.params;
+
+    const data = await Voucher.findOne({ UserId: UserId });
+
+    return res.status(200).json({
+      EC: 0,
+      data: data,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
 // Cập nhật voucher
 const updateVoucher = async (req, res) => {
   try {
@@ -153,4 +169,5 @@ module.exports = {
   listVoucherAPI,
   getListOneVoucherAPI,
   updateVoucher,
+  getListVoucherByUserId,
 };

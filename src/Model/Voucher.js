@@ -60,7 +60,7 @@ const voucherSchema = new mongoose.Schema(
     // Nhóm người dùng có thể sử dụng voucher
     userGroup: {
       type: String,
-      enum: ["all", "newUser", "vip", "loyalCustomer"],
+      enum: ["all", "newUser", "regular", "vip", "loyalCustomer", "elite"],
       default: "all",
     },
   },
