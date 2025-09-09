@@ -114,6 +114,7 @@ const LoginForm = () => {
   const handleGoogleLogin = () => {
     window.location.href = "http://localhost:9000/auth/google";
   };
+  // App.js hoặc component gốc
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);

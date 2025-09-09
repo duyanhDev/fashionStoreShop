@@ -33,6 +33,7 @@ const AuthCallback = () => {
 
             // Dispatch to Redux store
             dispatch(login(token, userData));
+            localStorage.setItem("token", token);
 
             // Redirect to home
             navigate("/");

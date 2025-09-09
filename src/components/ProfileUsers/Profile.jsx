@@ -10,7 +10,7 @@ import img4 from "./../../assets/Image/mceclip5_85.png";
 import img5 from "./../../assets/Image/mceclip6_34.png";
 import img6 from "./../../assets/Image/mceclip1_37.png";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "./../../untils/axios";
 
 import {
@@ -30,6 +30,7 @@ import {
   Tabs,
 } from "antd";
 import moment from "moment";
+import { login, updateUser } from "../../redux/actions/Auth";
 
 const { Option } = Select;
 
@@ -191,8 +192,6 @@ const PersonalInfoForm = ({ id }) => {
 const Profile = () => {
   const { user } = useSelector((state) => state.auth);
 
-  console.log(user);
-
   const id = user._id;
 
   const [points, setPoints] = useState(0);
@@ -211,6 +210,7 @@ const Profile = () => {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [ImageUpLoad, SetImageUpLoad] = useState("");
+  const dispatch = useDispatch();
 
   const [openResponsive, setOpenResponsive] = useState(false);
   const [password, setPassword] = useState("");
@@ -682,7 +682,10 @@ const Profile = () => {
         selectedImage
       );
       if (res) {
+        console.log(res);
+
         message.success("Profile updated successfully");
+        dispatch(updateUser(res.user)); // avatar + info khác sẽ cập nhật ngay
         setOpenResponsive(false);
       }
     } catch (error) {
