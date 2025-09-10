@@ -22,7 +22,7 @@ const ListProducts = async () => {
       .populate("category", "name")
       .populate({
         path: "ratings.userId", // Lấy thông tin userId trong ratings
-        select: "name avatar email", // Chỉ lấy trường name từ model Users
+        select: "name avatar email address ", // Chỉ lấy trường name từ model Users
       })
       .populate({
         path: "ratings.replies.userId", // Lấy thông tin userId trong ratings

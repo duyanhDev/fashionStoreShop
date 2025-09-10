@@ -19,13 +19,13 @@ const SEPAY_CONFIG = {
   accountNumber: "96247609",
   accountName: "DANG TRINH DUY ANH",
   bankCode: "BIDV",
-  webhookSecret: "https://6e55dcc2f48f.ngrok-free.app/sepay/callback",
+  webhookSecret: " https://870530fd17c2.ngrok-free.app/v1/sepay/callback",
 };
 
 const config = {
-  app_id: "2553",
-  key1: "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL",
-  key2: "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz",
+  app_id: "2554",
+  key1: "sdngKKJmqEMzvh5QQcdD2A9XBSKUNaYn",
+  key2: "trMrHtvjo6myautxDUiAcYsVtaeQ8nhf",
   endpoint: "https://sb-openapi.zalopay.vn/v2/create",
 };
 
@@ -288,12 +288,12 @@ class OrderService {
     return { nameProduct, formattedProducts };
   }
 
-  async processZaloPayPayment(totalAmount, order) {
+  async processZaloPayPayment(totalAmount, id) {
     const transID = Math.floor(Math.random() * 1000000);
     const appTime = Date.now();
 
     const embed_data = {
-      redirecturl: "http://localhost:5173/vnpay_return",
+      redirecturl: `http://localhost:5173/vnpay_return/${id}`,
       merchantinfo: "Doisin Store",
       promotioninfo: "",
       redirectdata: "",
@@ -318,7 +318,7 @@ class OrderService {
       item: JSON.stringify(items),
       embed_data: JSON.stringify(embed_data),
       callback_url:
-        "https://ccb5-14-191-105-190.ngrok-free.app/zalopay-callback".trim(),
+        " https://870530fd17c2.ngrok-free.app/zalopay-callback".trim(),
       description: `Doisin - Payment for the order #${transID}`,
       bank_code: "",
       title: `Thanh toán đơn hàng #${transID}`,
@@ -339,7 +339,11 @@ class OrderService {
       .update(data)
       .digest("hex");
 
+    console.log(zaloOrder);
+
     const result = await axios.post(config.endpoint, zaloOrder);
+
+    console.log(result);
 
     if (result.data.return_code !== 1) {
       throw new Error(
@@ -643,18 +647,19 @@ const CreateOrder = async (req, res) => {
         ", "
       )}`,
     });
-
+    console.log(paymentMethod);
     // Handle payment methods
     switch (paymentMethod) {
       case PAYMENT_METHODS.ZALOPAY:
         try {
+          console.log("xx");
+
           const ZaloPayResult = await orderService.processZaloPayPayment(
             totalAmount,
-            newOrder
+            newOrder._id
           );
-          console.log(ZaloPayResult);
+          console.log("PAYMENT_METHODS", ZaloPayResult);
 
-          // Kiểm tra kết quả
           if (ZaloPayResult.EC === 0) {
             // Thanh toán thành công
             await orderService.deductStock(items);
@@ -722,11 +727,10 @@ const CreateOrder = async (req, res) => {
             newOrder._id
           );
 
-          console.log(momoResult);
-
           // Kiểm tra kết quả thanh toán
           if (momoResult.EC === 0) {
             await orderService.deductStock(items);
+            newOrder.paymentStatus = PAYMENT_STATUS.PENDING;
             await orderService.updateCartItems(CartId, idItems);
             await newOrder.save();
           }
@@ -767,7 +771,11 @@ const listOderUserId = async (req, res) => {
   try {
     let { userId } = req.params;
 
-    let data = await Order.find({ userId: userId }).sort({ createdAt: -1 });
+    let data = await Order.find({ userId: userId })
+      .sort({
+        createdAt: -1,
+      })
+      .populate("userId", "email name"); // chỉ lấy email và name
 
     return res.status(200).json({
       EC: 0,
@@ -1100,7 +1108,8 @@ const getTotalProductsSoldByType = async (req, res) => {
 
 const ListOderProducts = async (req, res) => {
   try {
-    let data = await Order.find({}).sort({ createdAt: -1 }).populate("");
+    let data = await Order.find({}).sort({ createdAt: -1 });
+
     return res.status(200).json({
       EC: 0,
       data: data,
@@ -1114,10 +1123,15 @@ const getOrderOneProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const data = await Order.findOne({ _id: id }).populate({
-      path: "items.productId",
-      select: "name variants.images discountedPrice slug",
-    });
+    const data = await Order.findOne({ _id: id })
+      .populate({
+        path: "items.productId",
+        select: "name variants.images discountedPrice slug",
+      })
+      .populate({
+        path: "userId",
+        select: "email ", // ép lấy email nếu có select: false
+      });
     return res.status(200).json({
       EC: 0,
       data: data,

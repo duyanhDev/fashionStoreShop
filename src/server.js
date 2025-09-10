@@ -62,9 +62,9 @@ app.get("/", (req, res) => {
 });
 
 const config = {
-  app_id: "2553",
-  key1: "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL",
-  key2: "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz",
+  app_id: "2554",
+  key1: "sdngKKJmqEMzvh5QQcdD2A9XBSKUNaYn",
+  key2: "trMrHtvjo6myautxDUiAcYsVtaeQ8nhf",
   endpoint: "https://sb-openapi.zalopay.vn/v2/create",
 };
 app.post("/zalopay-callback", async (req, res) => {
@@ -198,13 +198,14 @@ io.on("connection", (socket) => {
   });
 });
 
+// SEPAY
 const apiToken =
   "WQJXNNJBI6VZLAJ2XLSZOPO9T5R4EC0PU32FH4WIY97UVRTMRXDHKK6GZQUGHMCB";
 
 // ======= Callback / Webhook SePay =======
 
-app.use("/sepay/callback", express.json());
-app.post("/sepay/callback", async (req, res) => {
+app.use("v1/sepay/callback", express.json());
+app.post("v1/sepay/callback", async (req, res) => {
   const payload = req.body;
   console.log("📩 Webhook payload:", payload);
 
@@ -275,6 +276,7 @@ app.post("/sepay/callback", async (req, res) => {
     if (order.status !== "paid") {
       // THÊM: Cập nhật thêm các trường hữu ích
       order.status = "paid";
+      order.orderStatus = "Processing";
       order.paymentStatus = "Completed"; // Nếu bạn có field này
       order.paidAt = new Date(); // Timestamp thanh toán
       order.paymentInfo = {
