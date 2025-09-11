@@ -28,10 +28,11 @@ const createBlogController = async (req, res) => {
 const updateBlogController = async (req, res) => {
   try {
     const { slug } = req.params;
+    console.log(slug);
 
     const data = await updateBlogView(slug);
 
-    return res.status(201).json({ view: "Tăng view thành công", data });
+    return res.status(201).json({ EC: 0, view: "Tăng view thành công", data });
   } catch (error) {
     res.status(400).json({ message: err.message });
   }

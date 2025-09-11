@@ -750,6 +750,7 @@ const CreateOrder = async (req, res) => {
         await orderService.updateCartItems(CartId, idItems);
         await newOrder.save();
         return res.status(200).json({
+          paymentMethod: paymentMethod.COD,
           EC: 0,
           message:
             "Order created successfully. Payment will be made upon delivery.",
