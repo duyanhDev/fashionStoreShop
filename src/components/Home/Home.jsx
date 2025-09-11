@@ -39,6 +39,7 @@ import {
 import { HeartIcon as HeartSolidIcon } from "@heroicons/react/24/solid";
 import EnhancedProductsSection from "../EnhancedProductsSection/EnhancedProductsSection";
 import { GiftIcon } from "lucide-react";
+import { getAllBlog, updateViewBlog } from "../../service/Blog";
 
 const Home = () => {
   const { ListProducts } = useOutletContext();
@@ -56,82 +57,7 @@ const Home = () => {
   const [WishList, setWishList] = useState([]);
   const [form] = Form.useForm();
   const [error, setError] = useState("");
-
-  const testimonials = [
-    {
-      id: 1,
-      name: "Nguyễn Minh Anh",
-      location: "Hà Nội",
-      rating: 5,
-      comment:
-        "Chất lượng sản phẩm rất tốt, giao hàng nhanh chóng. Tôi rất hài lòng với dịch vụ của DOSIN!",
-      avatar: "https://randomuser.me/api/portraits/women/1.jpg",
-      date: "2024-12-15",
-    },
-    {
-      id: 2,
-      name: "Trần Văn Nam",
-      location: "TP.HCM",
-      rating: 5,
-      comment:
-        "Thiết kế đẹp, chất liệu tốt, giá cả hợp lý. Sẽ tiếp tục ủng hộ shop!",
-      avatar: "https://randomuser.me/api/portraits/men/2.jpg",
-      date: "2024-12-10",
-    },
-    {
-      id: 3,
-      name: "Lê Thị Hương",
-      location: "Đà Nẵng",
-      rating: 5,
-      comment:
-        "Shop phục vụ tận tình, tư vấn nhiệt tình. Quần áo đẹp và chất lượng cao!",
-      avatar: "https://randomuser.me/api/portraits/women/3.jpg",
-      date: "2024-12-08",
-    },
-    {
-      id: 4,
-      name: "Lê Thị Hương",
-      location: "Đà Nẵng",
-      rating: 5,
-      comment:
-        "Shop phục vụ tận tình, tư vấn nhiệt tình. Quần áo đẹp và chất lượng cao!",
-      avatar: "https://randomuser.me/api/portraits/women/3.jpg",
-      date: "2024-12-08",
-    },
-  ];
-
-  const blogPosts = [
-    {
-      id: 1,
-      title: "Xu hướng thời trang Thu Đông 2024",
-      excerpt:
-        "Khám phá những xu hướng thời trang hot nhất mùa Thu Đông năm nay với DOSIN",
-      image:
-        "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=250&fit=crop",
-      date: "2024-12-01",
-      category: "Xu hướng",
-    },
-    {
-      id: 2,
-      title: "Cách phối đồ công sở chuyên nghiệp",
-      excerpt:
-        "Hướng dẫn phối đồ công sở thanh lịch và chuyên nghiệp cho cả nam và nữ",
-      image:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=250&fit=crop",
-      date: "2024-11-28",
-      category: "Style Tips",
-    },
-    {
-      id: 3,
-      title: "Chăm sóc và bảo quản quần áo",
-      excerpt:
-        "Những mẹo hay giúp quần áo luôn như mới và bền đẹp theo thời gian",
-      image:
-        "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=400&h=250&fit=crop",
-      date: "2024-11-25",
-      category: "Chăm sóc",
-    },
-  ];
+  const [blogPosts, SetBlogPosts] = useState([]);
 
   const brands = [
     {
@@ -187,15 +113,6 @@ const Home = () => {
 
   const formatPrice = (price) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
-  };
-
-  const handleNewsletterSubmit = (values) => {
-    api.success({
-      message: "Đăng ký thành công!",
-      description:
-        "Cảm ơn bạn đã đăng ký nhận tin từ DOSIN. Chúng tôi sẽ gửi những ưu đãi tốt nhất đến bạn!",
-    });
-    form.resetFields();
   };
 
   useEffect(() => {
@@ -328,6 +245,36 @@ const Home = () => {
           item?.ratings.filter((rating) => rating.rating === 5)
         )
       : [];
+
+  const fetchApiBlog = async () => {
+    try {
+      const res = await getAllBlog();
+
+      if (res && res.data && res.data.EC === 0) {
+        SetBlogPosts(res.data.data); // dữ liệu hiển thị mặc định
+        // tạo danh mục (nếu cần unique)
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchApiBlog();
+  }, []);
+
+  const handleIncreaseView = async (slug) => {
+    try {
+      const res = await updateViewBlog(slug);
+      console.log(res);
+
+      if (res && res.data && res.data.EC === 0) {
+        navigate(`/blog/${slug}`);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <>
@@ -716,7 +663,7 @@ const Home = () => {
         {/* Customer Testimonials */}
         <div className="py-20 bg-white relative overflow-hidden">
           {/* Background Pattern */}
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-green-50/30"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl shadow-xl"></div>
           <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-200 to-transparent"></div>
 
           <div className="w-full mx-auto px-4 sm:px-0 lg:px-8 relative z-10">
@@ -731,11 +678,11 @@ const Home = () => {
                   <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z" />
                 </svg>
               </div>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
                 KHÁCH HÀNG NÓI GÌ VỀ
-                <span className="text-green-600"> CHÚNG TÔI</span>
+                <span className="text-white"> CHÚNG TÔI</span>
               </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-xl text-white max-w-3xl mx-auto leading-relaxed">
                 Những phản hồi chân thực từ hàng nghìn khách hàng đã tin tưởng
                 và lựa chọn DOSIN
               </p>
@@ -799,7 +746,7 @@ const Home = () => {
                           </h4>
                           <p className="text-green-100 flex items-center text-sm font-medium">
                             <MapPinIcon className="w-4 h-4 mr-1" />
-                            {testimonial.userId.address.city || "Việt Nam"}
+                            {testimonial?.userId?.address?.city || "Việt Nam"}
                           </p>
                         </div>
                       </div>
@@ -811,11 +758,11 @@ const Home = () => {
                       <div className="mb-6">
                         <Rate
                           disabled
-                          defaultValue={testimonial.rating}
+                          defaultValue={testimonial?.rating || 5}
                           className="text-yellow-400 text-lg"
                         />
                         <span className="ml-2 text-sm font-medium text-gray-600">
-                          {testimonial.rating}/5 sao
+                          {testimonial?.rating}/5 sao
                         </span>
                       </div>
 
@@ -829,7 +776,7 @@ const Home = () => {
                           <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z" />
                         </svg>
                         <p className="text-gray-700 leading-relaxed text-lg font-medium pl-6 relative">
-                          {testimonial.review}
+                          {testimonial?.review}
                         </p>
                       </div>
 
@@ -837,7 +784,7 @@ const Home = () => {
                       <div className="flex items-center justify-between pt-6 border-t border-gray-100">
                         <div className="flex items-center text-sm text-gray-500">
                           <CalendarIcon className="w-4 h-4 mr-2 text-green-500" />
-                          {new Date(testimonial.createdAt).toLocaleDateString(
+                          {new Date(testimonial?.createdAt).toLocaleDateString(
                             "vi-VN"
                           )}
                         </div>
@@ -868,34 +815,32 @@ const Home = () => {
             {/* Trust Indicators */}
             <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8">
               <div className="text-center">
-                <div className="text-3xl font-bold text-green-600 mb-2">
+                <div className="text-3xl font-bold text-blue-900 mb-2">
                   15K+
                 </div>
-                <div className="text-sm text-gray-600 font-medium">
+                <div className="text-sm text-white font-medium">
                   Khách hàng hài lòng
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-green-600 mb-2">
+                <div className="text-3xl font-bold text-blue-900 mb-2">
                   4.9/5
                 </div>
-                <div className="text-sm text-gray-600 font-medium">
+                <div className="text-sm text-white font-medium">
                   Điểm đánh giá
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-green-600 mb-2">
-                  98%
-                </div>
-                <div className="text-sm text-gray-600 font-medium">
+                <div className="text-3xl font-bold text-blue-900 mb-2">98%</div>
+                <div className="text-sm text-white font-medium">
                   Tỷ lệ hài lòng
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-green-600 mb-2">
+                <div className="text-3xl font-bold text-blue-900  mb-2">
                   5 năm
                 </div>
-                <div className="text-sm text-gray-600 font-medium">
+                <div className="text-sm text-white font-medium">
                   Kinh nghiệm
                 </div>
               </div>
@@ -925,21 +870,24 @@ const Home = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {blogPosts.map((post, index) => (
+              {blogPosts.slice(0, 3).map((post, index) => (
                 <article
-                  key={`${post.id}-${index}`}
-                  className="group bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 overflow-hidden border border-gray-100"
+                  key={`${post._id}-${index}`}
+                  className="cursor-pointer group bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 overflow-hidden border border-gray-100"
+                  onClick={() => {
+                    handleIncreaseView(post.slug);
+                  }}
                 >
-                  <div className="relative overflow-hidden">
+                  <div className="relative overflow-hidden ">
                     <img
+                      src={post.img[0]?.url}
                       alt={post.title}
-                      src={post.image || "/placeholder.svg"}
                       className="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
                       loading="lazy"
                     />
                     <div className="absolute top-4 left-4">
                       <span className="bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                        {post.category}
+                        {post.regex}
                       </span>
                     </div>
                   </div>
@@ -947,7 +895,7 @@ const Home = () => {
                   <div className="p-6">
                     <div className="flex items-center text-sm text-gray-500 mb-3">
                       <CalendarIcon className="w-4 h-4 mr-2" />
-                      {new Date(post.date).toLocaleDateString("vi-VN")}
+                      {new Date(post.createdAt).toLocaleDateString("vi-VN")}
                     </div>
 
                     <h3 className="font-bold text-xl text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
@@ -959,10 +907,7 @@ const Home = () => {
                     </p>
 
                     <div className="mt-4 pt-4 border-t border-gray-100">
-                      <Link
-                        to={`/blog/${post.id}`}
-                        className="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition-colors duration-300"
-                      >
+                      <Link className="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition-colors duration-300">
                         Đọc thêm
                         <ArrowRightIcon className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                       </Link>
@@ -975,31 +920,52 @@ const Home = () => {
         </div>
 
         {/* Brand Partners */}
-        <div className="py-16 bg-gray-50">
-          <div className="w-full mx-auto px-4 sm:px-2 lg:px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        <div className="py-16 bg-gradient-to-b from-gray-50 to-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12 animate-fade-in">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
                 THƯƠNG HIỆU ĐỐI TÁC
               </h2>
-              <p className="text-lg text-gray-600">
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                 Những thương hiệu uy tín mà chúng tôi hợp tác
               </p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
+            {/* Desktop Grid View */}
+            <div className="hidden lg:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
               {brands.map((brand, index) => (
                 <div
                   key={index}
-                  className="flex justify-center items-center p-6 bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 grayscale hover:grayscale-0 transform hover:scale-105"
+                  className="group relative flex justify-center items-center p-6 bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                 >
                   <img
-                    src={brand.logo || "/placeholder.svg"}
+                    src={brand.logo}
                     alt={brand.name}
-                    className="max-h-12 object-contain"
+                    className="max-h-14 object-contain group-hover:grayscale-0 grayscale transition-all duration-300"
                     loading="lazy"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
                 </div>
               ))}
+            </div>
+
+            {/* Mobile/Tablet Carousel View */}
+            <div className="lg:hidden swiper">
+              <div className="swiper-wrapper">
+                {brands.map((brand, index) => (
+                  <div
+                    key={index}
+                    className="swiper-slide flex justify-center items-center p-6 bg-white rounded-2xl shadow-md"
+                  >
+                    <img
+                      src={brand.logo}
+                      alt={brand.name}
+                      className="max-h-12 object-contain"
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

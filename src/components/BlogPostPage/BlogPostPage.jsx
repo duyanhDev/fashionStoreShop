@@ -5,11 +5,8 @@ import { getDetaillBlog } from "../../service/Blog";
 import moment from "moment";
 
 const BlogPostPage = () => {
-  const [isLiked, setIsLiked] = useState(false);
-  const [likes, setLikes] = useState(142);
   const { slug } = useParams();
   const [blogPost1, SetblogPost] = useState("");
-  console.log(slug);
 
   const fetchAPIBlog = async () => {
     try {
@@ -17,7 +14,9 @@ const BlogPostPage = () => {
 
       console.log(res);
       SetblogPost(res.data.data);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // Mock data cho các bài viết gợi ý
@@ -98,11 +97,6 @@ const BlogPostPage = () => {
     content: blogPost1?.content,
 
     tags: ["React", "JavaScript", "Frontend", "Web Development", "Hooks"],
-  };
-
-  const handleLike = () => {
-    setIsLiked(!isLiked);
-    setLikes(isLiked ? likes - 1 : likes + 1);
   };
 
   const formatContent = (content) => {
