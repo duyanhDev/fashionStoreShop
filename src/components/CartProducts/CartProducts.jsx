@@ -586,7 +586,7 @@ const CartProducts = ({}) => {
           ghnResponse.data.data.order_code,
           idItems
         );
-        console.log("x", res);
+        console.log(res);
         if (res && res.data.EC === 0) {
           await CartListProductsUser();
           setTimeout(() => {

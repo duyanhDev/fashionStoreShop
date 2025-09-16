@@ -163,6 +163,8 @@ const ProductReviewAdmin = () => {
         responseText
       );
 
+      console.log("xxx", res);
+
       if (res && res.data && res.data.EC === 0) {
         const updatedReviews = reviews.map((review) => {
           if (review.id === selectedReview.id) {

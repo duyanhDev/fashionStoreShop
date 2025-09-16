@@ -117,8 +117,6 @@ const GeminiBlogGenerator = () => {
   };
 
   const handleSave = async (values) => {
-    console.log(values);
-
     if (!values.title || !values.content) {
       message.error("Tiêu đề và nội dung không được để trống.");
       return;
@@ -138,7 +136,6 @@ const GeminiBlogGenerator = () => {
       if (images.length > 0) {
         images.forEach((img) => formData.append("img", img));
       }
-      console.log(formData);
 
       const res = await CreateBlog(formData);
 

@@ -8,8 +8,6 @@ import { forwardRef } from "react";
 export const InvoiceTemplate = forwardRef(({ transaction }, ref) => {
   if (!transaction) return null;
 
-  console.log(transaction);
-
   const {
     _id,
     orderId,
