@@ -645,7 +645,7 @@ const CreateOrder = async (req, res) => {
         ", "
       )}`,
     });
-    console.log(paymentMethod);
+
     // Handle payment methods
     switch (paymentMethod) {
       case PAYMENT_METHODS.ZALOPAY:
@@ -751,9 +751,9 @@ const CreateOrder = async (req, res) => {
         await orderService.updateCartItems(CartId, idItems);
         await newOrder.save();
         return res.status(200).json({
-          paymentMethod: paymentMethod.COD,
           EC: 0,
           order_id: newOrder._id,
+          paymentMethod: paymentMethod,
           message:
             "Order created successfully. Payment will be made upon delivery.",
         });
@@ -1314,6 +1314,62 @@ const filterOrdersByStatus = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+const getListDallyOrder = async (req, res) => {
+  try {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const daysInMonth = endOfMonth.getDate(); // số ngày trong tháng
+
+    // Lấy dữ liệu doanh số từ Mongo
+    const dailySales = await Order.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+        },
+      },
+      {
+        $group: {
+          _id: { day: { $dayOfMonth: "$createdAt" } },
+          totalSales: { $sum: "$totalAmount" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          day: "$_id.day",
+          totalSales: 1,
+        },
+      },
+      {
+        $sort: { day: 1 },
+      },
+    ]);
+
+    // Tạo mảng đầy đủ các ngày trong tháng
+    const fullDailySales = Array.from({ length: daysInMonth }, (_, i) => {
+      const day = i + 1;
+      const found = dailySales.find((d) => d.day === day);
+      return {
+        day,
+        totalSales: found ? found.totalSales : 0, // nếu không có thì = 0
+      };
+    });
+
+    res.status(200).json({
+      EC: 0,
+      data: fullDailySales,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      EC: 1,
+      message: "Lỗi server khi lấy doanh số theo ngày",
+    });
+  }
+};
+
 module.exports = {
   CreateOrder,
   listOderUserId,
@@ -1328,4 +1384,5 @@ module.exports = {
   UpDateOrderStatus,
   filterOrdersByStatus,
   createRepurchaseOrder,
+  getListDallyOrder,
 };
