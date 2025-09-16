@@ -28,7 +28,6 @@ const createBlogController = async (req, res) => {
 const updateBlogController = async (req, res) => {
   try {
     const { slug } = req.params;
-    console.log(slug);
 
     const data = await updateBlogView(slug);
 

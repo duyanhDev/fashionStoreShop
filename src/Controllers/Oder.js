@@ -339,8 +339,6 @@ class OrderService {
       .update(data)
       .digest("hex");
 
-    console.log(zaloOrder);
-
     const result = await axios.post(config.endpoint, zaloOrder);
 
     console.log(result);
@@ -360,7 +358,7 @@ class OrderService {
     };
   }
 
-  async processVNPayPayment(totalAmount) {
+  async processVNPayPayment(totalAmount, id) {
     const { vnp_TmnCode, vnp_HashSecret, vnp_ReturnUrl, vnp_Url } = process.env;
 
     if (!vnp_TmnCode || !vnp_HashSecret || !vnp_ReturnUrl) {
@@ -382,7 +380,7 @@ class OrderService {
         `Thanh toan don hang : ${orderId}`
       ).replace(/%20/g, "+"),
       vnp_OrderType: "other",
-      vnp_ReturnUrl: vnp_ReturnUrl,
+      vnp_ReturnUrl: `http://localhost:5173/vnpay_return/${id}`,
       vnp_TmnCode: vnp_TmnCode,
       vnp_TxnRef: orderId,
       vnp_Version: "2.1.0",
@@ -404,14 +402,14 @@ class OrderService {
     };
   }
 
-  async processMoMoPayment(totalAmount) {
+  async processMoMoPayment(totalAmount, id) {
     const endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
     const accessKey = "F8BBA842ECF85";
     const secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
     const orderInfo = "pay with MoMo";
     const partnerCode = "MOMO";
-    const redirectUrl = "http://localhost:5173/vnpay_return";
-    const ipnUrl = "http://localhost:5173/vnpay_return";
+    const redirectUrl = `http://localhost:5173/vnpay_return/${id}`;
+    const ipnUrl = `http://localhost:5173/vnpay_return/${id}`;
     const requestType = "payWithMethod";
     const orderId = partnerCode + new Date().getTime();
     const requestId = orderId;
@@ -653,12 +651,10 @@ const CreateOrder = async (req, res) => {
       case PAYMENT_METHODS.ZALOPAY:
         try {
           console.log("xx");
-
           const ZaloPayResult = await orderService.processZaloPayPayment(
             totalAmount,
             newOrder._id
           );
-          console.log("PAYMENT_METHODS", ZaloPayResult);
 
           if (ZaloPayResult.EC === 0) {
             // Thanh toán thành công
@@ -681,8 +677,10 @@ const CreateOrder = async (req, res) => {
 
       case PAYMENT_METHODS.VNPAY:
         try {
-          const vnpResult = await orderService.processVNPayPayment(totalAmount);
-          console.log(vnpResult);
+          const vnpResult = await orderService.processVNPayPayment(
+            totalAmount,
+            newOrder._id
+          );
 
           if (vnpResult.EC === 0) {
             await orderService.deductStock(items);
@@ -702,7 +700,10 @@ const CreateOrder = async (req, res) => {
 
       case PAYMENT_METHODS.MOMO:
         try {
-          const momoResult = await orderService.processMoMoPayment(totalAmount);
+          const momoResult = await orderService.processMoMoPayment(
+            totalAmount,
+            newOrder._id
+          );
 
           // Kiểm tra kết quả thanh toán
           if (momoResult?.data?.resultCode === 0) {
@@ -752,6 +753,7 @@ const CreateOrder = async (req, res) => {
         return res.status(200).json({
           paymentMethod: paymentMethod.COD,
           EC: 0,
+          order_id: newOrder._id,
           message:
             "Order created successfully. Payment will be made upon delivery.",
         });
