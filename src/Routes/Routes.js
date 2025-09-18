@@ -1,4 +1,7 @@
 const express = require("express");
+const multer = require("multer");
+// Configure multer with better error handling
+const upload = multer({ dest: "uploads/" });
 const verifyToken = require("../Middlewares/auth");
 const checkPermission = require("../Middlewares/checkPermission");
 const isAdmin = require("../Middlewares/isAdmin");
@@ -109,10 +112,12 @@ const {
   updateBlogController,
   getAllBlogController,
   getDetailSlugController,
+  newUpdateBlogAPI,
 } = require("../Controllers/Blog");
 const {
   handleGeminiRequest,
   generateBlogByGemini,
+  generateTryOn,
 } = require("../Controllers/Gemini");
 const {
   CreateSupplierAPI,
@@ -132,6 +137,8 @@ const { getRevenue } = require("../Controllers/Transaction");
 const {
   createChangeModelAPI,
   getChangeModelAPI,
+  updateChangeModelAPI,
+  DeletehangeModelAPI,
 } = require("../Controllers/Change");
 
 /**
@@ -461,6 +468,7 @@ RouterAPI.post("/create-blog", createBlogController);
 RouterAPI.put("/post-view/:slug", updateBlogController);
 RouterAPI.get("/all-blog", getAllBlogController);
 RouterAPI.get("/blog/:slug", getDetailSlugController);
+RouterAPI.put("/update-blog/:id", newUpdateBlogAPI);
 
 // AI
 RouterAPI.post("/ChatAI", BotChatAPI);
@@ -567,4 +575,15 @@ RouterAPI.get("/revenue/total", getRevenue);
 
 RouterAPI.post("/create/changelog", createChangeModelAPI);
 RouterAPI.get("/changelog", getChangeModelAPI);
+RouterAPI.put("/update-changelog/:id", updateChangeModelAPI);
+RouterAPI.delete("/delete-changelog/:id", DeletehangeModelAPI);
+
+// thu quan ao
+
+RouterAPI.post("/try-on", generateTryOn);
+
+// Multer config
+
+// Route POST /api/try-on
+RouterAPI.post("/try-on", upload.single("human"), generateTryOn);
 module.exports = RouterAPI;
