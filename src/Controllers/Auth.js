@@ -311,8 +311,6 @@ const UpDateProfileUserAPI = async (req, res) => {
 
     // Nếu có avatar mới
     if (avatar) {
-      console.log(avatar);
-
       try {
         const result = await uploadFileToCloudinary(avatar);
         updatedData.avatar = result[0].secure_url;

@@ -1,7 +1,5 @@
 const express = require("express");
-const multer = require("multer");
-// Configure multer with better error handling
-const upload = multer({ dest: "uploads/" });
+
 const verifyToken = require("../Middlewares/auth");
 const checkPermission = require("../Middlewares/checkPermission");
 const isAdmin = require("../Middlewares/isAdmin");
@@ -140,6 +138,11 @@ const {
   updateChangeModelAPI,
   DeletehangeModelAPI,
 } = require("../Controllers/Change");
+const {
+  createSizeGuideModel,
+  getSizeGuideModel,
+  addOneSize,
+} = require("../Controllers/SizeGuide");
 
 /**
  * @swagger
@@ -578,12 +581,9 @@ RouterAPI.get("/changelog", getChangeModelAPI);
 RouterAPI.put("/update-changelog/:id", updateChangeModelAPI);
 RouterAPI.delete("/delete-changelog/:id", DeletehangeModelAPI);
 
-// thu quan ao
+/// bảng size
 
-RouterAPI.post("/try-on", generateTryOn);
-
-// Multer config
-
-// Route POST /api/try-on
-RouterAPI.post("/try-on", upload.single("human"), generateTryOn);
+RouterAPI.post("/create/size", createSizeGuideModel);
+RouterAPI.get("/size/:id", getSizeGuideModel);
+RouterAPI.post("/add-one/size", addOneSize);
 module.exports = RouterAPI;
