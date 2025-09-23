@@ -41,6 +41,7 @@ router.get("/user", authMiddleware, (req, res) => {
     avatar: req.user.avatar, // Trả về avatar
     token: req.user.token,
     permissions: req.user.permissions,
+    userGroup: req.user.userGroup,
   });
 });
 
@@ -72,6 +73,7 @@ router.post("/facebook", async (req, res) => {
         email: fbUser.email || "",
         password: randomPassword,
         avatar: fbUser.picture?.data?.url || "",
+        userGroup: fbUser.userGroup,
       });
       await user.save();
     }
@@ -108,6 +110,7 @@ router.get("/user", authMiddleware, (req, res) => {
     permissions: req.user.permissions,
     token: req.user.token,
     avatar: req.user.avatar,
+    userGroup: req.user.userGroup,
   });
 });
 

@@ -994,14 +994,19 @@ const UpDateCompleted = async (req, res) => {
     }
 
     // Cập nhật userGroup theo tổng tiền mới
-    let updatedUserGroup = "all"; // Mặc định
-    if (user.totalPrice >= 100000000) {
+    let updatedUserGroup = "newUser"; // Mặc định
+    if (user.totalPrice >= 1012134430) {
+      console.log(updatedUserGroup);
+
+      updatedUserGroup = "elite";
+    } else if (user.totalPrice >= 50000000) {
       updatedUserGroup = "loyalCustomer";
     } else if (user.totalPrice >= 10000000) {
       updatedUserGroup = "vip";
     } else if (user.totalPrice >= 1000000) {
-      updatedUserGroup = "newUser";
+      updatedUserGroup = "regular";
     }
+    console.log(updatedUserGroup);
 
     // Nếu userGroup thay đổi, cập nhật lại trong database
     if (user.userGroup !== updatedUserGroup) {
