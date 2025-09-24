@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   GiftFilled,
   MessageOutlined,
@@ -11,14 +11,14 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import { IoNotificationsOutline } from "react-icons/io5";
-import { Avatar, Badge, Button, Drawer } from "antd";
+import { Avatar, Badge, Button, Drawer, Dropdown } from "antd";
 import { FiUsers, FiShoppingBag } from "react-icons/fi";
 import { FaSquarePollVertical } from "react-icons/fa6";
 import { AiTwotoneAppstore } from "react-icons/ai";
 import { RiAdminLine } from "react-icons/ri";
 import { FcFeedback } from "react-icons/fc";
 import { MdDashboard, MdCategory, MdInventory } from "react-icons/md";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   AllReadNotifications,
   DeleteAllNotificationsAPI,
@@ -40,6 +40,7 @@ import { RiCustomerService2Line } from "react-icons/ri";
 import { AiOutlineShop } from "react-icons/ai";
 import { TbRuler2 } from "react-icons/tb";
 import { PiPantsFill } from "react-icons/pi";
+import { logout } from "../../redux/actions/Auth";
 
 const menuItems = [
   {
@@ -162,13 +163,15 @@ const Admin = () => {
   const [showHiden, setShowHiden] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev);
   };
 
   const unreadNotifications = (DataNotifications || []).filter(
     (item) =>
-      item.read === false && item.isCheck === false && item.isAdmin === true
+      item.read === false && item.isCheck === true && item.isAdmin === true
   );
 
   // Đóng sidebar khi click ra ngoài (mobile only)
@@ -292,6 +295,33 @@ const Admin = () => {
       return date.toLocaleDateString("vi-VN");
     }
   }
+  const handleLogOut = async () => {
+    localStorage.removeItem("token");
+    dispatch(logout());
+    navigate("/login");
+  };
+  const items = [
+    {
+      key: "1",
+      label: (
+        <Button className="w-full text-left bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg px-4 py-2 transition-colors duration-200 border-none focus:ring-2 focus:ring-blue-300 focus:outline-none">
+          Profile
+        </Button>
+      ),
+    },
+    {
+      key: "2",
+      label: (
+        <Button
+          className="w-full text-left bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg px-4 py-2 transition-colors duration-200 border-none focus:ring-2 focus:ring-red-300 focus:outline-none"
+          onClick={handleLogOut}
+        >
+          Đăng Xuất
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <div className="flex h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       {/* Overlay cho mobile */}
@@ -317,7 +347,7 @@ const Admin = () => {
                 <MdDashboard className="text-2xl text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold">DOIIN</h1>
+                <h1 className="text-2xl font-bold">DUY ANH SHOP</h1>
                 <p className="text-blue-100 text-sm">Admin Dashboard</p>
               </div>
             </Link>
@@ -390,7 +420,7 @@ const Admin = () => {
             {/* Right Side */}
             <div className="flex items-center gap-4">
               {/* Notifications */}
-              <Badge count={5} size="small">
+              <Badge count={unreadNotifications?.length} size="small">
                 <button className="flex items-center justify-center w-10 h-10 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
                   <BellOutlined
                     className="text-gray-600 text-lg"
@@ -405,15 +435,20 @@ const Admin = () => {
               <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
                 <div className="hidden sm:block text-right">
                   <p className="text-sm font-medium text-gray-700">
-                    Admin User
+                    {user?.name}
                   </p>
-                  <p className="text-xs text-gray-500">Quản trị viên</p>
+                  <p className="text-xs text-gray-500">
+                    {user?.role === "admin" ? "Quản trị viên" : "Nhân viên"}
+                  </p>
                 </div>
-                <Avatar
-                  size={40}
-                  icon={<UserOutlined />}
-                  className="border-2 border-blue-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                />
+
+                <Dropdown menu={{ items }} placement="bottom">
+                  <Avatar
+                    size={40}
+                    icon={<UserOutlined />}
+                    className="border-2 border-blue-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                  />
+                </Dropdown>
               </div>
             </div>
           </div>

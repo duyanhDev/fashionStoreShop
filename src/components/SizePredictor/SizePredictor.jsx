@@ -31,7 +31,7 @@ const SizePredictor = ({ open, onClose, productId, shift }) => {
     setResult(null);
 
     try {
-      const res = await fetch("http://127.0.0.1:8080/predict", {
+      const res = await fetch("http://127.0.0.1:8000/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -61,7 +61,7 @@ const SizePredictor = ({ open, onClose, productId, shift }) => {
 
     try {
       const res = await fetch(
-        `http://127.0.0.1:8080/feedback/${prediction_id}`,
+        `http://127.0.0.1:8000/feedback/${prediction_id}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
