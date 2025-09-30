@@ -76,6 +76,8 @@ const Home = () => {
   const [form] = Form.useForm();
   const [error, setError] = useState("");
   const [blogPosts, SetBlogPosts] = useState([]);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [slidesToShow, setSlidesToShow] = useState(1);
 
   const services = [
     {
@@ -270,9 +272,6 @@ const Home = () => {
       console.log(error);
     }
   };
-
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [slidesToShow, setSlidesToShow] = useState(1);
 
   useEffect(() => {
     const updateSlidesToShow = () => {
@@ -1001,7 +1000,7 @@ const Home = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {blogPosts.slice(0, 3).map((post, index) => (
+              {blogPosts?.slice(0, 3).map((post, index) => (
                 <article
                   key={`${post._id}-${index}`}
                   className="cursor-pointer group bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 overflow-hidden border border-gray-100"
