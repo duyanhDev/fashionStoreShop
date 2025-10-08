@@ -200,7 +200,6 @@ const BlogManager = () => {
           title: formData.title,
           tip: formData.tip,
           content: formData.content,
-          slug: formData.slug,
           regex: formData.regex,
           userId: formData.userId,
           readTime: formData.readTime,
