@@ -19,7 +19,7 @@ const SEPAY_CONFIG = {
   accountNumber: "96247609",
   accountName: "DANG TRINH DUY ANH",
   bankCode: "BIDV",
-  webhookSecret: " https://870530fd17c2.ngrok-free.app/v1/sepay/callback",
+  webhookSecret: "https://fa492e0aa700.ngrok-free.app/sepay/callback",
 };
 
 const config = {
@@ -111,7 +111,7 @@ class OrderService {
       discountAmount = Math.min(discountAmount, item.price);
 
       const basePrice = item.price - discountAmount;
-      const finalPrice = basePrice > 300000 ? basePrice + 35000 : basePrice;
+      const finalPrice = basePrice > 300000 ? basePrice : basePrice + 35000;
 
       totalAmount += finalPrice;
 
@@ -216,7 +216,6 @@ class OrderService {
 
     try {
       const info = await this.emailTransporter.sendMail(mailOptions);
-      console.log("Email sent: " + info.response);
     } catch (error) {
       console.error("Error sending email:", error);
     }
@@ -351,8 +350,6 @@ class OrderService {
 
     const result = await axios.post(config.endpoint, zaloOrder);
 
-    console.log(result);
-
     if (result.data.return_code !== 1) {
       throw new Error(
         `${result.data.return_message}: ${result.data.sub_return_message}`
@@ -469,9 +466,6 @@ class OrderService {
 
   async processSePayPayment(totalAmount, orderId) {
     try {
-      console.log(
-        `Creating payment QR for Order ${orderId}, Amount: ${totalAmount}`
-      );
       const transferContent = `ORDER${orderId}`; // Thay vì ORDER_${orderId}
 
       // ✅ TẠO QR CODE SỬ DỤNG VIETQR (KHÔNG CẦN API SEPAY)
@@ -489,8 +483,7 @@ class OrderService {
         `bank=${encodeURIComponent(SEPAY_CONFIG.bankCode)}&` +
         `amount=${encodeURIComponent(totalAmount)}&` +
         `des=${encodeURIComponent(transferContent)}`;
-
-      console.log("✅ QR URL generated:", qrUrl);
+      console.log(sePayQrUrl);
 
       return {
         EC: 0,
@@ -1002,8 +995,6 @@ const UpDateCompleted = async (req, res) => {
     // Cập nhật userGroup theo tổng tiền mới
     let updatedUserGroup = "newUser"; // Mặc định
     if (user.totalPrice >= 1012134430) {
-      console.log(updatedUserGroup);
-
       updatedUserGroup = "elite";
     } else if (user.totalPrice >= 50000000) {
       updatedUserGroup = "loyalCustomer";
@@ -1012,7 +1003,6 @@ const UpDateCompleted = async (req, res) => {
     } else if (user.totalPrice >= 1000000) {
       updatedUserGroup = "regular";
     }
-    console.log(updatedUserGroup);
 
     // Nếu userGroup thay đổi, cập nhật lại trong database
     if (user.userGroup !== updatedUserGroup) {
