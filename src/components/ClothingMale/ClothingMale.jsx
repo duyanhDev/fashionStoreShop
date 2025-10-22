@@ -973,8 +973,6 @@ const ClothingMale = () => {
                     return item.color === color;
                   });
 
-                  console.log(filiterColor);
-
                   return (
                     <div
                       key={product._id}
