@@ -182,6 +182,7 @@ class OrderService {
       PAYMENT_METHODS.VNPAY,
       PAYMENT_METHODS.MOMO,
       PAYMENT_METHODS.ZALOPAY,
+      PAYMENT_METHODS.SEPAY,
     ].includes(paymentMethod);
 
     emailContent += `
@@ -222,6 +223,8 @@ class OrderService {
   }
 
   async updateCartItems(CartId, idItems) {
+    console.log(CartId, idItems);
+
     if (!CartId || !idItems?.length) return;
 
     const cartItem = await Cart.findOne({ _id: CartId });
@@ -753,6 +756,8 @@ const CreateOrder = async (req, res) => {
 
       case PAYMENT_METHODS.COD:
         // COD trừ stock ngay lập tức
+        console.log(items);
+
         await orderService.deductStock(items);
         newOrder.paymentStatus = PAYMENT_STATUS.PENDING;
         await orderService.updateCartItems(CartId, idItems);
