@@ -297,7 +297,7 @@ const Transactions = () => {
     navigate(`/admin/transactions/${id}`);
   };
 
-  const handleRefund = async (transactionId) => {
+  const handleRefund = async () => {
     try {
       // Simulate API call for refund
       message.success("Đã khởi tạo quy trình hoàn tiền");
