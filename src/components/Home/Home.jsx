@@ -583,7 +583,7 @@ const Home = () => {
                         {isOutOfStock && (
                           <div className="absolute inset-0 bg-black/70 flex items-center justify-center backdrop-blur-sm z-10">
                             <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 sm:px-4 lg:px-6 py-1.5 sm:py-2 lg:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transform -rotate-12 shadow-xl border-2 border-white/30">
-                              HẾT HÀNG
+                              SOLD OUT
                             </div>
                           </div>
                         )}
