@@ -94,8 +94,6 @@ const addToCart = async (req, res) => {
 const addMultipleToCart = async (req, res) => {
   const { userId, items } = req.body;
 
-  console.log(items);
-
   try {
     if (!userId || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ message: "Missing userId or items" });
