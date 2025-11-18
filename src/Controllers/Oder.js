@@ -13,6 +13,14 @@ const nodemailer = require("nodemailer");
 const axios = require("axios");
 const Transaction = require("../Model/transactionSchema");
 
+const transporter = nodemailer.createTransport({
+  service: "Gmail",
+  auth: {
+    user: "dangtrinhduyanh100202@gmail.com",
+    pass: "qfmc zizc ppdg ldjg",
+  },
+});
+
 const SEPAY_CONFIG = {
   storeSubdomain: "dtda", // Subdomain cửa hàng bạn trên SePay
   apiToken: "QEDOVHB13DODXJPLEWBW2TZ38CVXY5CKANS2AMKHIGSTKUX7SOYIPZHJRFSNJYIB", // Lấy từ dashboard SePay

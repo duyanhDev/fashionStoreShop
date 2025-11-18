@@ -94,6 +94,8 @@ const addToCart = async (req, res) => {
 const addMultipleToCart = async (req, res) => {
   const { userId, items } = req.body;
 
+  console.log(items);
+
   try {
     if (!userId || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ message: "Missing userId or items" });
@@ -106,7 +108,12 @@ const addMultipleToCart = async (req, res) => {
 
     await Promise.all(
       items.map(async (item) => {
-        const productId = item.productId?._id || item.productId || item._id;
+        const productId =
+          item.product?._id ||
+          item.productId?._id ||
+          item.productId ||
+          item._id;
+
         const product = await Product.findById(productId);
         if (!product) return;
 
