@@ -420,6 +420,8 @@ const Header = ({ user, ListCart, CartListProductsUser, setListCard }) => {
     setOpenSearch(false);
     const keyword = keywordSearch.trim();
 
+    console.log(keyword);
+
     if (!keyword) {
       message.error("Vui lòng nhập từ khóa tìm kiếm!");
       return;
@@ -431,7 +433,6 @@ const Header = ({ user, ListCart, CartListProductsUser, setListCard }) => {
     navigate(`search?q=${keyword}`);
     dispatch(SearchAction(data, totalPage));
     setSearchVisible(false);
-    setKeywordSearch("");
   };
 
   const unreadNotifications = (DataNotifications || []).filter(

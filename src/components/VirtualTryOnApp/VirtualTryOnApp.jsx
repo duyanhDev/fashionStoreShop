@@ -216,7 +216,7 @@ const VirtualTryOnApp = ({
       title={
         <div className="text-center">
           <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-            Fitroom Virtual Try-On
+            Thử Đồ Ảo Với FitRoom
           </span>
         </div>
       }
@@ -242,8 +242,6 @@ const VirtualTryOnApp = ({
                 {[
                   { value: "upper", label: "Áo", icon: "👕" },
                   { value: "lower", label: "Quần", icon: "👖" },
-                  { value: "full_set", label: "Toàn thân", icon: "👗" },
-                  { value: "combo", label: "Combo", icon: "👔" },
                 ].map((type, index) => (
                   <button
                     key={type.index + 1}

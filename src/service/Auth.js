@@ -242,8 +242,6 @@ const RegisterUserAPI_Alternative = async (
   permissions,
   avatarUrl
 ) => {
-  console.log(name, email, password, role, permissions, avatarUrl);
-
   try {
     const token = localStorage.getItem("token");
     return await axios.post(
