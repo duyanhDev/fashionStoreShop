@@ -42,114 +42,138 @@ import { TbRuler2 } from "react-icons/tb";
 import { PiPantsFill } from "react-icons/pi";
 import { logout } from "../../redux/actions/Auth";
 
+// Định nghĩa tất cả menu items với permissions
 const menuItems = [
   {
     icon: <MdDashboard className="text-xl" />,
     label: "Tổng quan",
     to: "",
     color: "text-blue-500",
+    allowedRoles: ["admin"],
   },
   {
     icon: <MdAttachMoney className="text-xl" />,
     label: "Quản lí doanh thu",
     to: "/admin/revenue",
     color: "text-green-600",
+    allowedRoles: ["admin"],
   },
   {
     icon: <FiUsers className="text-xl" />,
     label: "Khách hàng",
     to: "/admin/usercustom",
     color: "text-blue-600",
+    allowedRoles: ["admin"],
   },
   {
     icon: <RiAdminLine className="text-xl" />,
     label: "Quản trị viên",
     to: "/admin/account",
     color: "text-purple-500",
+    allowedRoles: ["admin"],
   },
   {
     icon: <RiCustomerService2Line className="text-xl" />,
     label: "Hỗ trợ tài khoản",
     to: "/admin/adminAccountManagement",
     color: "text-indigo-500",
+    allowedRoles: ["admin"],
   },
   {
     icon: <MdInventory className="text-xl" />,
     label: "Quản lí sản phẩm",
     to: "/admin/products",
     color: "text-orange-500",
+    allowedRoles: ["admin"],
   },
   {
     icon: <MdCategory className="text-xl" />,
     label: "Quản lí danh mục",
     to: "category",
     color: "text-pink-500",
+    allowedRoles: ["admin"],
   },
   {
     icon: <MdAssessment className="text-xl" />,
     label: "Quản lí báo cáo",
-    to: "/reports",
+    to: "du-doan",
     color: "text-red-500",
+    allowedRoles: ["admin"],
   },
   {
     icon: <FiShoppingBag className="text-xl" />,
     label: "Quản lí Đơn hàng",
     to: "order",
     color: "text-teal-500",
+    allowedRoles: ["admin"],
+    allowedPermissions: ["order_approval"],
   },
   {
     icon: <AiOutlineShop className="text-xl" />,
     label: "Quản lí nhà cung cấp",
     to: "/admin/manage-store",
     color: "text-cyan-500",
+    allowedRoles: ["admin"],
   },
   {
     icon: <FiMessageCircle className="text-xl" />,
     label: "Hỗ trợ",
     to: "/admin/support-chat",
     color: "text-blue-400",
+    allowedRoles: ["admin"],
+    allowedPermissions: ["customer_support"],
   },
   {
     icon: <MdCardGiftcard className="text-xl" />,
     label: "Quản lí khuyến mãi",
     to: "/admin/voucher",
     color: "text-yellow-500",
+    allowedRoles: ["admin"],
+    allowedPermissions: ["customer_support"],
   },
   {
     icon: <FiImage className="text-xl" />,
     label: "Quản lý Banner",
     to: "/admin/banner",
     color: "text-purple-400",
+    allowedRoles: ["admin"],
+    allowedPermissions: ["customer_support"],
   },
   {
     icon: <MdRateReview className="text-xl" />,
     label: "Quản lí Đánh giá",
     to: "/admin/review",
     color: "text-amber-500",
+    allowedRoles: ["admin"],
+    allowedPermissions: ["customer_support"],
   },
   {
     icon: <MdHistory className="text-xl" />,
     label: "Quản lí nhật kí",
     to: "/admin/changle-log",
     color: "text-slate-500",
+    allowedRoles: ["admin"],
   },
   {
     icon: <MdArticle className="text-xl" />,
     label: "Quản lí bài viết",
     to: "/admin/quan-li-blog",
     color: "text-emerald-500",
+    allowedRoles: ["admin"],
   },
   {
     icon: <TbRuler2 className="text-xl" />,
     label: "Quản lí bảng size áo",
     to: "/admin/quan-li-bang-size-ao",
     color: "text-rose-500",
+    allowedRoles: ["admin"],
   },
   {
     icon: <PiPantsFill className="text-xl" />,
     label: "Quản lí bảng size quần",
     to: "/admin/quan-li-bang-size-quan",
     color: "text-violet-500",
+    allowedRoles: ["admin"],
   },
 ];
 
@@ -165,6 +189,35 @@ const Admin = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // Hàm kiểm tra quyền truy cập menu
+  const hasAccess = (menuItem) => {
+    // Admin có quyền truy cập tất cả
+    if (user?.role === "admin") {
+      return true;
+    }
+
+    // Staff kiểm tra permissions
+    if (user?.role === "staff") {
+      // Nếu menu item có allowedPermissions, kiểm tra xem user có permission đó không
+      if (
+        menuItem.allowedPermissions &&
+        menuItem.allowedPermissions.length > 0
+      ) {
+        return menuItem.allowedPermissions.includes(user?.permissions);
+      }
+      // Nếu không có allowedPermissions nhưng có allowedRoles
+      if (menuItem.allowedRoles && !menuItem.allowedPermissions) {
+        return false; // Staff không được truy cập các menu chỉ dành cho admin
+      }
+    }
+
+    return false;
+  };
+
+  // Lọc menu items dựa trên quyền
+  const filteredMenuItems = menuItems.filter(hasAccess);
+
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev);
   };
@@ -198,6 +251,7 @@ const Admin = () => {
       location.pathname === itemTo || location.pathname === `/admin/${itemTo}`
     );
   };
+
   const FetchDataNocatifionsAPI = async () => {
     try {
       let res = await FetcDataNocatifions(user._id);
@@ -208,6 +262,7 @@ const Admin = () => {
       console.error("Error fetching notifications:", error);
     }
   };
+
   useEffect(() => {
     if (user?._id) {
       FetchDataNocatifionsAPI();
@@ -264,6 +319,7 @@ const Admin = () => {
       console.error("Error updating notification:", error);
     }
   };
+
   const handleShowNocations = () => {
     setShowHiden(true);
     setLoading(true);
@@ -295,11 +351,13 @@ const Admin = () => {
       return date.toLocaleDateString("vi-VN");
     }
   }
+
   const handleLogOut = async () => {
     localStorage.removeItem("token");
     dispatch(logout());
     navigate("/login");
   };
+
   const items = [
     {
       key: "1",
@@ -363,10 +421,10 @@ const Admin = () => {
         </div>
 
         {/* Menu Items */}
-        <div className="overflow-y-auto h-full pb-20 ">
+        <div className="overflow-y-auto h-full pb-20">
           <nav className="p-4">
             <ul className="space-y-2">
-              {menuItems.map((item, index) => {
+              {filteredMenuItems.map((item, index) => {
                 const isActive = isActiveRoute(item.to);
                 return (
                   <li key={item.label}>
@@ -396,9 +454,6 @@ const Admin = () => {
             </ul>
           </nav>
         </div>
-
-        {/* Bottom Gradient */}
-        {/* <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white via-white/90 to-transparent pointer-events-none" /> */}
       </aside>
 
       {/* Main Content */}
@@ -438,7 +493,13 @@ const Admin = () => {
                     {user?.name}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {user?.role === "admin" ? "Quản trị viên" : "Nhân viên"}
+                    {user?.role === "admin"
+                      ? "Quản trị viên"
+                      : user?.permissions === "order_approval"
+                      ? "Nhân viên đơn hàng"
+                      : user?.permissions === "customer_support"
+                      ? "Nhân viên hỗ trợ"
+                      : "Nhân viên"}
                   </p>
                 </div>
 

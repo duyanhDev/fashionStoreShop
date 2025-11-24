@@ -92,8 +92,6 @@ const FavoritesList = () => {
     try {
       const res = await addMultipleToCart(user._id, inStockItems);
 
-      console.log(res);
-
       if (res && res.data) {
         alert(`Đã thêm ${inStockItems.length} sản phẩm vào giỏ hàng!`);
         CartListProductsUser();
