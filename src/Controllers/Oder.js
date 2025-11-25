@@ -413,6 +413,8 @@ class OrderService {
 
     const vnpUrl = `${vnp_Url}?${qs.stringify(vnp_Params, { encode: false })}`;
 
+    console.log("vnpUrl", vnpUrl);
+
     return {
       EC: 0,
       message: "Order created successfully. Redirecting to VNPay.",
