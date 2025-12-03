@@ -191,8 +191,6 @@ const Banner = () => {
   };
 
   const handleStatusToggle = async (banner, checked) => {
-    console.log(banner);
-
     try {
       // Replace with actual API call to update status
 
