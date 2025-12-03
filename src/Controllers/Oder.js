@@ -27,7 +27,7 @@ const SEPAY_CONFIG = {
   accountNumber: "96247609",
   accountName: "DANG TRINH DUY ANH",
   bankCode: "BIDV",
-  webhookSecret: "https://26fa1da38e57.ngrok-free.app/sepay/callback",
+  webhookSecret: "https://0073da05d7f9.ngrok-free.app/sepay/callback",
 };
 
 const config = {
