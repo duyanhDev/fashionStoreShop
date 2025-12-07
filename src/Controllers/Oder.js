@@ -1009,7 +1009,7 @@ const UpDateCompleted = async (req, res) => {
 
     // Cập nhật userGroup theo tổng tiền mới
     let updatedUserGroup = "newUser"; // Mặc định
-    if (user.totalPrice >= 1012134430) {
+    if (user.totalPrice >= 10000000) {
       updatedUserGroup = "elite";
     } else if (user.totalPrice >= 50000000) {
       updatedUserGroup = "loyalCustomer";

@@ -51,13 +51,13 @@ const UserSchema = new mongoose.Schema(
 UserSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
-  if (this.totalPrice >= 1000000000) {
+  if (this.totalPrice >= 10000000) {
     this.userGroup = "elite";
-  } else if (this.totalPrice >= 50000000) {
+  } else if (this.totalPrice >= 5000000) {
     this.userGroup = "loyalCustomer";
-  } else if (this.totalPrice >= 10000000) {
-    this.userGroup = "vip";
   } else if (this.totalPrice >= 1000000) {
+    this.userGroup = "vip";
+  } else if (this.totalPrice >= 100000) {
     this.userGroup = "regular";
   } else {
     this.userGroup = "newUser";
